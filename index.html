@@ -1,0 +1,124 @@
+<!--
+
+To run this demo, you need to replace 'YOUR_ACCESS_TOKEN' with an access token from ArcGIS that has the correct privileges.
+
+To get started, sign up for a free ArcGIS Location Platform account or a free trial of ArcGIS Online and create developer credentials.
+
+https://developers.arcgis.com/documentation/security-and-authentication/get-started/
+
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Directions widget | Sample | ArcGIS Maps SDK for JavaScript 4.31
+    </title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.31/"></script>
+
+    <script>
+      fetch("./config.json").then(response => response.json()).then(config => {
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/widgets/Directions",
+        "esri/layers/RouteLayer"
+      ], function (Map, MapView, Directions, RouteLayer) {
+        // SunoAPI running locally => https://github.com/gcui-art/suno-api
+        const sunoApiBaseUrl = "http://localhost:3000";
+
+        // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
+        customGenerateAudio = async (payload) => {
+          const url = `${sunoApiBaseUrl}/api/custom_generate`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+            cache: "default",
+          });
+          // Parse response body as JSON
+          return await response.json();
+        };
+
+        const sunoGenerate = async (directionsText, title) => {
+          const data = await customGenerateAudio({
+            tags: "classic prog rock",
+            title: title.substring(0, 80),
+            prompt: directionsText,
+            make_instrumental: false,
+            wait_audio: true,
+          });
+          console.log("customGenerateAudio data", data);
+        };
+
+        // An ArcGIS authorization string used to access the basemap, geocoding and routing services
+        const apiKey = config.apiKey;
+
+        // create a new RouteLayer, required for Directions widget
+        const routeLayer = new RouteLayer();
+
+        // new RouteLayer must be added to the map
+        const map = new Map({
+          basemap: "topo-vector",
+          layers: [routeLayer],
+        });
+
+        const view = new MapView({
+          zoom: 14,
+          center: [-118.24, 34.05],
+          container: "viewDiv",
+          map: map,
+        });
+
+        // new RouteLayer must be added to Directions widget
+        let directionsWidget = new Directions({
+          layer: routeLayer,
+          apiKey,
+          view,
+        });
+
+        directionsWidget.watch("lastRoute", (lastRoute) => {
+          console.log("lastRoute", lastRoute);
+          const directionsText = lastRoute.directionPoints.items
+            .map((item) => item.voiceInstruction)
+            .join("\n");
+          console.log("directionsText", directionsText);
+          const generatedSongs = sunoGenerate(directionsText, lastRoute.routeInfo.name);
+        });
+
+        // Add the Directions widget to the top right corner of the view
+        view.ui.add(directionsWidget, {
+          position: "top-right",
+        });
+      });
+    });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
