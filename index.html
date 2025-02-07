@@ -28,6 +28,14 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         height: 100%;
         width: 100%;
       }
+      #parametersDiv {
+        padding: 12px;
+        width: 300px;
+      }
+      #sunoDiv {
+        padding: 12px;
+        width: 300px;
+      }
     </style>
 
     <link
@@ -46,6 +54,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       ], function (Map, MapView, Directions, RouteLayer) {
         // SunoAPI running locally => https://github.com/gcui-art/suno-api
         const sunoApiBaseUrl = "http://localhost:3000";
+        let songLyrics = "";
+        let songTitle = "";
 
         // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
         customGenerateAudio = async (payload) => {
@@ -64,14 +74,14 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         };
 
         const sunoGenerate = async (directionsText, title) => {
-          const data = await customGenerateAudio({
-            tags: "classic prog rock",
+          const musicalStyle = document.getElementById("musicalStyle").value;
+          return await customGenerateAudio({
+            tags: musicalStyle.substring(0, 200),
             title: title.substring(0, 80),
-            prompt: directionsText,
+            prompt: directionsText.substring(0, 3000),
             make_instrumental: false,
             wait_audio: true,
           });
-          console.log("customGenerateAudio data", data);
         };
 
         // An ArcGIS authorization string used to access the basemap, geocoding and routing services
@@ -102,17 +112,27 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
         directionsWidget.watch("lastRoute", (lastRoute) => {
           console.log("lastRoute", lastRoute);
-          const directionsText = lastRoute.directionPoints.items
+          songLyrics = lastRoute.directionPoints.items
             .map((item) => item.voiceInstruction)
             .join("\n");
-          console.log("directionsText", directionsText);
-          const generatedSongs = sunoGenerate(directionsText, lastRoute.routeInfo.name);
+          songTitle = lastRoute.routeInfo.name;
+          console.log("directionsText", songLyrics.substring(0, 3000));
         });
 
-        // Add the Directions widget to the top right corner of the view
+        view.ui.add("parametersDiv", "top-right");
         view.ui.add(directionsWidget, {
           position: "top-right",
         });
+        view.ui.add("sunoDiv", "top-right");
+
+        // add divs
+        const generateButton = document.getElementById("generateButton");
+        const sunoDiv = document.getElementById("sunoDiv");
+        generateButton.onclick = async () => {
+          const generatedSongs = await sunoGenerate(songLyrics, songTitle);
+          console.log("customGenerateAudio data", generatedSongs);
+          sunoDiv.innerHTML += JSON.stringify(generatedSongs);
+        }
       });
     });
     </script>
@@ -120,5 +140,11 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
   <body>
     <div id="viewDiv"></div>
+    <div id="parametersDiv" class="esri-widget">
+      Musical style: <input type="text" id="musicalStyle" placeholder="Musical style" />
+    </div>
+    <div id="sunoDiv" class="esri-widget">
+      <button id="generateButton">Generate song</button>
+    </div>
   </body>
 </html>
