@@ -1,0 +1,18 @@
+@startuml
+!theme plain
+
+' Basic activity diagram for Directions2Music
+start
+ :Start application;
+ :Receive directions input;
+ :Parse route steps;
+ if (Has musical mapping?) then (yes)
+	 :Generate musical phrases;
+	 :Map phrases to route steps;
+ else (no)
+	 :Use default tones;
+ endif
+ :Play music for directions;
+ stop
+
+@enduml
