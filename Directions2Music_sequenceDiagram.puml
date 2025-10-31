@@ -4,13 +4,24 @@
 ' Sequence diagram mapping the flow you described
 ' Actors: User, MapClient, DirectionsComponent, EsriRoutingService, LLM, MusicGenAI, MCP
 
-actor User
-participant "Map Client\n(local)" as MapClient
-participant "Directions\n(component)" as DirectionsComponent
-participant "Esri Routing\nService (cloud)" as EsriRoutingService
-participant LLM
-participant "Music GenAI\n(e.g. Suno)" as MusicGenAI
-participant MCP
+'' Participant colors
+skinparam participant {
+  BackgroundColor<<User>> LightGoldenRodYellow
+  BackgroundColor<<MapClient>> #FFF2CC
+  BackgroundColor<<DirectionsComponent>> #E6F2FF
+  BackgroundColor<<EsriRoutingService>> #F2E6FF
+  BackgroundColor<<LLM>> #E8F8E8
+  BackgroundColor<<MusicGenAI>> #FFE6E6
+  BackgroundColor<<MCP>> #FFF0D9
+}
+
+actor User <<User>>
+participant "Map Client\n(local)" as MapClient <<MapClient>>
+participant "Directions\n(component)" as DirectionsComponent <<DirectionsComponent>>
+participant "Esri Routing\nService (cloud)" as EsriRoutingService <<EsriRoutingService>>
+participant LLM <<LLM>>
+participant "Music GenAI\n(e.g. Suno)" as MusicGenAI <<MusicGenAI>>
+participant MCP <<MCP>>
 
 == Authentication / Startup ==
 User -> MapClient: Open Map Client (local)
@@ -20,7 +31,7 @@ note right of MapClient #yellow
  API key if routing supports it.
 end note
 MapClient -> MapClient: Ensure ArcGIS token/API key present
-alt no token
+alt #FFF2CC no token
  MapClient -> User: Prompt for OAuth2 login
  User -> MapClient: Complete OAuth2 login (token returned)
 end
@@ -28,7 +39,9 @@ end
 == Request directions ==
 User -> MapClient: Use Directions component to request route
 MapClient -> DirectionsComponent: createRoute(params)
-note over DirectionsComponent: Uses ArcGIS Directions component API
+note over DirectionsComponent #E6F2FF
+ Uses ArcGIS Directions component API
+end note
 DirectionsComponent -> EsriRoutingService: Request route (token/API-key)
 EsriRoutingService --> DirectionsComponent: JSON route result
 note right of DirectionsComponent #yellow
