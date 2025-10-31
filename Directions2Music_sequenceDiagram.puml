@@ -14,7 +14,7 @@ participant MCP
 
 == Authentication / Startup ==
 User -> MapClient: Open Map Client (local)
-note right of MapClient
+note right of MapClient #yellow
  Map Client must have ArcGIS access credentials to call
  cloud routing: either an OAuth2 token (via login) or an
  API key if routing supports it.
@@ -31,7 +31,7 @@ MapClient -> DirectionsComponent: createRoute(params)
 note over DirectionsComponent: Uses ArcGIS Directions component API
 DirectionsComponent -> EsriRoutingService: Request route (token/API-key)
 EsriRoutingService --> DirectionsComponent: JSON route result
-note right of DirectionsComponent
+note right of DirectionsComponent #yellow
  JSON contains: array of routing directions, each with
  - humanReadableText
  - compressedGeometry
@@ -42,7 +42,7 @@ end note
 DirectionsComponent -> MapClient: Return route JSON
 MapClient -> MapClient: Extract human-readable directions
 MapClient -> LLM: Send human-readable directions + location context
-note right of LLM
+note right of LLM #lightblue
  Prompt: Analyze text & location to choose a musical style
  Examples (notes):
  - US heartland -> Country
@@ -62,9 +62,10 @@ MusicGenAI --> LLM: Song artifact (audio file / stream URL, metadata)
 
 == Final instructions and playback ==
 LLM -> MapClient: Instruct MapClient via MCP to:\n- visualize route (use compressedGeometry)\n- display human-readable directions\n- play generated song
-note left of MCP
- MCP = local custom message protocol between LLM and MapClient
- e.g., LLM issues a command bundle describing visualization + play
+note left of MCP #yellow
+ MCP = Model Context Protocol (local server or Docker container)
+ Runs as a local service that lets the LLM instruct the Music GenAI
+ and the local MapClient with structured commands and payloads.
 end note
 LLM -> MCP: Send visualization + playback instructions
 MCP -> MapClient: Command: visualize route & play song
