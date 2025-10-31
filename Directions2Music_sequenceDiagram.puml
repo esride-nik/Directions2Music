@@ -1,0 +1,77 @@
+@startuml
+!theme plain
+
+' Sequence diagram mapping the flow you described
+' Actors: User, MapClient, DirectionsComponent, EsriRoutingService, LLM, MusicGenAI, MCP
+
+actor User
+participant "Map Client\n(local)" as MapClient
+participant "Directions\n(component)" as DirectionsComponent
+participant "Esri Routing\nService (cloud)" as EsriRoutingService
+participant LLM
+participant "Music GenAI\n(e.g. Suno)" as MusicGenAI
+participant MCP
+
+== Authentication / Startup ==
+User -> MapClient: Open Map Client (local)
+note right of MapClient
+ Map Client must have ArcGIS access credentials to call
+ cloud routing: either an OAuth2 token (via login) or an
+ API key if routing supports it.
+end note
+MapClient -> MapClient: Ensure ArcGIS token/API key present
+alt no token
+ MapClient -> User: Prompt for OAuth2 login
+ User -> MapClient: Complete OAuth2 login (token returned)
+end
+
+== Request directions ==
+User -> MapClient: Use Directions component to request route
+MapClient -> DirectionsComponent: createRoute(params)
+note over DirectionsComponent: Uses ArcGIS Directions component API
+DirectionsComponent -> EsriRoutingService: Request route (token/API-key)
+EsriRoutingService --> DirectionsComponent: JSON route result
+note right of DirectionsComponent
+ JSON contains: array of routing directions, each with
+ - humanReadableText
+ - compressedGeometry
+ - summarized route data (distance, time, attributes)
+end note
+
+== Map client handles result ==
+DirectionsComponent -> MapClient: Return route JSON
+MapClient -> MapClient: Extract human-readable directions
+MapClient -> LLM: Send human-readable directions + location context
+note right of LLM
+ Prompt: Analyze text & location to choose a musical style
+ Examples (notes):
+ - US heartland -> Country
+ - Los Angeles -> West Coast Rap
+ - India -> Bollywood
+ - Brazil -> Samba
+ - Bavaria -> Alpen-Schlager
+ - Rheinland -> Kölsche Karnevalsmusik
+end note
+
+LLM --> MapClient: Style + tonality suggestion
+
+== Generate song ==
+MapClient -> LLM: Instruct to prompt Music GenAI with:\n- chosen style/tonality\n- exact, unchanged human-readable directions (as lyrics)
+LLM -> MusicGenAI: Prompt to generate song (lyrics = directions)
+MusicGenAI --> LLM: Song artifact (audio file / stream URL, metadata)
+
+== Final instructions and playback ==
+LLM -> MapClient: Instruct MapClient via MCP to:\n- visualize route (use compressedGeometry)\n- display human-readable directions\n- play generated song
+note left of MCP
+ MCP = local custom message protocol between LLM and MapClient
+ e.g., LLM issues a command bundle describing visualization + play
+end note
+LLM -> MCP: Send visualization + playback instructions
+MCP -> MapClient: Command: visualize route & play song
+MapClient -> MapClient: Render route and directions
+MapClient -> MapClient: Play song (from Music GenAI URL)
+
+== End ==
+User <-- MapClient: Route displayed + music playing
+
+@enduml
