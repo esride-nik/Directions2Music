@@ -8,21 +8,33 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
 -->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
-    <title>Directions component with RouteLayer | Sample | ArcGIS Maps SDK for JavaScript</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Directions component with RouteLayer | Sample | ArcGIS Maps SDK for
+      JavaScript
+    </title>
 
     <!-- Load Calcite components from CDN -->
-    <script type="module" src="https://js.arcgis.com/calcite-components/3.3.3/calcite.esm.js"></script>
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/3.3.3/calcite.esm.js"
+    ></script>
 
     <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
     <script src="https://js.arcgis.com/4.34/"></script>
 
     <!-- Load Map components from CDN-->
-    <script type="module" src="https://js.arcgis.com/4.34/map-components/"></script>
+    <script
+      type="module"
+      src="https://js.arcgis.com/4.34/map-components/"
+    ></script>
 
     <style>
       html,
@@ -39,7 +51,9 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
     </arcgis-map>
     <script type="module">
       // import RouteLayer module to load a RouteLayer from a portal item
-      const RouteLayer = await $arcgis.import("@arcgis/core/layers/RouteLayer.js");
+      const RouteLayer = await $arcgis.import(
+        "@arcgis/core/layers/RouteLayer.js"
+      );
       // import esriConfig to set the API key
       const esriConfig = await $arcgis.import("@arcgis/core/config.js");
 
@@ -50,23 +64,25 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // load application config (config.json) — same-origin fetch
       // Using top-level await in this module script ensures config is
       // available before we configure esriConfig.
-      const configResp = await fetch(new URL('./config.json', import.meta.url));
+      const configResp = await fetch(new URL("./config.json", import.meta.url));
       if (!configResp.ok) {
-        console.warn('Failed to load config.json, falling back to placeholder token');
+        console.warn(
+          "Failed to load config.json, falling back to placeholder token"
+        );
       }
       const appConfig = configResp.ok ? await configResp.json() : {};
 
       // define the API key and define their scopes (only for directions component)
       // config.json can provide either `apiKey` or `token` fields.
-      const token = appConfig.apiKey || appConfig.token || '%YOUR_ACCESS_TOKEN%';
+      const token = appConfig.apiKey || appConfig.token || "%YOUR_ACCESS_TOKEN%";
       esriConfig.apiKeys.scopes = [
         {
           token: token,
           urls: [
-            'https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer',
-            'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World'
-          ]
-        }
+            "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer",
+            "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World",
+          ],
+        },
       ];
 
       // create a RouteLayer from a portal item
@@ -81,6 +97,23 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // and load the RouteLayer
       await viewElement.viewOnReady();
       await directionsElement.componentOnReady();
+
+      directionsElement.addEventListener("arcgisPropertyChange", (event) => {
+        if (event.detail.name === "lastRoute") {
+          const route = directionsElement.lastRoute;
+          if (route) {
+            console.log("🚗 New route calculated:");
+            console.log(route);
+
+            // Example: print total distance and duration
+            const totalDistance = route.totalLength.text;
+            const totalTime = route.totalTime.text;
+            console.log(`Total Distance: ${totalDistance}`);
+            console.log(`Estimated Time: ${totalTime}`);
+          }
+        }
+      });
+
       await routeLayer.load();
 
       // assign the RouteLayer to the Directions component
@@ -92,6 +125,43 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // then pan and zoom the map to that extent
       const extent = routeLayer.fullExtent.clone().expand(1.2);
       viewElement.goTo(extent);
+
+
+      /*************
+       * Music GenAI
+       * ************/
+
+      // SunoAPI running locally => https://github.com/gcui-art/suno-api
+      const sunoApiBaseUrl = "http://localhost:3000";
+      let songLyrics = "";
+      let songTitle = "";
+
+      // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
+      const customGenerateAudio = async (payload) => {
+        const url = `${sunoApiBaseUrl}/api/custom_generate`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          cache: "default",
+        });
+        // Parse response body as JSON
+        return await response.json();
+      };
+
+      const sunoGenerate = async (directionsText, title) => {
+        const musicalStyle = document.getElementById("musicalStyle").value;
+        return await customGenerateAudio({
+          tags: musicalStyle.substring(0, 200),
+          title: title.substring(0, 80),
+          prompt: directionsText.substring(0, 3000),
+          make_instrumental: false,
+          wait_audio: true,
+        });
+      };
     </script>
   </body>
 </html>
