@@ -1,6 +1,6 @@
 # Directions 2 Music
 
-This sample sends the text output of an ArcGIS JSSDK Directions widget to [Suno API](https://github.com/gcui-art/suno-api), which is running on localhost.
+This sample sends the text output of an ArcGIS JSSDK Directions widget to <s>[Suno API](https://github.com/gcui-art/suno-api), which is running on localhost</s> [under reconsideration].
 
 ![Roundabout](assets/AtTheRoundabout.jpeg) 
 
@@ -9,3 +9,7 @@ One of the first masterpieces to emerge from this fruitful alliance is [Barrow-i
 ## How to use
 
 Start by running ``npx serve .``
+
+## Sequence diagram of re-designed solution
+
+![Sequence diagram](out/Directions2Music_sequenceDiagram/Directions2Music_sequenceDiagram.png)

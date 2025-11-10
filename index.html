@@ -8,143 +8,90 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
 -->
 
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
-    <title>
-      Directions widget | Sample | ArcGIS Maps SDK for JavaScript 4.31
-    </title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>Directions component with RouteLayer | Sample | ArcGIS Maps SDK for JavaScript</title>
+
+    <!-- Load Calcite components from CDN -->
+    <script type="module" src="https://js.arcgis.com/calcite-components/3.3.3/calcite.esm.js"></script>
+
+    <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
+    <script src="https://js.arcgis.com/4.34/"></script>
+
+    <!-- Load Map components from CDN-->
+    <script type="module" src="https://js.arcgis.com/4.34/map-components/"></script>
 
     <style>
       html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
+      body {
         height: 100%;
-        width: 100%;
-      }
-      #parametersDiv {
-        padding: 12px;
-        width: 300px;
-      }
-      #sunoDiv {
-        padding: 12px;
-        width: 300px;
+        margin: 0;
       }
     </style>
-
-    <link
-      rel="stylesheet"
-      href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
-    />
-    <script src="https://js.arcgis.com/4.31/"></script>
-
-    <script>
-      fetch("./config.json").then(response => response.json()).then(config => {
-      require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/widgets/Directions",
-        "esri/layers/RouteLayer"
-      ], function (Map, MapView, Directions, RouteLayer) {
-        // SunoAPI running locally => https://github.com/gcui-art/suno-api
-        const sunoApiBaseUrl = "http://localhost:3000";
-        let songLyrics = "";
-        let songTitle = "";
-
-        // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
-        customGenerateAudio = async (payload) => {
-          const url = `${sunoApiBaseUrl}/api/custom_generate`;
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-            cache: "default",
-          });
-          // Parse response body as JSON
-          return await response.json();
-        };
-
-        const sunoGenerate = async (directionsText, title) => {
-          const musicalStyle = document.getElementById("musicalStyle").value;
-          return await customGenerateAudio({
-            tags: musicalStyle.substring(0, 200),
-            title: title.substring(0, 80),
-            prompt: directionsText.substring(0, 3000),
-            make_instrumental: false,
-            wait_audio: true,
-          });
-        };
-
-        // An ArcGIS authorization string used to access the basemap, geocoding and routing services
-        const apiKey = config.apiKey;
-
-        // create a new RouteLayer, required for Directions widget
-        const routeLayer = new RouteLayer();
-
-        // new RouteLayer must be added to the map
-        const map = new Map({
-          basemap: "topo-vector",
-          layers: [routeLayer],
-        });
-
-        const view = new MapView({
-          zoom: 14,
-          center: [-118.24, 34.05],
-          container: "viewDiv",
-          map: map,
-        });
-
-        // new RouteLayer must be added to Directions widget
-        let directionsWidget = new Directions({
-          layer: routeLayer,
-          apiKey,
-          view,
-        });
-
-        directionsWidget.watch("lastRoute", (lastRoute) => {
-          console.log("lastRoute", lastRoute);
-          songLyrics = lastRoute.directionPoints.items
-            .map((item) => item.voiceInstruction)
-            .join("\n");
-          songTitle = lastRoute.routeInfo.name;
-          console.log("directionsText", songLyrics.substring(0, 3000));
-        });
-
-        view.ui.add("parametersDiv", "top-right");
-        view.ui.add(directionsWidget, {
-          position: "top-right",
-        });
-        view.ui.add("sunoDiv", "top-right");
-
-        // add divs
-        const generateButton = document.getElementById("generateButton");
-        const sunoDiv = document.getElementById("sunoDiv");
-        generateButton.onclick = async () => {
-          const generatedSongs = await sunoGenerate(songLyrics, songTitle);
-          console.log("customGenerateAudio data", generatedSongs);
-          sunoDiv.innerHTML += JSON.stringify(generatedSongs);
-        }
-      });
-    });
-    </script>
   </head>
 
   <body>
-    <div id="viewDiv"></div>
-    <div id="parametersDiv" class="esri-widget">
-      Musical style: <input type="text" id="musicalStyle" placeholder="Musical style" />
-    </div>
-    <div id="sunoDiv" class="esri-widget">
-      <button id="generateButton">Generate song</button>
-    </div>
+    <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
+      <arcgis-directions slot="top-right"></arcgis-directions>
+    </arcgis-map>
+    <script type="module">
+      // import RouteLayer module to load a RouteLayer from a portal item
+      const RouteLayer = await $arcgis.import("@arcgis/core/layers/RouteLayer.js");
+      // import esriConfig to set the API key
+      const esriConfig = await $arcgis.import("@arcgis/core/config.js");
+
+      // get access to the arcgis-map component element and arcgis-directions component
+      const viewElement = document.querySelector("arcgis-map");
+      const directionsElement = document.querySelector("arcgis-directions");
+
+      // load application config (config.json) — same-origin fetch
+      // Using top-level await in this module script ensures config is
+      // available before we configure esriConfig.
+      const configResp = await fetch(new URL('./config.json', import.meta.url));
+      if (!configResp.ok) {
+        console.warn('Failed to load config.json, falling back to placeholder token');
+      }
+      const appConfig = configResp.ok ? await configResp.json() : {};
+
+      // define the API key and define their scopes (only for directions component)
+      // config.json can provide either `apiKey` or `token` fields.
+      const token = appConfig.apiKey || appConfig.token || '%YOUR_ACCESS_TOKEN%';
+      esriConfig.apiKeys.scopes = [
+        {
+          token: token,
+          urls: [
+            'https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer',
+            'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World'
+          ]
+        }
+      ];
+
+      // create a RouteLayer from a portal item
+      const routeLayer = new RouteLayer({
+        portalItem: {
+          // autocasts as new PortalItem()
+          id: "1607ad700759418095e696bc387a1ff6", // Redlands Route
+        },
+      });
+
+      // wait for the map and directions and routeLayer to be ready
+      // and load the RouteLayer
+      await viewElement.viewOnReady();
+      await directionsElement.componentOnReady();
+      await routeLayer.load();
+
+      // assign the RouteLayer to the Directions component
+      // and add the RouteLayer to the map
+      directionsElement.layer = routeLayer;
+      viewElement.map.add(routeLayer);
+
+      // get the extent of the route and expand it by 20%
+      // then pan and zoom the map to that extent
+      const extent = routeLayer.fullExtent.clone().expand(1.2);
+      viewElement.goTo(extent);
+    </script>
   </body>
 </html>
