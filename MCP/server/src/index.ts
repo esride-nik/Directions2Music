@@ -1,60 +1,148 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import { string } from "zod/v4";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import express from "express";
+import { z, ZodRawShape } from "zod";
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",
   version: "1.0.0",
-  capabilities: {
-    resources: {},
-    tools: {},
-  },
+});
+
+const inputShape: ZodRawShape = {
+  lines: z
+    .array(z.string())
+    .describe("An array of routing directions as strings."),
+};
+const outputShape: ZodRawShape = {
+  bpm: z.number().describe("Beats per minute for the musical style."),
+  key: z
+    .string()
+    .describe("The musical key for the style (e.g., C Major, A Minor)."),
+  genre: z.string().describe("The genre of the musical style."),
+  instrumentation: z
+    .array(z.string())
+    .describe("List of instruments used in the musical style."),
+  mood: z.array(z.string()).describe("Moods evoked by the musical style."),
+  description: z.string().describe("A brief description of the musical style."),
+};
+const StyleCard = z.object({
+  bpm: z.number(),
+  key: z.string(),
+  genre: z.string(),
+  instrumentation: z.array(z.string()),
+  mood: z.array(z.string()),
+  description: z.string(),
 });
 
 server.registerTool(
-  'find-musical-style',
+  "find-musical-style",
   {
-    title: 'Find Musical Style',
-    description: 'Find a musical style based on given routing directions by drawing cultural references from the location.',
-    inputSchema: z.array(z.string()).describe('An array of routing directions as strings.'),
-    outputSchema: z.object({
-      bpm: z.number().describe('Beats per minute for the musical style.'),
-      key: z.string().describe('The musical key for the style (e.g., C Major, A Minor).'),
-      genre: z.string().describe('The genre of the musical style.'),
-      instrumentation: z.array(z.string()).describe('List of instruments used in the musical style.'),
-      mood: z.array(z.string()).describe('Moods evoked by the musical style.'),
-      description: z.string().describe('A brief description of the musical style.'),
-    }).describe('A musical style card that matches the given directions.'),
+    title: "Find Musical Style",
+    description:
+      "Find a musical style based on given routing directions by drawing cultural references from the location.",
+    inputSchema: inputShape,
+    outputSchema: outputShape,
   },
-  async (directions: string[]) => {
+  async (args: any, extra: any) => {
+    // narrow & validate at runtime
+    const lines = Array.isArray(args?.lines) ? args.lines.map(String) : [];
+
     // Placeholder implementation - replace with actual logic to determine musical style
-    return directions.length%2===0 ? {
-      bpm: 120,
-      key: "C Major",
-      genre: "Pop",
-      instrumentation: ["Guitar", "Drums", "Bass"],
-      mood: ["Energetic", "Uplifting"],
-      description: "A lively pop style perfect for upbeat journeys.",
-    }
-    : {
-      bpm: 100,
-      key: "D minor",
-      genre: "North-African desert raï + electronic",
-      instrumentation: ["oud", "derbouka", "bass", "synth pad"],
-      mood: "adventurous, journey",
-      description: "Saharan travel groove with modern beat; steady 4/4."
+    const card =
+      lines.length % 2 === 0
+        ? {
+            bpm: 120,
+            key: "C Major",
+            genre: "Pop",
+            instrumentation: ["Guitar", "Drums", "Bass"],
+            mood: ["Energetic", "Uplifting"],
+            description: "A lively pop style perfect for upbeat journeys.",
+          }
+        : {
+            bpm: 100,
+            key: "D minor",
+            genre: "North-African desert raï + electronic",
+            instrumentation: ["oud", "derbouka", "bass", "synth pad"],
+            mood: ["adventurous", "journey"],
+            description: "Saharan travel groove with modern beat; steady 4/4.",
+          };
+
+    // validate runtime
+    const parsed = StyleCard.parse(card);
+
+    // return the MCP response envelope expected by the SDK
+    const responseEnvelope = {
+      // content array: many SDKs accept text/image/file choices here
+      content: [
+        {
+          type: "text",
+          text: "Style card generated successfully.",
+          _meta: { note: "style card attached as structuredContent" },
+        },
+      ],
+      // structuredContent is optional but convenient for programmatic clients
+      structuredContent: {
+        mimeType: "application/vnd.stylecard+json",
+        data: parsed,
+      },
+      // include helpful metadata too
+      _meta: {
+        styleCard: parsed,
+      },
     };
+
+    // cast as any to satisfy the SDK typing if needed
+    return responseEnvelope as any;
   }
-)
+);
 
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Weather MCP Server running on stdio");
-}
+// Set up Express and HTTP transport
+const app = express();
+app.use(express.json());
 
-main().catch((error) => {
-  console.error("Fatal error in main():", error);
-  process.exit(1);
+app.post("/mcp", async (req, res) => {
+  // In stateless mode, create a new transport for each request to prevent
+  // request ID collisions. Different clients may use the same JSON-RPC request IDs,
+  // which would cause responses to be routed to the wrong HTTP connections if
+  // the transport state is shared.
+
+  try {
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    });
+
+    res.on("close", () => {
+      transport.close();
+    });
+
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  } catch (error) {
+    console.error("Error handling MCP request:", error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        error: {
+          code: -32603,
+          message: "Internal server error",
+        },
+        id: null,
+      });
+    }
+  }
 });
+
+app.get('/', (req, res) => {
+  res.send('Demo MCP Server running under /mcp, responding to POST requests.');
+})
+
+const port = parseInt(process.env.PORT || "3000");
+app
+  .listen(port, () => {
+    console.log(`Demo MCP Server running on http://localhost:${port}/mcp`);
+  })
+  .on("error", (error) => {
+    console.error("Server error:", error);
+    process.exit(1);
+  });
