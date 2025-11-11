@@ -1,4 +1,4 @@
-# Directions 2 Music
+# Directions 2 Music Web Client
 
 This sample sends the text output of an ArcGIS JSSDK Directions widget to <s>[Suno API](https://github.com/gcui-art/suno-api), which is running on localhost</s> [under reconsideration].
 
