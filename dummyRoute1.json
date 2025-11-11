@@ -1,0 +1,107 @@
+30052, Hassi Ben Abdellah, Sidi Khouiled, Ouargla - 30031, N'goussa, Ouargla
+
+
+===
+
+
++++ voiceInstruction +++
+
+Start at 3 oh oh 5 2, Hassi Ben Abdellah, Sidi Khouiled, Ouargla
+Go west toward RN RN56
+Restriction: Avoid Unpaved Roads
+Turn right on RN RN56
+Turn left to RN RN56
+Turn left to stay on RN RN56
+At the roundabout, take the third exit onto RN RN49
+At the roundabout, take the first exit to stay on RN RN49
+Continue forward on RN RN3
+At the roundabout, take the third exit to stay on RN RN3
+At the roundabout, take the second exit to stay on RN RN3
+At the roundabout, take the second exit to stay on RN RN3
+At the roundabout, take the third exit onto RN RN3
+At the roundabout, take the third exit to stay on RN RN3
+Turn right
+Make a sharp left
+Arrive at 3 oh oh oh 1, Hassi Messaoud, Ouargla, on the right
+Depart 3 oh oh oh 1, Hassi Messaoud, Ouargla
+Go back north
+At the roundabout, take the fifth exit onto RN RN3
+At the roundabout, take the second exit to stay on RN RN3
+At the roundabout, take the second exit to stay on RN RN3
+At the roundabout, take the first exit to stay on RN RN3
+At the roundabout, take the second exit to stay on RN RN3
+At the roundabout, take the second exit to stay on RN RN49
+At the roundabout, take the second exit to stay on RN RN49
+At the roundabout, take the first exit
+At the roundabout, take the second exit
+At the roundabout, take the second exit
+At the roundabout, take the second exit
+Turn right on CW CW2 oh 2
+Bear right
+Keep left at the fork
+Bear right on CW CW2 oh 2
+Turn right
+Restriction: Avoid Unpaved Roads
+Turn right, then turn left
+Finish at 3 oh oh 3 1, N'goussa, Ouargla, on the right
+
+
+===
+
+
++++ displayText +++
+
+Start at 30052, Hassi Ben Abdellah, Sidi Khouiled, Ouargla
+Go west toward RN56
+Restriction: Avoid Unpaved Roads
+Turn right on RN56
+Turn left to RN56
+Turn left to stay on RN56
+At the roundabout, take the third exit onto RN49
+At the roundabout, take the first exit to stay on RN49
+Continue forward on RN3
+At the roundabout, take the third exit to stay on RN3
+At the roundabout, take the second exit to stay on RN3
+At the roundabout, take the second exit to stay on RN3
+At the roundabout, take the third exit onto RN3
+At the roundabout, take the third exit to stay on RN3
+Turn right
+Make a sharp left
+Arrive at 30001, Hassi Messaoud, Ouargla, on the right
+Depart 30001, Hassi Messaoud, Ouargla
+Go back north
+At the roundabout, take the fifth exit onto RN3
+At the roundabout, take the second exit to stay on RN3
+At the roundabout, take the second exit to stay on RN3
+At the roundabout, take the first exit to stay on RN3
+At the roundabout, take the second exit to stay on RN3
+At the roundabout, take the second exit to stay on RN49
+At the roundabout, take the second exit to stay on RN49
+At the roundabout, take the first exit
+At the roundabout, take the second exit
+At the roundabout, take the second exit
+At the roundabout, take the second exit
+Turn right on CW202
+Bear right
+Keep left at the fork
+Bear right on CW202
+Turn right
+Restriction: Avoid Unpaved Roads
+Turn right, then turn left
+Finish at 30031, N'goussa, Ouargla, on the right
+
+
+
+
+=====
+
+
+
+
+
+
+["Start at 30052, Hassi Ben Abdellah, Sidi Khouiled, Ouargla","Go west toward RN56","Restriction: Avoid Unpaved Roads","Turn right on RN56","Turn left to RN56","Turn left to stay on RN56","At the roundabout, take the third exit onto RN49","At the roundabout, take the first exit to stay on RN49","Continue forward on RN3","At the roundabout, take the third exit to stay on RN3","At the roundabout, take the second exit to stay on RN3","At the roundabout, take the second exit to stay on RN3","At the roundabout, take the third exit onto RN3","At the roundabout, take the third exit to stay on RN3","Turn right","Make a sharp left","Arrive at 30001, Hassi Messaoud, Ouargla, on the right","Depart 30001, Hassi Messaoud, Ouargla","Go back north","At the roundabout, take the fifth exit onto RN3","At the roundabout, take the second exit to stay on RN3","At the roundabout, take the second exit to stay on RN3","At the roundabout, take the first exit to stay on RN3","At the roundabout, take the second exit to stay on RN3","At the roundabout, take the second exit to stay on RN49","At the roundabout, take the second exit to stay on RN49","At the roundabout, take the first exit","At the roundabout, take the second exit","At the roundabout, take the second exit","At the roundabout, take the second exit","Turn right on CW202","Bear right","Keep left at the fork","Bear right on CW202","Turn right","Restriction: Avoid Unpaved Roads","Turn right, then turn left","Finish at 30031, N'goussa, Ouargla, on the right"]
+
+
+
+[{"time":null,"text":"Start at 30052, Hassi Ben Abdellah, Sidi Khouiled, Ouargla"},{"time":null,"text":"Go west toward RN56"},{"time":null,"text":"Restriction: Avoid Unpaved Roads"},{"time":null,"text":"Turn right on RN56"},{"time":null,"text":"Turn left to RN56"},{"time":null,"text":"Turn left to stay on RN56"},{"time":null,"text":"At the roundabout, take the third exit onto RN49"},{"time":null,"text":"At the roundabout, take the first exit to stay on RN49"},{"time":null,"text":"Continue forward on RN3"},{"time":null,"text":"At the roundabout, take the third exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the third exit onto RN3"},{"time":null,"text":"At the roundabout, take the third exit to stay on RN3"},{"time":null,"text":"Turn right"},{"time":null,"text":"Make a sharp left"},{"time":null,"text":"Arrive at 30001, Hassi Messaoud, Ouargla, on the right"},{"time":null,"text":"Depart 30001, Hassi Messaoud, Ouargla"},{"time":null,"text":"Go back north"},{"time":null,"text":"At the roundabout, take the fifth exit onto RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the first exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN3"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN49"},{"time":null,"text":"At the roundabout, take the second exit to stay on RN49"},{"time":null,"text":"At the roundabout, take the first exit"},{"time":null,"text":"At the roundabout, take the second exit"},{"time":null,"text":"At the roundabout, take the second exit"},{"time":null,"text":"At the roundabout, take the second exit"},{"time":null,"text":"Turn right on CW202"},{"time":null,"text":"Bear right"},{"time":null,"text":"Keep left at the fork"},{"time":null,"text":"Bear right on CW202"},{"time":null,"text":"Turn right"},{"time":null,"text":"Restriction: Avoid Unpaved Roads"},{"time":null,"text":"Turn right, then turn left"},{"time":null,"text":"Finish at 30031, N'goussa, Ouargla, on the right"}]

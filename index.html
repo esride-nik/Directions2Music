@@ -85,14 +85,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         },
       ];
 
-      // create a RouteLayer from a portal item
-      const routeLayer = new RouteLayer({
-        portalItem: {
-          // autocasts as new PortalItem()
-          id: "1607ad700759418095e696bc387a1ff6", // Redlands Route
-        },
-      });
-
       // wait for the map and directions and routeLayer to be ready
       // and load the RouteLayer
       await viewElement.viewOnReady();
@@ -102,29 +94,16 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         if (event.detail.name === "lastRoute") {
           const route = directionsElement.lastRoute;
           if (route) {
-            console.log("🚗 New route calculated:");
-            console.log(route);
-
-            // Example: print total distance and duration
-            const totalDistance = route.totalLength.text;
-            const totalTime = route.totalTime.text;
-            console.log(`Total Distance: ${totalDistance}`);
-            console.log(`Estimated Time: ${totalTime}`);
+            console.log("New route:", route);
           }
         }
       });
 
-      await routeLayer.load();
-
       // assign the RouteLayer to the Directions component
       // and add the RouteLayer to the map
+      const routeLayer = new RouteLayer();
       directionsElement.layer = routeLayer;
       viewElement.map.add(routeLayer);
-
-      // get the extent of the route and expand it by 20%
-      // then pan and zoom the map to that extent
-      const extent = routeLayer.fullExtent.clone().expand(1.2);
-      viewElement.goTo(extent);
 
 
       /*************
