@@ -2,7 +2,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { z } from "zod";
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({
+  apiKey: "AIzaSyC9yaQUsLTxUEyxv6i8M1IcMPkIWJto6RY",
+});
 
 interface StyleCard {
   bpm: number;
@@ -39,14 +43,12 @@ Lyrics:
 ${lyricsLines.join("\n")}
   `;
 
-  const client = new OpenAI();
-
-  const response = await client.responses.create({
-    model: "gpt-5",
-    input: prompt,
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
   });
 
-  console.log("LLM response output_text", response.output_text);
+  console.log("LLM response output_text", response.text);
   // const resp = await fetch(process.env.LLM_URL, {
   //   method: 'POST',
   //   headers: { 'Authorization': `Bearer ${process.env.LLM_KEY}`, 'Content-Type':'application/json' },
