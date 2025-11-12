@@ -139,7 +139,7 @@ server.registerTool(
           text: JSON.stringify(card),
         },
       ],
-      structuredContent: card as StyleCard,
+      structuredContent: card as any,
     };
   }
 );
