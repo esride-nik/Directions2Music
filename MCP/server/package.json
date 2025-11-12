@@ -4,16 +4,16 @@
   "description": "Directions2Music MCP Server",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx -y tsx src/index.ts"
   },
   "dependencies": {
+    "@google/genai": "^1.29.0",
     "@modelcontextprotocol/sdk": "^1.21.1",
     "express": "^5.1.0",
-    "openai": "^6.8.1",
     "zod": "3.25.76"
   },
   "devDependencies": {
