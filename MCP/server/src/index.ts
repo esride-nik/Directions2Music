@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
@@ -37,46 +39,27 @@ const server = new McpServer({
 
 const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
   const prompt = `
-You are a music style selector. Infer locale and style from these lyric lines (routing directions).
-Return JSON: { bpm, key, genre, instrumentation[], mood[], description }.
-Lyrics:
-${lyricsLines.join("\n")}
+    You are a music style selector. Infer locale and style from these lyric lines (routing directions).
+    Return JSON: { bpm, key, genre, instrumentation[], mood[], description }.
+    Lyrics:
+    ${lyricsLines.join("\n")}
   `;
 
   // This is the LLM call => commented out for debugging
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseJsonSchema: zodToJsonSchema(z.object(styleCard)),
+    },
   });
 
-  console.log("LLM response", response);
-
-//   // DUMMY
-//   const response = {
-//     text:
-//       "```" +
-//       `{
-//   "bpm": 110,
-//     "Rhythmic",
-//     "Contemplative",
-//     "Guided",
-//     "Journey"
-//   ],
-//   "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
-// }` +
-//       "```",
-//   };
-
-  const openingBraceIndex = response.text.indexOf("{");
-  const closingBraceIndex = response.text.lastIndexOf("}");
-  const responseJsonText = closingBraceIndex > openingBraceIndex 
-    ? response.text.slice(response.text.indexOf('{'), response.text.lastIndexOf('}') + 1) 
-    : response.text;
-
-  console.log("LLM response output_text", responseJsonText);
-  return responseJsonText.length > 0
-    ? JSON.parse(responseJsonText)
-    : ({} as StyleCard);
+  const jsonResponse =
+    response.text && response.text.length > 0
+      ? (z.object(styleCard).parse(JSON.parse(response.text)) as StyleCard)
+      : ({} as StyleCard);
+  return jsonResponse;
 };
 
 server.registerTool(
@@ -164,27 +147,24 @@ server.registerTool(
 
     console.log("directions length", directions.length);
 
-    // Placeholder implementation - replace with actual logic to determine musical style
-    const card =
-      directions.length % 2 === 0
-        ? {
-            bpm: 120,
-            key: "C Major",
-            genre: "Pop",
-            instrumentation: ["Guitar", "Drums", "Bass"],
-            mood: ["Energetic", "Uplifting"],
-            description: "A lively pop style perfect for upbeat journeys.",
-          }
-        : {
-            bpm: 100,
-            key: "D minor",
-            genre: "North-African desert raï + electronic",
-            instrumentation: ["oud", "derbouka", "bass", "synth pad"],
-            mood: ["adventurous", "journey"],
-            description: "Saharan travel groove with modern beat; steady 4/4.",
-          };
+    let card = {} as StyleCard;
 
-    console.log("Generated Style Card:", card);
+    // Placeholder implementation - replace with actual logic to determine musical style
+    // Read local dummy responses JSON file (server-side filesystem)
+    try {
+      const dummyPath = new URL(
+        "../dummyData/dummyResponses_musicalStyle.json",
+        import.meta.url
+      );
+      const dummyText = await fs.readFile(dummyPath, "utf8");
+      const dummyResponses = JSON.parse(dummyText);
+      // console.log("Fetched dummy responses", dummyResponses?.length ?? null, dummyResponses);
+      const randomId = Math.floor(Math.random()*dummyResponses?.length);
+      card = dummyResponses[randomId];
+      console.log(`Fetched dummy Style Card no.${randomId}:`, card);
+    } catch (e) {
+      console.warn("Could not read dummy responses file:", e);
+    }
 
     return {
       content: [
@@ -194,32 +174,6 @@ server.registerTool(
         },
       ],
       structuredContent: card,
-    };
-  }
-);
-
-// Simple tool with parameters
-server.registerTool(
-  "calculate-bmi",
-  {
-    title: "BMI Calculator",
-    description: "Calculate Body Mass Index",
-    inputSchema: {
-      weightKg: z.number(),
-      heightM: z.number(),
-    },
-    outputSchema: { bmi: z.number() },
-  },
-  async ({ weightKg, heightM }) => {
-    const output = { bmi: weightKg / (heightM * heightM) };
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(output),
-        },
-      ],
-      structuredContent: output,
     };
   }
 );
