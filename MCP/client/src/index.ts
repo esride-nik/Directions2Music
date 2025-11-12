@@ -49,10 +49,11 @@ const musicalStyleResult = await client.callTool({
         directions: directionsInput
     } as any
 });
+console.log('Musical Style Result:', JSON.stringify(musicalStyleResult));
 
 // Extract the StyleCard from the result
 const styleCard: StyleCard = extractStyleCard(musicalStyleResult);
-console.log('+++Client+++ Style Card:', JSON.stringify(styleCard, null, 2));
+// console.log('+++Client+++ Style Card:', JSON.stringify(styleCard, null, 2));
 
 // TODO: add compositionplan with lyrics
 // Use the StyleCard to generate music
@@ -71,8 +72,7 @@ const generateMusicInput: GenerateMusicInput = {
         }]
     }
 };
-
-console.log('Music Generation Input:', JSON.stringify(generateMusicInput));
+// console.log('Music Generation Input:', JSON.stringify(generateMusicInput, null, 2));
 
 const musicGenerationResult = await client.callTool({
     name: 'generate-music',
