@@ -5,11 +5,15 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+
 import { StyleCard, styleCardSchema, findStyleInputSchema, generateMusicInputSchema } from "./schemas.js";
+import { compositionPlan } from "@elevenlabs/elevenlabs-js/api/resources/music/index.js";
 
 const ai = new GoogleGenAI({
   apiKey: "AIzaSyC9yaQUsLTxUEyxv6i8M1IcMPkIWJto6RY",
 });
+const elevenLabsApiKey = "sk_15d6f23c93bf4d768f210fbbfc07f68105f0870aa8aa0198";
 
 const styleCard = styleCardSchema;
 
@@ -161,6 +165,7 @@ server.registerTool(
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
+    const composition_plan = args?.composition_plan || undefined;
     const prompt = args?.prompt ? String(args.prompt) : "";
     const music_length_ms = args?.music_length_ms ? Number(args.music_length_ms) : undefined;
     const output_format = args?.output_format || "mp3_44100_128";
@@ -169,6 +174,7 @@ server.registerTool(
     const store_for_inpainting = Boolean(args?.store_for_inpainting);
 
     console.log("Generate music with ElevenLabs API", {
+      composition_plan,
       prompt: prompt.substring(0, 50),
       music_length_ms,
       output_format,
@@ -181,7 +187,40 @@ server.registerTool(
     let card = {} as StyleCard;
     try {
 
-      // TODO: Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed with the parameters above
+      // Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed with the parameters above
+      
+      const client = new ElevenLabsClient({
+          environment: "https://api.elevenlabs.io",
+          apiKey: elevenLabsApiKey,
+      });
+      const finalCompositionPlan = await client.music.compositionPlan.create({
+          prompt: prompt,
+          sourceCompositionPlan: composition_plan
+      });
+      console.log("Final Composition Plan:", finalCompositionPlan);
+      const musicResponse = await client.music.composeDetailed.apply({
+        compositionPlan: finalCompositionPlan
+      });
+
+      // const musicRequest = {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "xi-api-key": elevenLabsApiKey,
+      //   },
+      //   body: JSON.stringify({
+      //     composition_plan,
+      //     // prompt,
+      //     // music_length_ms,
+      //     // output_format,
+      //     // model_id,
+      //     force_instrumental
+      //   })
+      // }
+      // console.log("ElevenLabs music generation request:", JSON.stringify(musicRequest));
+      // const musicResponse = await fetch("https://api.elevenlabs.io/v1/music/detailed", musicRequest);
+
+      console.log("ElevenLabs music generation response status:", JSON.stringify(musicResponse));
 
       // TODO: adjust tool output according to model output
       return {
