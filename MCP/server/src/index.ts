@@ -2,11 +2,65 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { z } from "zod";
+import OpenAI from "openai";
+
+interface StyleCard {
+  bpm: number;
+  key: string;
+  genre: string;
+  instrumentation: string[];
+  mood: string[];
+  description: string;
+}
+
+const styleCard = {
+  bpm: z.number().describe("Beats per minute for the musical style."),
+  key: z
+    .string()
+    .describe("The musical key for the style (e.g., C Major, A Minor)."),
+  genre: z.string().describe("The genre of the musical style."),
+  instrumentation: z
+    .array(z.string())
+    .describe("List of instruments used in the musical style."),
+  mood: z.array(z.string()).describe("Moods evoked by the musical style."),
+  description: z.string().describe("A brief description of the musical style."),
+};
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",
   version: "1.0.0",
 });
+
+const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
+  const prompt = `
+You are a music style selector. Infer locale and style from these lyric lines (routing directions).
+Return JSON: { bpm, key, genre, instrumentation[], mood, description }.
+Lyrics:
+${lyricsLines.join("\n")}
+  `;
+
+  const client = new OpenAI();
+
+  const response = await client.responses.create({
+    model: "gpt-5",
+    input: prompt,
+  });
+
+  console.log("LLM response output_text", response.output_text);
+  // const resp = await fetch(process.env.LLM_URL, {
+  //   method: 'POST',
+  //   headers: { 'Authorization': `Bearer ${process.env.LLM_KEY}`, 'Content-Type':'application/json' },
+  //   body: JSON.stringify({
+  //     model: 'your-preferred-model',
+  //     temperature: 0,
+  //     messages: [{ role:'system', content:'Return concise JSON only.' },
+  //                { role:'user', content: prompt }]
+  //   })
+  // });
+  // const data = await resp.json();
+  // // parse JSON from the assistant message; validate/normalize
+  return JSON.parse(response.output_text);
+};
 
 server.registerTool(
   "find-musical-style",
@@ -15,7 +69,47 @@ server.registerTool(
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
     inputSchema: {
-      directions: z.array(z.string().describe("An array of routing directions as strings.")),
+      directions: z.array(
+        z.string().describe("An array of routing directions as strings.")
+      ),
+    },
+    outputSchema: styleCard,
+  },
+  async (args: any, extra: any) => {
+    // narrow & validate at runtime
+    const directions = Array.isArray(args?.directions)
+      ? args.directions.map(String)
+      : [];
+
+    console.log("directions length", directions.length);
+
+    // Placeholder implementation - replace with actual logic to determine musical style
+    const card = getStyleCard(directions);
+
+    console.log("Generated Style Card:", card);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(card),
+        },
+      ],
+      structuredContent: card,
+    };
+  }
+);
+
+server.registerTool(
+  "dummy-find-musical-style",
+  {
+    title: "DUMMY Find Musical Style",
+    description:
+      "Find a musical style based on given routing directions by drawing cultural references from the location.",
+    inputSchema: {
+      directions: z.array(
+        z.string().describe("An array of routing directions as strings.")
+      ),
     },
     outputSchema: {
       bpm: z.number().describe("Beats per minute for the musical style."),
@@ -27,13 +121,17 @@ server.registerTool(
         .array(z.string())
         .describe("List of instruments used in the musical style."),
       mood: z.array(z.string()).describe("Moods evoked by the musical style."),
-      description: z.string().describe("A brief description of the musical style."),
+      description: z
+        .string()
+        .describe("A brief description of the musical style."),
     },
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
-    const directions = Array.isArray(args?.directions) ? args.directions.map(String) : [];
-    
+    const directions = Array.isArray(args?.directions)
+      ? args.directions.map(String)
+      : [];
+
     console.log("directions length", directions.length);
 
     // Placeholder implementation - replace with actual logic to determine musical style
@@ -59,41 +157,41 @@ server.registerTool(
     console.log("Generated Style Card:", card);
 
     return {
-        content: [
-            {
-                type: 'text',
-                text: JSON.stringify(card)
-            }
-        ],
-        structuredContent: card
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(card),
+        },
+      ],
+      structuredContent: card,
     };
   }
 );
 
 // Simple tool with parameters
 server.registerTool(
-    'calculate-bmi',
-    {
-        title: 'BMI Calculator',
-        description: 'Calculate Body Mass Index',
-        inputSchema: {
-            weightKg: z.number(),
-            heightM: z.number()
-        },
-        outputSchema: { bmi: z.number() }
+  "calculate-bmi",
+  {
+    title: "BMI Calculator",
+    description: "Calculate Body Mass Index",
+    inputSchema: {
+      weightKg: z.number(),
+      heightM: z.number(),
     },
-    async ({ weightKg, heightM }) => {
-        const output = { bmi: weightKg / (heightM * heightM) };
-        return {
-            content: [
-                {
-                    type: 'text',
-                    text: JSON.stringify(output)
-                }
-            ],
-            structuredContent: output
-        };
-    }
+    outputSchema: { bmi: z.number() },
+  },
+  async ({ weightKg, heightM }) => {
+    const output = { bmi: weightKg / (heightM * heightM) };
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(output),
+        },
+      ],
+      structuredContent: output,
+    };
+  }
 );
 
 // Set up Express and HTTP transport
@@ -133,9 +231,9 @@ app.post("/mcp", async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Demo MCP Server running under /mcp, responding to POST requests.');
-})
+app.get("/", (req, res) => {
+  res.send("Demo MCP Server running under /mcp, responding to POST requests.");
+});
 
 const port = parseInt(process.env.PORT || "3000");
 app
