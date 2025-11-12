@@ -180,8 +180,10 @@ server.registerTool(
     // Placeholder implementation - replace with actual logic to call ElevenLabs API
     let card = {} as StyleCard;
     try {
-      // TODO: Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed
-      // with the parameters above
+
+      // TODO: Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed with the parameters above
+
+      // TODO: adjust tool output according to model output
       return {
         content: [
           {
