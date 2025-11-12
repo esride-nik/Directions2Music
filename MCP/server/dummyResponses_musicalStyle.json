@@ -14,5 +14,48 @@
     ],
     "mood": "Hypnotic, Driving, Expansive, Meditative, Steady",
     "description": "nomadic spirit with a modern, relentless drive. Perfect for a long, reflective journey under the Saharan sun."
+  },
+  {
+    "bpm": 105,
+    "key": "A Minor",
+    "genre": "Rai (Saharan Fusion)",
+    "instrumentation": [
+      "Male Lead Vocals",
+      "Electric Guitar (with delay and reverb)",
+      "Bass Guitar (groovy, driving)",
+      "Drum Machine (incorporating traditional percussion samples like Darbuka and Bendir)",
+      "Synthesizer (atmospheric pads, subtle melodic motifs)",
+      "Gasba (Algerian folk flute)"
+    ],
+    "mood": [
+      "Hypnotic",
+      "Driving",
+      "Reflective",
+      "Expansive",
+      "Adventurous",
+      "Steady"
+    ],
+    "description": "A modern Rai track designed for a long, contemplative journey through the Algerian Sahara. The music blends the iconic vocal stylings and driving rhythms of Algerian Rai with the vast, hypnotic soundscapes of the desert blues, featuring a prominent, blues-infused electric guitar and traditional flute melodies over a fusion of electronic and organic percussion. It's the perfect soundtrack for navigating national routes through ancient lands, embracing the smoothness of paved roads while embodying the spirit of the open desert."
+  },
+  {
+    "bpm": 110,
+    "key": "A Minor",
+    "genre": "Rai (Saharan Fusion)",
+    "instrumentation": [
+      "Male Lead Vocals",
+      "Electric Guitar (with delay and reverb)",
+      "Bass Guitar (groovy, driving)",
+      "Drum Machine (incorporating traditional percussion samples like Darbuka and Bendir)",
+      "Synthesizer (atmospheric pads, subtle melodic motifs)",
+      "Gasba (Algerian folk flute)"
+    ],
+    "mood": [
+      "Hypnotic",
+      "Rhythmic",
+      "Contemplative",
+      "Guided",
+      "Journey"
+    ],
+    "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
   }
 ]

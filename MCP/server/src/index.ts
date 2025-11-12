@@ -44,27 +44,38 @@ ${lyricsLines.join("\n")}
   `;
 
   // This is the LLM call => commented out for debugging
-  // const response = await ai.models.generateContent({
-  //   model: "gemini-2.5-flash",
-  //   contents: prompt,
-  // });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
-  // DUMMY
-  const response = {
-    text: `{
-  "bpm": 110,
-    "Rhythmic",
-    "Contemplative",
-    "Guided",
-    "Journey"
-  ],
-  "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
-}`,
-  };
+  console.log("LLM response", response);
 
-  console.log("LLM response output_text", response.text);
-  return response?.text && response.text.length > 0
-    ? JSON.parse(response.text)
+//   // DUMMY
+//   const response = {
+//     text:
+//       "```" +
+//       `{
+//   "bpm": 110,
+//     "Rhythmic",
+//     "Contemplative",
+//     "Guided",
+//     "Journey"
+//   ],
+//   "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
+// }` +
+//       "```",
+//   };
+
+  const openingBraceIndex = response.text.indexOf("{");
+  const closingBraceIndex = response.text.lastIndexOf("}");
+  const responseJsonText = closingBraceIndex > openingBraceIndex 
+    ? response.text.slice(response.text.indexOf('{'), response.text.lastIndexOf('}') + 1) 
+    : response.text;
+
+  console.log("LLM response output_text", responseJsonText);
+  return responseJsonText.length > 0
+    ? JSON.parse(responseJsonText)
     : ({} as StyleCard);
 };
 
