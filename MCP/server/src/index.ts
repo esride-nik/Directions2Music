@@ -37,6 +37,10 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
+/***********************
+** Find musical style **
+************************/
+
 const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
   const prompt = `
     You are a music style selector. Infer locale and style from these lyric lines (routing directions).
@@ -62,6 +66,7 @@ const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
   return jsonResponse;
 };
 
+// find-musical-style with Gemini LLM
 server.registerTool(
   "find-musical-style",
   {
@@ -96,7 +101,7 @@ server.registerTool(
             text: JSON.stringify(card),
           },
         ],
-        structuredContent: card,
+        structuredContent: card as any,
       };
     } catch (error) {
       console.error("Error generating Style Card:", error);
@@ -107,12 +112,13 @@ server.registerTool(
             text: "Error generating Style Card",
           },
         ],
-        structuredContent: {},
+        structuredContent: {} as any,
       };
     }
   }
 );
 
+// dummy-find-musical-style (no LLM, local dummy data)
 server.registerTool(
   "dummy-find-musical-style",
   {
@@ -173,10 +179,110 @@ server.registerTool(
           text: JSON.stringify(card),
         },
       ],
-      structuredContent: card,
+      structuredContent: card as any,
     };
   }
 );
+
+
+/*******************
+** Generate music **
+********************/
+
+// generate-music with ElevenLabs
+server.registerTool(
+  "generate-music",
+  {
+    title: "Generate Music",
+    description:
+      "Generate music based on the provided routing directions and style card using the ElevenLabs Music API.",
+    inputSchema: {
+      prompt: z
+        .string()
+        .max(4100)
+        .describe("A simple text prompt to generate a song from (max 4100 characters). Cannot be used with composition_plan."),
+      music_length_ms: z
+        .number()
+        .int()
+        .min(3000)
+        .max(300000)
+        .optional()
+        .describe("The length of the song in milliseconds (3000-300000). Optional - model will choose if not provided."),
+      output_format: z
+        .enum([
+          "mp3_44100_128",
+          "mp3_44100_192",
+          "mp3_22050_32",
+          "mp3_22050_64",
+          "mp3_22050_128",
+          "pcm_44100_16",
+          "ulaw_8000_8",
+        ])
+        .optional()
+        .describe("Output format (default: mp3_44100_128). Some formats require specific subscription tiers."),
+      model_id: z
+        .enum(["music_v1"])
+        .optional()
+        .describe("The model to use for generation (default: music_v1)."),
+      force_instrumental: z
+        .boolean()
+        .optional()
+        .describe("If true, guarantees instrumental generation (default: false)."),
+      store_for_inpainting: z
+        .boolean()
+        .optional()
+        .describe("Whether to store the song for inpainting (enterprise only, default: false)."),
+    },
+    outputSchema: {}
+  },
+  async (args: any, extra: any) => {
+    // narrow & validate at runtime
+    const prompt = args?.prompt ? String(args.prompt) : "";
+    const music_length_ms = args?.music_length_ms ? Number(args.music_length_ms) : undefined;
+    const output_format = args?.output_format || "mp3_44100_128";
+    const model_id = args?.model_id || "music_v1";
+    const force_instrumental = Boolean(args?.force_instrumental);
+    const store_for_inpainting = Boolean(args?.store_for_inpainting);
+
+    console.log("Generate music with ElevenLabs API", {
+      prompt: prompt.substring(0, 50),
+      music_length_ms,
+      output_format,
+      model_id,
+      force_instrumental,
+      store_for_inpainting,
+    });
+
+    // Placeholder implementation - replace with actual logic to call ElevenLabs API
+    let card = {} as StyleCard;
+    try {
+      // TODO: Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed
+      // with the parameters above
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Music generation requested: "${prompt.substring(0, 50)}..."`,
+          },
+        ],
+        structuredContent: card as any,
+      };
+    } catch (error) {
+      console.error("Error generating music:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Error generating music",
+          },
+        ],
+        structuredContent: {} as any,
+      };
+    }
+  }
+);
+
+
 
 // Set up Express and HTTP transport
 const app = express();
