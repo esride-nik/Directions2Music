@@ -1,0 +1,16 @@
+{
+  "name": "directions2music_mcpclient",
+  "version": "1.0.0",
+  "description": "Directions2Music MCP Client",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx -y tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.21.1"
+  }
+}

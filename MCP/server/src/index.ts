@@ -1,38 +1,29 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
-import { z, ZodRawShape } from "zod";
+import { z } from "zod";
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",
   version: "1.0.0",
 });
 
-const inputShape: ZodRawShape = {
-  lines: z
-    .array(z.string())
-    .describe("An array of routing directions as strings."),
+const InputSchema = {
+  directions: z.string().describe("An array of routing directions as strings."),
 };
-const outputShape: ZodRawShape = {
+
+const OutputSchema = {
   bpm: z.number().describe("Beats per minute for the musical style."),
-  key: z
-    .string()
-    .describe("The musical key for the style (e.g., C Major, A Minor)."),
-  genre: z.string().describe("The genre of the musical style."),
-  instrumentation: z
-    .array(z.string())
-    .describe("List of instruments used in the musical style."),
-  mood: z.array(z.string()).describe("Moods evoked by the musical style."),
-  description: z.string().describe("A brief description of the musical style."),
+  // key: z
+  //   .string()
+  //   .describe("The musical key for the style (e.g., C Major, A Minor)."),
+  // genre: z.string().describe("The genre of the musical style."),
+  // instrumentation: z
+  //   .array(z.string())
+  //   .describe("List of instruments used in the musical style."),
+  // mood: z.array(z.string()).describe("Moods evoked by the musical style."),
+  // description: z.string().describe("A brief description of the musical style."),
 };
-const StyleCard = z.object({
-  bpm: z.number(),
-  key: z.string(),
-  genre: z.string(),
-  instrumentation: z.array(z.string()),
-  mood: z.array(z.string()),
-  description: z.string(),
-});
 
 server.registerTool(
   "find-musical-style",
@@ -40,60 +31,73 @@ server.registerTool(
     title: "Find Musical Style",
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
-    inputSchema: inputShape,
-    outputSchema: outputShape,
+    inputSchema: InputSchema,
+    outputSchema: OutputSchema,
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
     const lines = Array.isArray(args?.lines) ? args.lines.map(String) : [];
+    
+    console.log("lines length", lines.length);
 
     // Placeholder implementation - replace with actual logic to determine musical style
     const card =
       lines.length % 2 === 0
         ? {
             bpm: 120,
-            key: "C Major",
-            genre: "Pop",
-            instrumentation: ["Guitar", "Drums", "Bass"],
-            mood: ["Energetic", "Uplifting"],
-            description: "A lively pop style perfect for upbeat journeys.",
+            // key: "C Major",
+            // genre: "Pop",
+            // instrumentation: ["Guitar", "Drums", "Bass"],
+            // mood: ["Energetic", "Uplifting"],
+            // description: "A lively pop style perfect for upbeat journeys.",
           }
         : {
             bpm: 100,
-            key: "D minor",
-            genre: "North-African desert raï + electronic",
-            instrumentation: ["oud", "derbouka", "bass", "synth pad"],
-            mood: ["adventurous", "journey"],
-            description: "Saharan travel groove with modern beat; steady 4/4.",
+            // key: "D minor",
+            // genre: "North-African desert raï + electronic",
+            // instrumentation: ["oud", "derbouka", "bass", "synth pad"],
+            // mood: ["adventurous", "journey"],
+            // description: "Saharan travel groove with modern beat; steady 4/4.",
           };
 
-    // validate runtime
-    const parsed = StyleCard.parse(card);
+    console.log("Generated Style Card:", card);
 
-    // return the MCP response envelope expected by the SDK
-    const responseEnvelope = {
-      // content array: many SDKs accept text/image/file choices here
-      content: [
-        {
-          type: "text",
-          text: "Style card generated successfully.",
-          _meta: { note: "style card attached as structuredContent" },
-        },
-      ],
-      // structuredContent is optional but convenient for programmatic clients
-      structuredContent: {
-        mimeType: "application/vnd.stylecard+json",
-        data: parsed,
-      },
-      // include helpful metadata too
-      _meta: {
-        styleCard: parsed,
-      },
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify(card)
+            }
+        ],
+        structuredContent: card
     };
-
-    // cast as any to satisfy the SDK typing if needed
-    return responseEnvelope as any;
   }
+);
+
+// Simple tool with parameters
+server.registerTool(
+    'calculate-bmi',
+    {
+        title: 'BMI Calculator',
+        description: 'Calculate Body Mass Index',
+        inputSchema: {
+            weightKg: z.number(),
+            heightM: z.number()
+        },
+        outputSchema: { bmi: z.number() }
+    },
+    async ({ weightKg, heightM }) => {
+        const output = { bmi: weightKg / (heightM * heightM) };
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: JSON.stringify(output)
+                }
+            ],
+            structuredContent: output
+        };
+    }
 );
 
 // Set up Express and HTTP transport
