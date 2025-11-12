@@ -38,30 +38,34 @@ const server = new McpServer({
 const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
   const prompt = `
 You are a music style selector. Infer locale and style from these lyric lines (routing directions).
-Return JSON: { bpm, key, genre, instrumentation[], mood, description }.
+Return JSON: { bpm, key, genre, instrumentation[], mood[], description }.
 Lyrics:
 ${lyricsLines.join("\n")}
   `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-  });
+  // This is the LLM call => commented out for debugging
+  // const response = await ai.models.generateContent({
+  //   model: "gemini-2.5-flash",
+  //   contents: prompt,
+  // });
+
+  // DUMMY
+  const response = {
+    text: `{
+  "bpm": 110,
+    "Rhythmic",
+    "Contemplative",
+    "Guided",
+    "Journey"
+  ],
+  "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
+}`,
+  };
 
   console.log("LLM response output_text", response.text);
-  // const resp = await fetch(process.env.LLM_URL, {
-  //   method: 'POST',
-  //   headers: { 'Authorization': `Bearer ${process.env.LLM_KEY}`, 'Content-Type':'application/json' },
-  //   body: JSON.stringify({
-  //     model: 'your-preferred-model',
-  //     temperature: 0,
-  //     messages: [{ role:'system', content:'Return concise JSON only.' },
-  //                { role:'user', content: prompt }]
-  //   })
-  // });
-  // const data = await resp.json();
-  // // parse JSON from the assistant message; validate/normalize
-  return JSON.parse(response.output_text);
+  return response?.text && response.text.length > 0
+    ? JSON.parse(response.text)
+    : ({} as StyleCard);
 };
 
 server.registerTool(
@@ -86,19 +90,32 @@ server.registerTool(
     console.log("directions length", directions.length);
 
     // Placeholder implementation - replace with actual logic to determine musical style
-    const card = getStyleCard(directions);
-
-    console.log("Generated Style Card:", card);
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(card),
-        },
-      ],
-      structuredContent: card,
-    };
+    let card = {} as StyleCard;
+    try {
+      console.log("Calling getStyleCard with directions");
+      card = await getStyleCard(directions);
+      console.log("Generated Style Card:", card);
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(card),
+          },
+        ],
+        structuredContent: card,
+      };
+    } catch (error) {
+      console.error("Error generating Style Card:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Error generating Style Card",
+          },
+        ],
+        structuredContent: {},
+      };
+    }
   }
 );
 
