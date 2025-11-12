@@ -5,32 +5,13 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
+import { StyleCard, styleCardSchema, findStyleInputSchema, generateMusicInputSchema } from "./schemas.js";
 
 const ai = new GoogleGenAI({
   apiKey: "AIzaSyC9yaQUsLTxUEyxv6i8M1IcMPkIWJto6RY",
 });
 
-interface StyleCard {
-  bpm: number;
-  key: string;
-  genre: string;
-  instrumentation: string[];
-  mood: string[];
-  description: string;
-}
-
-const styleCard = {
-  bpm: z.number().describe("Beats per minute for the musical style."),
-  key: z
-    .string()
-    .describe("The musical key for the style (e.g., C Major, A Minor)."),
-  genre: z.string().describe("The genre of the musical style."),
-  instrumentation: z
-    .array(z.string())
-    .describe("List of instruments used in the musical style."),
-  mood: z.array(z.string()).describe("Moods evoked by the musical style."),
-  description: z.string().describe("A brief description of the musical style."),
-};
+const styleCard = styleCardSchema;
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",
@@ -73,11 +54,7 @@ server.registerTool(
     title: "Find Musical Style",
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
-    inputSchema: {
-      directions: z.array(
-        z.string().describe("An array of routing directions as strings.")
-      ),
-    },
+    inputSchema: findStyleInputSchema,
     outputSchema: styleCard,
   },
   async (args: any, extra: any) => {
@@ -112,7 +89,7 @@ server.registerTool(
             text: "Error generating Style Card",
           },
         ],
-        structuredContent: {} as any,
+        structuredContent: {} as StyleCard,
       };
     }
   }
@@ -125,25 +102,8 @@ server.registerTool(
     title: "DUMMY Find Musical Style",
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
-    inputSchema: {
-      directions: z.array(
-        z.string().describe("An array of routing directions as strings.")
-      ),
-    },
-    outputSchema: {
-      bpm: z.number().describe("Beats per minute for the musical style."),
-      key: z
-        .string()
-        .describe("The musical key for the style (e.g., C Major, A Minor)."),
-      genre: z.string().describe("The genre of the musical style."),
-      instrumentation: z
-        .array(z.string())
-        .describe("List of instruments used in the musical style."),
-      mood: z.array(z.string()).describe("Moods evoked by the musical style."),
-      description: z
-        .string()
-        .describe("A brief description of the musical style."),
-    },
+    inputSchema: findStyleInputSchema,
+    outputSchema: styleCard,
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
@@ -179,7 +139,7 @@ server.registerTool(
           text: JSON.stringify(card),
         },
       ],
-      structuredContent: card as any,
+      structuredContent: card as StyleCard,
     };
   }
 );
@@ -196,44 +156,8 @@ server.registerTool(
     title: "Generate Music",
     description:
       "Generate music based on the provided routing directions and style card using the ElevenLabs Music API.",
-    inputSchema: {
-      prompt: z
-        .string()
-        .max(4100)
-        .describe("A simple text prompt to generate a song from (max 4100 characters). Cannot be used with composition_plan."),
-      music_length_ms: z
-        .number()
-        .int()
-        .min(3000)
-        .max(300000)
-        .optional()
-        .describe("The length of the song in milliseconds (3000-300000). Optional - model will choose if not provided."),
-      output_format: z
-        .enum([
-          "mp3_44100_128",
-          "mp3_44100_192",
-          "mp3_22050_32",
-          "mp3_22050_64",
-          "mp3_22050_128",
-          "pcm_44100_16",
-          "ulaw_8000_8",
-        ])
-        .optional()
-        .describe("Output format (default: mp3_44100_128). Some formats require specific subscription tiers."),
-      model_id: z
-        .enum(["music_v1"])
-        .optional()
-        .describe("The model to use for generation (default: music_v1)."),
-      force_instrumental: z
-        .boolean()
-        .optional()
-        .describe("If true, guarantees instrumental generation (default: false)."),
-      store_for_inpainting: z
-        .boolean()
-        .optional()
-        .describe("Whether to store the song for inpainting (enterprise only, default: false)."),
-    },
-    outputSchema: {}
+    inputSchema: generateMusicInputSchema,
+    outputSchema: styleCard,
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
