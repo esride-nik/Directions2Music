@@ -9,7 +9,7 @@ const server = new McpServer({
 });
 
 const InputSchema = {
-  directions: z.string().describe("An array of routing directions as strings."),
+  directions: z.array(z.string().describe("An array of routing directions as strings.")),
 };
 
 const OutputSchema = {
@@ -36,13 +36,13 @@ server.registerTool(
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
-    const lines = Array.isArray(args?.lines) ? args.lines.map(String) : [];
+    const directions = Array.isArray(args?.directions) ? args.directions.map(String) : [];
     
-    console.log("lines length", lines.length);
+    console.log("directions length", directions.length);
 
     // Placeholder implementation - replace with actual logic to determine musical style
     const card =
-      lines.length % 2 === 0
+      directions.length % 2 === 0
         ? {
             bpm: 120,
             // key: "C Major",
