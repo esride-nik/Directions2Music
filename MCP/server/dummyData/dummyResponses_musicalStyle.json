@@ -49,13 +49,39 @@
       "Synthesizer (atmospheric pads, subtle melodic motifs)",
       "Gasba (Algerian folk flute)"
     ],
-    "mood": [
-      "Hypnotic",
-      "Rhythmic",
-      "Contemplative",
-      "Guided",
-      "Journey"
-    ],
+    "mood": ["Hypnotic", "Rhythmic", "Contemplative", "Guided", "Journey"],
     "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
+  },
+  {
+    "bpm": 110,
+    "key": "C Major",
+    "genre": "Italian Folk Pop",
+    "instrumentation": [
+      "Acoustic Guitar",
+      "Mandolin",
+      "Accordion",
+      "Bass Guitar",
+      "Drums",
+      "Vocals",
+      "String Section"
+    ],
+    "mood": ["Journey", "Reflective", "Scenic", "Anticipatory", "Bittersweet"],
+    "description": "A moderately-paced Italian folk-pop track that evokes the feeling of a long, scenic drive through the Southern Italian countryside towards the vibrant city of Naples, blending traditional instrumentation with a contemporary sound."
+  },
+  {
+    "bpm": 100,
+    "key": "D minor",
+    "genre": "North-African desert raï + electronic",
+    "instrumentation": ["oud", "derbouka", "bass", "synth pad"],
+    "mood": ["adventurous", "journey"],
+    "description": "Saharan travel groove with modern beat; steady 4/4."
+  },
+  {
+    "bpm": 120,
+    "key": "C Major",
+    "genre": "Pop",
+    "instrumentation": ["Guitar", "Drums", "Bass"],
+    "mood": ["Energetic", "Uplifting"],
+    "description": "A lively pop style perfect for upbeat journeys."
   }
 ]

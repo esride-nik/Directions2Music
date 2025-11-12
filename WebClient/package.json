@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "npx serve . -p 3080"
+  },
   "dependencies": {
     "serve": "^14.2.4"
   }

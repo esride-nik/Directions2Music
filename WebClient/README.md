@@ -13,3 +13,8 @@ Start by running ``npx serve .``
 ## Sequence diagram of re-designed solution
 
 ![Sequence diagram](out/Directions2Music_sequenceDiagram/Directions2Music_sequenceDiagram.png)
+
+## Ideas
+
+* karaoke display
+* translate directions into identified local language before generating music

@@ -95,6 +95,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           const route = directionsElement.lastRoute;
           if (route) {
             console.log("New route:", route);
+            console.log(route.directionPoints.items.map((pt) => pt.displayText));
           }
         }
       });
@@ -106,41 +107,41 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       viewElement.map.add(routeLayer);
 
 
-      /*************
-       * Music GenAI
-       * ************/
+      // /*************
+      //  * Music GenAI
+      //  * ************/
 
-      // SunoAPI running locally => https://github.com/gcui-art/suno-api
-      const sunoApiBaseUrl = "http://localhost:3000";
-      let songLyrics = "";
-      let songTitle = "";
+      // // SunoAPI running locally => https://github.com/gcui-art/suno-api
+      // const sunoApiBaseUrl = "http://localhost:3000";
+      // let songLyrics = "";
+      // let songTitle = "";
 
-      // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
-      const customGenerateAudio = async (payload) => {
-        const url = `${sunoApiBaseUrl}/api/custom_generate`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-          cache: "default",
-        });
-        // Parse response body as JSON
-        return await response.json();
-      };
+      // // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
+      // const customGenerateAudio = async (payload) => {
+      //   const url = `${sunoApiBaseUrl}/api/custom_generate`;
+      //   const response = await fetch(url, {
+      //     method: "POST",
+      //     headers: {
+      //       Accept: "application/json",
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(payload),
+      //     cache: "default",
+      //   });
+      //   // Parse response body as JSON
+      //   return await response.json();
+      // };
 
-      const sunoGenerate = async (directionsText, title) => {
-        const musicalStyle = document.getElementById("musicalStyle").value;
-        return await customGenerateAudio({
-          tags: musicalStyle.substring(0, 200),
-          title: title.substring(0, 80),
-          prompt: directionsText.substring(0, 3000),
-          make_instrumental: false,
-          wait_audio: true,
-        });
-      };
+      // const sunoGenerate = async (directionsText, title) => {
+      //   const musicalStyle = document.getElementById("musicalStyle").value;
+      //   return await customGenerateAudio({
+      //     tags: musicalStyle.substring(0, 200),
+      //     title: title.substring(0, 80),
+      //     prompt: directionsText.substring(0, 3000),
+      //     make_instrumental: false,
+      //     wait_audio: true,
+      //   });
+      // };
     </script>
   </body>
 </html>
