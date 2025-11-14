@@ -150,7 +150,7 @@ server.registerTool(
 ** Generate music **
 ********************/
 
-const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, songTitle?: string) => {
+const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, description?: string, songTitle?: string) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
         environment: "https://api.elevenlabs.io",
@@ -159,9 +159,11 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
     let finalCompositionPlan;
     let musicResponse;
 
+    console.log("+++ Initial Composition Plan: +++\n", JSON.stringify(elevenLabsGenerateMusicInput.compositionPlan));
+
     try {
       finalCompositionPlan = await client.music.compositionPlan.create({
-          prompt: elevenLabsGenerateMusicInput.prompt ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
+          prompt: description ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
           sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
       });
       console.log("+++ Final Composition Plan: +++\n", JSON.stringify(finalCompositionPlan));
@@ -229,6 +231,42 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
           }
         } catch (bodyErr) {
           console.warn("⚠️  Could not extract from .body:", bodyErr);
+        }
+      }
+      
+      // Method 4: Check if it has .audio property (ElevenLabs specific format)
+      else if ((musicResponse as any)?.audio) {
+        console.log("📦 Response has .audio property, extracting...");
+        try {
+          const audioData = (musicResponse as any).audio;
+          let audioBuffer: Buffer;
+          
+          if (Buffer.isBuffer(audioData)) {
+            audioBuffer = audioData;
+          } else if (typeof audioData[Symbol.asyncIterator] === 'function') {
+            const chunks: Buffer[] = [];
+            for await (const chunk of audioData) {
+              chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+            }
+            audioBuffer = Buffer.concat(chunks);
+          } else if (typeof audioData === 'string') {
+            // Might be base64 encoded
+            audioBuffer = Buffer.from(audioData, 'base64');
+          } else if (audioData && typeof audioData === 'object' && audioData.type === 'Buffer' && Array.isArray(audioData.data)) {
+            // Serialized Buffer format from JSON.stringify
+            audioBuffer = Buffer.from(audioData.data);
+          } else if (audioData instanceof Uint8Array) {
+            audioBuffer = Buffer.from(audioData);
+          } else {
+            console.warn("⚠️  Unknown audio data type:", typeof audioData);
+            throw new Error("Unknown audio data type");
+          }
+          
+          await fs.writeFile(audioFile, audioBuffer);
+          console.log(`✅ Audio file saved (audio property): ${audioFile} (${audioBuffer.length} bytes)`);
+          audioSaved = true;
+        } catch (audioErr) {
+          console.warn("⚠️  Could not extract from .audio:", audioErr);
         }
       }
       
@@ -317,7 +355,9 @@ const shortenDirectionsInput = (directionsInput: string[], maxLines: number): st
 
 // helper to prepare ElevenLabs music generation input, meeting some API-specific constraints
 const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInput: string[]): ElevenLabsGenerateMusicInput => {
-  const calcLengthFromLines = directionsInput.length * 5000;
+  const lines = directionsInput.length <= 30 ? directionsInput : shortenDirectionsInput(directionsInput, 30);
+  const calcLengthFromLines = lines.length * 5000;
+  console.log(`getElevenLabsInitialCompositionPlan: Original directions length ${directionsInput.length}. Using ${lines.length} lines for composition plan, calculated length ${calcLengthFromLines} ms.`, JSON.stringify(lines));
   return {
     forceInstrumental: false,
     compositionPlan: {
@@ -328,7 +368,7 @@ const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInp
             positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
             negativeLocalStyles: [],
             durationMs: calcLengthFromLines <= 120000 ? calcLengthFromLines : 120000,
-            lines: directionsInput.length <= 30 ? directionsInput : shortenDirectionsInput(directionsInput, 30)
+            lines: lines
         }]
     }
   };
@@ -352,9 +392,7 @@ server.registerTool(
       : [];
 
     // ElevenLabs music generation call
-    console.log("Generate music with ElevenLabs API - before", JSON.stringify(styleCard), lyrics, extra);
-    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics), styleCard.songTitle);
-    console.log("Generate music with ElevenLabs API - after", JSON.stringify(musicResponse));
+    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
 
     // TODO: adjust tool output according to model output
     return {

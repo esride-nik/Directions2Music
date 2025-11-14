@@ -2,6 +2,22 @@
 
 This is a Model Context Protocol (MCP) server for the Directions2Music project. It provides tools for finding musical styles based on routing directions and generating music using AI models.
 
+- [Directions2Music MCP Server](#directions2music-mcp-server)
+  - [Tools](#tools)
+    - [1. find-musical-style](#1-find-musical-style)
+    - [2. dummy-find-musical-style](#2-dummy-find-musical-style)
+    - [3. generate-music](#3-generate-music)
+  - [API Reference](#api-reference)
+  - [Getting Started](#getting-started)
+    - [Installation](#installation)
+    - [Running the Server](#running-the-server)
+  - [Environment Variables](#environment-variables)
+  - [File Structure](#file-structure)
+  - [Notes](#notes)
+  - [Comparison of Music GenAIs](#comparison-of-music-genais)
+
+
+
 ## Tools
 
 ### 1. find-musical-style
@@ -128,7 +144,8 @@ npm start  # Uses cross-env to set PORT=8080
 ## Environment Variables
 
 - `PORT`: The port on which the server listens (default: 3000)
-- `GOOGLE_API_KEY`: (Optional) API key for Google Gemini LLM (currently hardcoded in index.ts for development)
+- `GOOGLE_API_KEY`: API key for Google Gemini LLM (currently hardcoded in index.ts for development)
+- `elevenLabsApiKey`: API key for music generation with ElevenLabs (currently hardcoded in index.ts for development)
 
 ---
 
@@ -151,3 +168,23 @@ server/
 - The `find-musical-style` tool requires a valid Google Gemini API key to function.
 - The `dummy-find-musical-style` tool is useful for testing without LLM calls.
 - The `generate-music` tool is currently a placeholder and requires implementation of the ElevenLabs API integration.
+
+
+---
+
+## Comparison of Music GenAIs
+
+* Google Gemini / Lyria: Targeted on on-the-fly music alteration für background music. Not able to create a full song with exact lyrics.
+  * API not tested
+* ElevenLabs: Creates full songs. Vocals often not very understandable. Music quality and originality significantly lower than what Suno does.
+  * API delivers binary MP3. Response not documented => bummer! [API doc](https://elevenlabs.io/docs/api-reference/music/compose-detailed) just says response is ``Multipart/mixed response with JSON metadata and binary audio file``, but no word about the JSON structure. Hard to find out in such a long response.
+  * wrapped in npm package, which is quite comfy
+  * not all requests well documented
+  * API limited to 40 lines of lyrics, a maximum text length, only 2 mins of music per song... discovered all those API limitations after buying the plan for a month and was pretty disappointed
+* Suno: best overall
+  * no API :(
+  * [API project on Github](https://github.com/gcui-art/suno-api) needs extras, like ReCaptcha + of course the paid Suno account, when exceeding the free tier limit
+  * still the best free tier out there
+* This page called [Sunoapi](https://sunoapi.org/api-key) says that it wraps "your models" => which models? 
+  * Quality tested at [the playground](https://sunoapi.org/playground) didn't seem so great. Is this really Suno? Bad luck?
+* [Mureka](https://www.mureka.ai/) seemed fine - maybe not as shiny as Suno, but the minimum amount to buy credits is 30$.. too expensive.
