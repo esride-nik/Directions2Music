@@ -175,35 +175,130 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
         compositionPlan: finalCompositionPlan
       });
 
-      console.log("ElevenLabs music generation response:", musicResponse);
+      console.log("✅ ElevenLabs music generation succeeded");
       
-      // Save the response to a file for inspection
+      // Create filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const responseFile = songTitle ? `./music_response_${songTitle.substring(0, 20)}_${timestamp}.json` : `./music_response_${timestamp}.json`;
-      await fs.writeFile(responseFile, JSON.stringify(musicResponse, null, 2));
-      console.log(`Music response saved to: ${responseFile}`);
+      const audioFile = songTitle 
+        ? `./music_${songTitle.substring(0, 20)}_${timestamp}.mp3` 
+        : `./music_${timestamp}.mp3`;
       
-      // Try to save the audio if it's a stream
-      if (musicResponse && typeof musicResponse === 'object') {
-        const audioFile = songTitle ? `./generated_music_${songTitle.substring(0, 20)}_${timestamp}.mp3` : `./generated_music_${timestamp}.mp3`;
+      let audioSaved = false;
+
+      // Method 1: Check if it's an async iterable (ReadableStream)
+      if (musicResponse && typeof (musicResponse as any)[Symbol.asyncIterator] === 'function') {
+        console.log("📦 Response is a stream, saving directly...");
+        const chunks: Buffer[] = [];
+        for await (const chunk of musicResponse as any) {
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        }
+        const audioBuffer = Buffer.concat(chunks);
+        await fs.writeFile(audioFile, audioBuffer);
+        console.log(`✅ Audio file saved (stream): ${audioFile} (${audioBuffer.length} bytes)`);
+        audioSaved = true;
+      }
+      
+      // Method 2: Check if it's a Buffer
+      else if (Buffer.isBuffer(musicResponse)) {
+        console.log("📦 Response is a buffer, saving directly...");
+        await fs.writeFile(audioFile, musicResponse);
+        console.log(`✅ Audio file saved (buffer): ${audioFile} (${(musicResponse as Buffer).length} bytes)`);
+        audioSaved = true;
+      }
+      
+      // Method 3: Try to access .body property (common in HTTP responses)
+      else if ((musicResponse as any)?.body) {
+        console.log("📦 Response has .body property, extracting...");
         try {
-          // musicResponse is likely a ReadableStream with audio data
           const chunks: Buffer[] = [];
-          const reader = (musicResponse as any)[Symbol.asyncIterator];
-          if (reader) {
-            for await (const chunk of musicResponse as any) {
-              chunks.push(Buffer.from(chunk));
+          const body = (musicResponse as any).body;
+          
+          if (typeof body[Symbol.asyncIterator] === 'function') {
+            for await (const chunk of body) {
+              chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
             }
+          } else if (Buffer.isBuffer(body)) {
+            chunks.push(body);
+          }
+          
+          if (chunks.length > 0) {
             const audioBuffer = Buffer.concat(chunks);
             await fs.writeFile(audioFile, audioBuffer);
-            console.log(`Audio file saved to: ${audioFile}`);
+            console.log(`✅ Audio file saved (body): ${audioFile} (${audioBuffer.length} bytes)`);
+            audioSaved = true;
           }
-        } catch (streamErr) {
-          console.log("Could not read stream as audio:", streamErr);
+        } catch (bodyErr) {
+          console.warn("⚠️  Could not extract from .body:", bodyErr);
         }
       }
+      
+      if (!audioSaved) {
+        console.warn("⚠️  Could not save audio file - response type unknown");
+        console.log("Response type:", typeof musicResponse);
+        console.log("Response keys:", Object.keys(musicResponse || {}));
+        
+        // Fallback: Save full response for analysis
+        console.log("💾 Saving full response for analysis...");
+        try {
+          const debugFile = `./music_response_debug_${timestamp}.json`;
+          const responseAnalysis = {
+            timestamp,
+            responseType: typeof musicResponse,
+            isBuffer: Buffer.isBuffer(musicResponse),
+            isStream: musicResponse && typeof (musicResponse as any)[Symbol.asyncIterator] === 'function',
+            hasBody: !!(musicResponse as any)?.body,
+            keys: Object.keys(musicResponse || {}),
+            constructorName: musicResponse?.constructor?.name || 'unknown',
+            stringified: JSON.stringify(musicResponse, (key, value) => {
+              if (typeof value === 'object' && value !== null) {
+                if (Buffer.isBuffer(value)) {
+                  return {
+                    _type: 'Buffer',
+                    length: value.length,
+                    hexStart: value.slice(0, 100).toString('hex')
+                  };
+                }
+                if (value instanceof ReadableStream || value[Symbol.asyncIterator]) {
+                  return { _type: 'Stream' };
+                }
+              }
+              return value;
+            }, 2)
+          };
+          
+          await fs.writeFile(debugFile, JSON.stringify(responseAnalysis, null, 2));
+          console.log(`✅ Debug response saved to: ${debugFile}`);
+        } catch (debugErr) {
+          console.error("Could not save debug response:", debugErr);
+        }
+      }
+      
     } catch (error) {
-      console.error("Error generating music:", error);
+      console.error("❌ Error generating music:", error);
+      
+      // Even on error, try to save error details
+      try {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const errorFile = `./music_error_${timestamp}.json`;
+        const errorDetails = {
+          timestamp,
+          error: error instanceof Error ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          } : String(error),
+          musicResponse: musicResponse ? {
+            type: typeof musicResponse,
+            keys: Object.keys(musicResponse as any)
+          } : null
+        };
+        
+        await fs.writeFile(errorFile, JSON.stringify(errorDetails, null, 2));
+        console.log(`📝 Error details saved to: ${errorFile}`);
+      } catch (saveErr) {
+        console.error("Could not save error details:", saveErr);
+      }
+      
       return error;
     }
     return musicResponse;
