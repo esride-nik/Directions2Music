@@ -12,6 +12,7 @@ export interface StyleCard {
   instrumentation: string[];
   mood: string[];
   description: string;
+  songTitle: string;
 }
 
 /***********************
@@ -29,6 +30,14 @@ export interface FindStyleInput {
  * Input interface for generate-music tool
  */
 export interface GenerateMusicInput {
+    styleCard: StyleCard;
+    lyrics: string[];
+}
+
+/**
+ * Input interface for generate-music tool
+ */
+export interface ElevenLabsGenerateMusicInput {
   prompt?: string;
   compositionPlan?: CompositionPlan;
   musicLengthMs?: number;
@@ -88,7 +97,8 @@ export const styleCardSchema = {
     .describe("List of instruments used in the musical style."),
   mood: z.array(z.string()).describe("Moods evoked by the musical style."),
   description: z.string().describe("A brief description of the musical style."),
-};
+  songTitle: z.string().describe("The song title."),
+}
 
 /***********************
 ** Input Schemas      **
@@ -101,12 +111,19 @@ export const findStyleInputSchema = {
   directions: z.array(
     z.string().describe("An array of routing directions as strings.")
   ),
-};
+}
 
-/**
- * Input schema for generate-music tool
+/** * Input schema for generate-music tool
  */
 export const generateMusicInputSchema = {
+    styleCard: z.object(styleCardSchema),
+    lyrics: z.array(z.string()).describe("An array of lyrics lines as strings."),
+}
+
+/**
+ * Input schema for ElevanLabs generate-music tool
+ */
+export const elevenLabsGenerateMusicInputSchema = {
   prompt: z
     .string()
     .max(4100)

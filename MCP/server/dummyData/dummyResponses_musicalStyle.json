@@ -12,8 +12,9 @@
       "Assorted traditional percussion (e.g., Tinde drum)",
       "Subtle, chant-like male vocals"
     ],
-    "mood": "Hypnotic, Driving, Expansive, Meditative, Steady",
-    "description": "nomadic spirit with a modern, relentless drive. Perfect for a long, reflective journey under the Saharan sun."
+    "mood": ["Hypnotic", "Driving", "Expansive", "Meditative", "Steady"],
+    "description": "nomadic spirit with a modern, relentless drive. Perfect for a long, reflective journey under the Saharan sun.",
+    "songTitle": "Saharan Journey"
   },
   {
     "bpm": 105,
@@ -35,7 +36,8 @@
       "Adventurous",
       "Steady"
     ],
-    "description": "A modern Rai track designed for a long, contemplative journey through the Algerian Sahara. The music blends the iconic vocal stylings and driving rhythms of Algerian Rai with the vast, hypnotic soundscapes of the desert blues, featuring a prominent, blues-infused electric guitar and traditional flute melodies over a fusion of electronic and organic percussion. It's the perfect soundtrack for navigating national routes through ancient lands, embracing the smoothness of paved roads while embodying the spirit of the open desert."
+    "description": "A modern Rai track designed for a long, contemplative journey through the Algerian Sahara. The music blends the iconic vocal stylings and driving rhythms of Algerian Rai with the vast, hypnotic soundscapes of the desert blues, featuring a prominent, blues-infused electric guitar and traditional flute melodies over a fusion of electronic and organic percussion. It's the perfect soundtrack for navigating national routes through ancient lands, embracing the smoothness of paved roads while embodying the spirit of the open desert.",
+    "songTitle": "Desert Roads"
   },
   {
     "bpm": 110,
@@ -50,7 +52,8 @@
       "Gasba (Algerian folk flute)"
     ],
     "mood": ["Hypnotic", "Rhythmic", "Contemplative", "Guided", "Journey"],
-    "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path."
+    "description": "A mesmerizing electronic journey across the vast, paved roads of Algeria's Ouargla desert. A steady, propulsive beat anchors a soundscape where atmospheric synthesizers meet the timeless melodies of the Oud and the intricate rhythms of Darbuka. The spoken routing directions are woven in, subtly processed with delays and reverb, transforming the mundane into a hypnotic narrative. This track evokes the feeling of a long, controlled drive through an ancient land, blending modern technology with traditional sounds, creating a mood of contemplative exploration and rhythmic forward motion, always staying on the smooth path.",
+    "songTitle": "Ouargla Drive"
   },
   {
     "bpm": 110,
@@ -66,7 +69,8 @@
       "String Section"
     ],
     "mood": ["Journey", "Reflective", "Scenic", "Anticipatory", "Bittersweet"],
-    "description": "A moderately-paced Italian folk-pop track that evokes the feeling of a long, scenic drive through the Southern Italian countryside towards the vibrant city of Naples, blending traditional instrumentation with a contemporary sound."
+    "description": "A moderately-paced Italian folk-pop track that evokes the feeling of a long, scenic drive through the Southern Italian countryside towards the vibrant city of Naples, blending traditional instrumentation with a contemporary sound.",
+    "songTitle": "Naples Drive"
   },
   {
     "bpm": 100,
@@ -74,7 +78,8 @@
     "genre": "North-African desert raï + electronic",
     "instrumentation": ["oud", "derbouka", "bass", "synth pad"],
     "mood": ["adventurous", "journey"],
-    "description": "Saharan travel groove with modern beat; steady 4/4."
+    "description": "Saharan travel groove with modern beat; steady 4/4.",
+    "songTitle": "Desert Voyage"
   },
   {
     "bpm": 120,
@@ -82,6 +87,7 @@
     "genre": "Pop",
     "instrumentation": ["Guitar", "Drums", "Bass"],
     "mood": ["Energetic", "Uplifting"],
-    "description": "A lively pop style perfect for upbeat journeys."
+    "description": "A lively pop style perfect for upbeat journeys.",
+    "songTitle": "Sunny Drive"
   }
 ]

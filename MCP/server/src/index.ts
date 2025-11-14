@@ -7,15 +7,12 @@ import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
-import { StyleCard, styleCardSchema, findStyleInputSchema, generateMusicInputSchema } from "./schemas.js";
-import { compositionPlan } from "@elevenlabs/elevenlabs-js/api/resources/music/index.js";
+import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, CompositionPlan } from "./schemas.js";
 
 const ai = new GoogleGenAI({
   apiKey: "YOUR_GOOGLE_API_KEY",
 });
 const elevenLabsApiKey = "YOUR_ELEVENLABS_API_KEY";
-
-const styleCard = styleCardSchema;
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",
@@ -29,7 +26,7 @@ const server = new McpServer({
 const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
   const prompt = `
     You are a music style selector. Infer locale and style from these lyric lines (routing directions).
-    Return JSON: { bpm, key, genre, instrumentation[], mood[], description }.
+    Return JSON: { bpm, key, genre, instrumentation[], mood[], description, songTitle }.
     Lyrics:
     ${lyricsLines.join("\n")}
   `;
@@ -59,7 +56,7 @@ server.registerTool(
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
     inputSchema: findStyleInputSchema,
-    outputSchema: styleCard,
+    outputSchema: styleCardSchema,
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
@@ -107,7 +104,7 @@ server.registerTool(
     description:
       "Find a musical style based on given routing directions by drawing cultural references from the location.",
     inputSchema: findStyleInputSchema,
-    outputSchema: styleCard,
+    outputSchema: styleCardSchema,
   },
   async (args: any, extra: any) => {
     // narrow & validate at runtime
@@ -153,38 +150,7 @@ server.registerTool(
 ** Generate music **
 ********************/
 
-// generate-music with ElevenLabs
-server.registerTool(
-  "generate-music",
-  {
-    title: "Generate Music",
-    description:
-      "Generate music based on the provided routing directions and style card using the ElevenLabs Music API.",
-    inputSchema: generateMusicInputSchema,
-    outputSchema: styleCard,
-  },
-  async (args: GenerateMusicInput, extra: any) => {
-    // narrow & validate at runtime
-    const compositionPlan = args?.compositionPlan || undefined;
-    const prompt = args?.prompt ? String(args.prompt) : "";
-    const musicLengthMs = args?.musicLengthMs ? Number(args.musicLengthMs) : undefined;
-    const outputFormat = args?.outputFormat || "mp3_44100_128";
-    const modelId = args?.modelId || "music_v1";
-    const forceInstrumental = Boolean(args?.forceInstrumental);
-    const storeForInpainting = Boolean(args?.storeForInpainting);
-
-    console.log("Generate music with ElevenLabs API", JSON.stringify(compositionPlan), {
-      prompt: prompt,
-      musicLengthMs,
-      outputFormat,
-      modelId,
-      forceInstrumental,
-      storeForInpainting,
-  }, extra);
-
-    // Placeholder implementation - replace with actual logic to call ElevenLabs API
-    let card = {} as StyleCard;
-
+const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
         environment: "https://api.elevenlabs.io",
@@ -195,8 +161,8 @@ server.registerTool(
 
     try {
       finalCompositionPlan = await client.music.compositionPlan.create({
-          prompt: prompt,
-          sourceCompositionPlan: compositionPlan
+          prompt: elevenLabsGenerateMusicInput.prompt ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
+          sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
       });
       console.log("Final Composition Plan:", finalCompositionPlan);
     } catch (error) {
@@ -232,16 +198,70 @@ server.registerTool(
       console.error("Error generating music:", error);
       return error;
     }
+    return musicResponse;
+}
+
+// concatenate lines to fit maxLines
+const shortenDirectionsInput = (directionsInput: string[], maxLines: number): string[] => {
+  let lineCount = 0;
+  while (directionsInput.length > maxLines) {
+    directionsInput[lineCount] = `${directionsInput[lineCount]}\n${directionsInput[lineCount+1]}`;
+    directionsInput.splice(lineCount+1, 1);
+    lineCount++;
+  }
+  return directionsInput;
+}
+
+// helper to prepare ElevenLabs music generation input, meeting some API-specific constraints
+const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInput: string[]): ElevenLabsGenerateMusicInput => {
+  const calcLengthFromLines = directionsInput.length * 5000;
+  return {
+    forceInstrumental: false,
+    compositionPlan: {
+        positiveGlobalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+        negativeGlobalStyles: [],
+        sections: [{
+            sectionName: styleCard.songTitle || directionsInput[0],
+            positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+            negativeLocalStyles: [],
+            durationMs: calcLengthFromLines <= 120000 ? calcLengthFromLines : 120000,
+            lines: directionsInput.length <= 30 ? directionsInput : shortenDirectionsInput(directionsInput, 30)
+        }]
+    }
+  };
+}
+
+// generate-music with ElevenLabs
+server.registerTool(
+  "generate-music",
+  {
+    title: "Generate Music",
+    description:
+      "Generate music based on the provided routing directions and style card using the ElevenLabs Music API.",
+    inputSchema: generateMusicInputSchema,
+    outputSchema: styleCardSchema,
+  },
+  async (args: GenerateMusicInput, extra: any) => {
+    // narrow & validate at runtime
+    const styleCard = args?.styleCard as StyleCard;
+    const lyrics = Array.isArray(args?.lyrics)
+      ? args.lyrics.map(String)
+      : [];
+
+    // ElevenLabs music generation call
+    console.log("Generate music with ElevenLabs API - before", JSON.stringify(styleCard), lyrics, extra);
+    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics));
+    console.log("Generate music with ElevenLabs API - after", JSON.stringify(musicResponse));
 
     // TODO: adjust tool output according to model output
     return {
       content: [
         {
           type: "text",
-          text: `Music generation requested: "${prompt.substring(0, 50)}..."`,
+          text: `Music generation requested: "${lyrics.slice(0, 50).join(" ")}..."`,
         },
       ],
-      structuredContent: card as any,
+      structuredContent: musicResponse as any,
     };
   }
 );

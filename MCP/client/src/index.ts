@@ -1,6 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { StyleCard, FindStyleInput, GenerateMusicInput, styleCardSchema, findStyleInputSchema, generateMusicInputSchema } from "../../server/src/schemas.js";
+import { StyleCard, FindStyleInput, ElevenLabsGenerateMusicInput, styleCardSchema, findStyleInputSchema, elevenLabsGenerateMusicInputSchema } from "../../server/src/schemas.js";
 
 // Helper function to extract and validate StyleCard from tool result
 function extractStyleCard(toolResult: any): StyleCard {
@@ -47,7 +47,7 @@ const musicalStyleResult = await client.callTool({
     name: 'dummy-find-musical-style',
     arguments: {
         directions: directionsInput
-    } as any
+    }
 });
 console.log('Musical Style Result:', JSON.stringify(musicalStyleResult));
 
@@ -55,28 +55,13 @@ console.log('Musical Style Result:', JSON.stringify(musicalStyleResult));
 const styleCard: StyleCard = extractStyleCard(musicalStyleResult);
 // console.log('+++Client+++ Style Card:', JSON.stringify(styleCard, null, 2));
 
-// TODO: add compositionplan with lyrics
-// Use the StyleCard to generate music
-const generateMusicInput: GenerateMusicInput = {
-    prompt: `Generate music for a journey in the style of ${styleCard.genre}. ${styleCard.description}`,
-    forceInstrumental: false,
-    compositionPlan: {
-        positiveGlobalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-        negativeGlobalStyles: [],
-        sections: [{
-            sectionName: directionsTitle,
-            positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-            negativeLocalStyles: [],
-            durationMs: directionsInput.length * 5000,
-            lines: directionsInput
-        }]
-    }
-};
-console.log('Music Generation Input:', JSON.stringify(generateMusicInput));
-
+// Use the StyleCard and lyrics to generate music
 const musicGenerationResult = await client.callTool({
     name: 'generate-music',
-    arguments: generateMusicInput as any
+    arguments: {
+        styleCard: styleCard,
+        lyrics: directionsInput
+    }
 });
 
 console.log('Music Generation Result:', JSON.stringify(musicGenerationResult, null, 2));
