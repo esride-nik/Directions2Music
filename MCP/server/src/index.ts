@@ -163,42 +163,49 @@ server.registerTool(
     inputSchema: generateMusicInputSchema,
     outputSchema: styleCard,
   },
-  async (args: any, extra: any) => {
+  async (args: GenerateMusicInput, extra: any) => {
     // narrow & validate at runtime
-    const composition_plan = args?.composition_plan || undefined;
+    const compositionPlan = args?.compositionPlan || undefined;
     const prompt = args?.prompt ? String(args.prompt) : "";
-    const music_length_ms = args?.music_length_ms ? Number(args.music_length_ms) : undefined;
-    const output_format = args?.output_format || "mp3_44100_128";
-    const model_id = args?.model_id || "music_v1";
-    const force_instrumental = Boolean(args?.force_instrumental);
-    const store_for_inpainting = Boolean(args?.store_for_inpainting);
+    const musicLengthMs = args?.musicLengthMs ? Number(args.musicLengthMs) : undefined;
+    const outputFormat = args?.outputFormat || "mp3_44100_128";
+    const modelId = args?.modelId || "music_v1";
+    const forceInstrumental = Boolean(args?.forceInstrumental);
+    const storeForInpainting = Boolean(args?.storeForInpainting);
 
-    console.log("Generate music with ElevenLabs API", {
-      composition_plan,
-      prompt: prompt.substring(0, 50),
-      music_length_ms,
-      output_format,
-      model_id,
-      force_instrumental,
-      store_for_inpainting,
-    });
+    console.log("Generate music with ElevenLabs API", JSON.stringify(compositionPlan), {
+      prompt: prompt,
+      musicLengthMs,
+      outputFormat,
+      modelId,
+      forceInstrumental,
+      storeForInpainting,
+  }, extra);
 
     // Placeholder implementation - replace with actual logic to call ElevenLabs API
     let card = {} as StyleCard;
-    try {
 
-      // Call ElevenLabs API at https://api.elevenlabs.io/v1/music/detailed with the parameters above
-      
-      const client = new ElevenLabsClient({
-          environment: "https://api.elevenlabs.io",
-          apiKey: elevenLabsApiKey,
-      });
-      const finalCompositionPlan = await client.music.compositionPlan.create({
+    // Create ElevenLabs API client
+    const client = new ElevenLabsClient({
+        environment: "https://api.elevenlabs.io",
+        apiKey: elevenLabsApiKey,
+    });
+    let finalCompositionPlan;
+    let musicResponse;
+
+    try {
+      finalCompositionPlan = await client.music.compositionPlan.create({
           prompt: prompt,
-          sourceCompositionPlan: composition_plan
+          sourceCompositionPlan: compositionPlan
       });
       console.log("Final Composition Plan:", finalCompositionPlan);
-      const musicResponse = await client.music.composeDetailed.apply({
+    } catch (error) {
+      console.error("Error generating final composition plan:", error);
+      return error;
+    }
+
+  try {
+      musicResponse = await client.music.composeDetailed.apply({
         compositionPlan: finalCompositionPlan
       });
 
@@ -221,29 +228,21 @@ server.registerTool(
       // const musicResponse = await fetch("https://api.elevenlabs.io/v1/music/detailed", musicRequest);
 
       console.log("ElevenLabs music generation response status:", JSON.stringify(musicResponse));
-
-      // TODO: adjust tool output according to model output
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Music generation requested: "${prompt.substring(0, 50)}..."`,
-          },
-        ],
-        structuredContent: card as any,
-      };
     } catch (error) {
       console.error("Error generating music:", error);
-      return {
-        content: [
-          {
-            type: "text",
-            text: "Error generating music",
-          },
-        ],
-        structuredContent: {} as any,
-      };
+      return error;
     }
+
+    // TODO: adjust tool output according to model output
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Music generation requested: "${prompt.substring(0, 50)}..."`,
+        },
+      ],
+      structuredContent: card as any,
+    };
   }
 );
 
@@ -294,8 +293,8 @@ const port = parseInt(process.env.PORT || "3000");
 app
   .listen(port, () => {
     console.log(`Demo MCP Server running on http://localhost:${port}/mcp`);
-  })
-  .on("error", (error) => {
-    console.error("Server error:", error);
-    process.exit(1);
   });
+  // .on("error", (error) => {
+  //   console.error("Server error:", error);
+  //   process.exit(1);
+  // });

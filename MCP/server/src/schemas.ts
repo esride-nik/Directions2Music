@@ -1,3 +1,4 @@
+import { compositionPlan } from "@elevenlabs/elevenlabs-js/api/resources/music/index.js";
 import { z } from "zod";
 
 /**
@@ -29,12 +30,12 @@ export interface FindStyleInput {
  */
 export interface GenerateMusicInput {
   prompt?: string;
-  composition_plan?: CompositionPlan;
-  music_length_ms?: number;
-  output_format?: "mp3_44100_128" | "mp3_44100_192" | "mp3_22050_32" | "mp3_22050_64" | "mp3_22050_128" | "pcm_44100_16" | "ulaw_8000_8";
-  model_id?: "music_v1";
-  force_instrumental?: boolean;
-  store_for_inpainting?: boolean;
+  compositionPlan?: CompositionPlan;
+  musicLengthMs?: number;
+  outputFormat?: "mp3_44100_128" | "mp3_44100_192" | "mp3_22050_32" | "mp3_22050_64" | "mp3_22050_128" | "pcm_44100_16" | "ulaw_8000_8";
+  modelId?: "music_v1";
+  forceInstrumental?: boolean;
+  storeForInpainting?: boolean;
 }
 
 /**
@@ -42,10 +43,10 @@ export interface GenerateMusicInput {
  * Detailed guide for music generation with sections, styles, and song metadata
  */
 export interface CompositionPlan {
-  positive_global_styles: string[];
-  negative_global_styles: string[];
+  positiveGlobalStyles: string[];
+  negativeGlobalStyles: string[];
   sections: CompositionSection[];
-  song_metadata?: SongMetadata;
+  songMetadata?: SongMetadata;
 }
 
 /**
@@ -53,10 +54,10 @@ export interface CompositionPlan {
  * Individual section within a composition plan
  */
 export interface CompositionSection {
-  section_name: string;
-  positive_local_styles: string[];
-  negative_local_styles: string[];
-  duration_ms: number;
+  sectionName: string;
+  positiveLocalStyles: string[];
+  negativeLocalStyles: string[];
+  durationMs: number;
   lines: string[];
 }
 
@@ -69,7 +70,7 @@ export interface SongMetadata {
   description?: string;
   genres?: string[];
   languages?: string[];
-  is_explicit?: boolean;
+  isExplicit?: boolean;
 }
 
 /**
@@ -111,25 +112,25 @@ export const generateMusicInputSchema = {
     .max(4100)
     .optional()
     .describe("A simple text prompt to generate a song from (max 4100 characters). Cannot be used with composition_plan."),
-  composition_plan: z
+  compositionPlan: z
     .object({
-      positive_global_styles: z
+      positiveGlobalStyles: z
         .array(z.string())
         .describe("Styles that should be present in the entire song (use English)."),
-      negative_global_styles: z
+      negativeGlobalStyles: z
         .array(z.string())
         .describe("Styles that should NOT be present in the entire song (use English)."),
       sections: z
         .array(
           z.object({
-            section_name: z.string().describe("Name of the song section (e.g., 'Verse 1', 'Chorus')."),
-            positive_local_styles: z
+            sectionName: z.string().describe("Name of the song section (e.g., 'Verse 1', 'Chorus')."),
+            positiveLocalStyles: z
               .array(z.string())
               .describe("Styles specific to this section (use English)."),
-            negative_local_styles: z
+            negativeLocalStyles: z
               .array(z.string())
               .describe("Styles to avoid in this section (use English)."),
-            duration_ms: z
+            durationMs: z
               .number()
               .int()
               .min(1000)
@@ -140,7 +141,7 @@ export const generateMusicInputSchema = {
           })
         )
         .describe("Array of sections that make up the composition."),
-      song_metadata: z
+      songMetadata: z
         .object({
           title: z.string().optional().describe("Title of the song."),
           description: z.string().optional().describe("Description of the song."),
@@ -152,21 +153,21 @@ export const generateMusicInputSchema = {
             .array(z.string())
             .optional()
             .describe("Array of language codes (e.g., 'en', 'fr')."),
-          is_explicit: z.boolean().optional().describe("Whether the song contains explicit content."),
+          isExplicit: z.boolean().optional().describe("Whether the song contains explicit content."),
         })
         .optional()
         .describe("Metadata about the generated song."),
     })
     .optional()
     .describe("A detailed composition plan to guide music generation. Cannot be used with prompt."),
-  music_length_ms: z
+  musicLengthMs: z
     .number()
     .int()
     .min(3000)
     .max(300000)
     .optional()
     .describe("The length of the song in milliseconds (3000-300000). Used only with prompt. Optional - model chooses if not provided."),
-  output_format: z
+  outputFormat: z
     .enum([
       "mp3_44100_128",
       "mp3_44100_192",
@@ -178,17 +179,13 @@ export const generateMusicInputSchema = {
     ])
     .optional()
     .describe("Output format (default: mp3_44100_128). Some formats require specific subscription tiers."),
-  model_id: z
+  modelId: z
     .enum(["music_v1"])
     .optional()
     .describe("The model to use for generation (default: music_v1)."),
-  force_instrumental: z
+  forceInstrumental: z
     .boolean()
     .optional()
-    .describe("If true, guarantees instrumental generation (default: false). Can only be used with prompt."),
-  store_for_inpainting: z
-    .boolean()
-    .optional()
-    .describe("Whether to store the song for inpainting (enterprise only, default: false)."),
+    .describe("If true, guarantees instrumental generation (default: false). Can only be used with prompt.")
 };
 
