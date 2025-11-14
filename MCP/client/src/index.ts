@@ -59,20 +59,20 @@ const styleCard: StyleCard = extractStyleCard(musicalStyleResult);
 // Use the StyleCard to generate music
 const generateMusicInput: GenerateMusicInput = {
     prompt: `Generate music for a journey in the style of ${styleCard.genre}. ${styleCard.description}`,
-    force_instrumental: false,
-    composition_plan: {
-        positive_global_styles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-        negative_global_styles: [],
+    forceInstrumental: false,
+    compositionPlan: {
+        positiveGlobalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+        negativeGlobalStyles: [],
         sections: [{
-            section_name: directionsTitle,
-            positive_local_styles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-            negative_local_styles: [],
-            duration_ms: directionsInput.length * 5000,
+            sectionName: directionsTitle,
+            positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+            negativeLocalStyles: [],
+            durationMs: directionsInput.length * 5000,
             lines: directionsInput
         }]
     }
 };
-// console.log('Music Generation Input:', JSON.stringify(generateMusicInput, null, 2));
+console.log('Music Generation Input:', JSON.stringify(generateMusicInput));
 
 const musicGenerationResult = await client.callTool({
     name: 'generate-music',
