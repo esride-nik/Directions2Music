@@ -1,0 +1,4 @@
+{
+  "googleGenAIApiKey": "YOUR_GOOGLE_GENAI_API_KEY_HERE",
+  "elevenLabsApiKey": "YOUR_ELEVENLABS_API_KEY_HERE"
+}
