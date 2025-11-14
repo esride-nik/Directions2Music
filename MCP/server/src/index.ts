@@ -7,12 +7,16 @@ import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
-import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, CompositionPlan, FindStyleInput } from "./schemas.js";
+import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, ElevenLabsCompositionPlan, FindStyleInput } from "./schemas.js";
+
+// Load configuration
+const configPath = new URL("../config.json", import.meta.url);
+const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyC9yaQUsLTxUEyxv6i8M1IcMPkIWJto6RY",
+  apiKey: config.googleGenAIApiKey,
 });
-const elevenLabsApiKey = "sk_15d6f23c93bf4d768f210fbbfc07f68105f0870aa8aa0198";
+const elevenLabsApiKey = config.elevenLabsApiKey;
 
 const server = new McpServer({
   name: "directions2Music_mcp_server",

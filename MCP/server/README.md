@@ -117,9 +117,26 @@ All tools are exposed via HTTP POST to the `/mcp` endpoint on the server.
 
 ### Installation
 
+1. Install dependencies:
 ```bash
 npm install
 ```
+
+2. Set up configuration:
+```bash
+# Copy the template to create your config file
+cp config.json.template config.json
+```
+
+3. Edit `config.json` and add your API keys:
+```json
+{
+  "googleGenAIApiKey": "YOUR_GOOGLE_GENAI_API_KEY_HERE",
+  "elevenLabsApiKey": "YOUR_ELEVENLABS_API_KEY_HERE"
+}
+```
+
+**Important:** The `config.json` file is gitignored to keep your API keys secure.
 
 ### Running the Server
 
@@ -144,8 +161,12 @@ npm start  # Uses cross-env to set PORT=8080
 ## Environment Variables
 
 - `PORT`: The port on which the server listens (default: 3000)
-- `GOOGLE_API_KEY`: API key for Google Gemini LLM (currently hardcoded in index.ts for development)
-- `elevenLabsApiKey`: API key for music generation with ElevenLabs (currently hardcoded in index.ts for development)
+
+## Configuration
+
+API keys are loaded from `config.json` (see `config.json.template` for the format):
+- `googleGenAIApiKey`: API key for Google Gemini LLM 
+- `elevenLabsApiKey`: API key for music generation with ElevenLabs
 
 ---
 
