@@ -150,7 +150,7 @@ server.registerTool(
 ** Generate music **
 ********************/
 
-const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput) => {
+const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, songTitle?: string) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
         environment: "https://api.elevenlabs.io",
@@ -164,36 +164,44 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
           prompt: elevenLabsGenerateMusicInput.prompt ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
           sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
       });
-      console.log("Final Composition Plan:", finalCompositionPlan);
+      console.log("+++ Final Composition Plan: +++\n", JSON.stringify(finalCompositionPlan));
     } catch (error) {
       console.error("Error generating final composition plan:", error);
       return error;
     }
 
   try {
-      musicResponse = await client.music.composeDetailed.apply({
+      musicResponse = await client.music.composeDetailed({
         compositionPlan: finalCompositionPlan
       });
 
-      // const musicRequest = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "xi-api-key": elevenLabsApiKey,
-      //   },
-      //   body: JSON.stringify({
-      //     composition_plan,
-      //     // prompt,
-      //     // music_length_ms,
-      //     // output_format,
-      //     // model_id,
-      //     force_instrumental
-      //   })
-      // }
-      // console.log("ElevenLabs music generation request:", JSON.stringify(musicRequest));
-      // const musicResponse = await fetch("https://api.elevenlabs.io/v1/music/detailed", musicRequest);
-
-      console.log("ElevenLabs music generation response status:", JSON.stringify(musicResponse));
+      console.log("ElevenLabs music generation response:", musicResponse);
+      
+      // Save the response to a file for inspection
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const responseFile = songTitle ? `./music_response_${songTitle.substring(0, 20)}_${timestamp}.json` : `./music_response_${timestamp}.json`;
+      await fs.writeFile(responseFile, JSON.stringify(musicResponse, null, 2));
+      console.log(`Music response saved to: ${responseFile}`);
+      
+      // Try to save the audio if it's a stream
+      if (musicResponse && typeof musicResponse === 'object') {
+        const audioFile = songTitle ? `./generated_music_${songTitle.substring(0, 20)}_${timestamp}.mp3` : `./generated_music_${timestamp}.mp3`;
+        try {
+          // musicResponse is likely a ReadableStream with audio data
+          const chunks: Buffer[] = [];
+          const reader = (musicResponse as any)[Symbol.asyncIterator];
+          if (reader) {
+            for await (const chunk of musicResponse as any) {
+              chunks.push(Buffer.from(chunk));
+            }
+            const audioBuffer = Buffer.concat(chunks);
+            await fs.writeFile(audioFile, audioBuffer);
+            console.log(`Audio file saved to: ${audioFile}`);
+          }
+        } catch (streamErr) {
+          console.log("Could not read stream as audio:", streamErr);
+        }
+      }
     } catch (error) {
       console.error("Error generating music:", error);
       return error;
@@ -250,7 +258,7 @@ server.registerTool(
 
     // ElevenLabs music generation call
     console.log("Generate music with ElevenLabs API - before", JSON.stringify(styleCard), lyrics, extra);
-    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics));
+    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics), styleCard.songTitle);
     console.log("Generate music with ElevenLabs API - after", JSON.stringify(musicResponse));
 
     // TODO: adjust tool output according to model output
