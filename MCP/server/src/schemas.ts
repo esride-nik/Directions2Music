@@ -24,6 +24,7 @@ export interface StyleCard {
  */
 export interface FindStyleInput {
   directions: string[];
+  dummyMode?: boolean;
 }
 
 /**
@@ -111,6 +112,7 @@ export const findStyleInputSchema = {
   directions: z.array(
     z.string().describe("An array of routing directions as strings.")
   ),
+  dummyMode: z.boolean().optional().describe("If true, activates dummy mode for testing."),
 }
 
 /** * Input schema for generate-music tool

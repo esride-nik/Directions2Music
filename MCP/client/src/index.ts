@@ -42,10 +42,10 @@ const directionsInput = ["Start at SP414, 84069, Roccadaspide, Salernes","Go nor
 
 //Find musical style based on directions
 const musicalStyleResult = await client.callTool({
-    // name: 'find-musical-style',
-    name: 'dummy-find-musical-style',
+    name: 'find-musical-style',
     arguments: {
-        directions: directionsInput
+        directions: directionsInput,
+        dummyMode: true
     }
 });
 console.log('Musical Style Result:', JSON.stringify(musicalStyleResult));
@@ -62,6 +62,6 @@ const musicGenerationResult = await client.callTool({
         lyrics: directionsInput
     }
 });
-
 console.log('Music Generation Result:', JSON.stringify(musicGenerationResult, null, 2));
+
 await client.close();

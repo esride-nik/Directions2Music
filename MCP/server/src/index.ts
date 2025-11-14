@@ -7,7 +7,7 @@ import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
-import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, CompositionPlan } from "./schemas.js";
+import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, CompositionPlan, FindStyleInput } from "./schemas.js";
 
 const ai = new GoogleGenAI({
   apiKey: "YOUR_GOOGLE_API_KEY",
@@ -23,7 +23,8 @@ const server = new McpServer({
 ** Find musical style **
 ************************/
 
-const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
+// query Gemini LLM to get StyleCard from directions
+const getStyleCardFromGemini = async (lyricsLines: string[]): Promise<StyleCard> => {
   const prompt = `
     You are a music style selector. Infer locale and style from these lyric lines (routing directions).
     Return JSON: { bpm, key, genre, instrumentation[], mood[], description, songTitle }.
@@ -37,15 +38,37 @@ const getStyleCard = async (lyricsLines: string[]): Promise<StyleCard> => {
     contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseJsonSchema: zodToJsonSchema(z.object(styleCard)),
+      responseJsonSchema: zodToJsonSchema(z.object(styleCardSchema)),
     },
   });
 
   const jsonResponse =
     response.text && response.text.length > 0
-      ? (z.object(styleCard).parse(JSON.parse(response.text)) as StyleCard)
+      ? (z.object(styleCardSchema).parse(JSON.parse(response.text)) as StyleCard)
       : ({} as StyleCard);
   return jsonResponse;
+};
+
+// get dummy StyleCard for testing
+const getDummyStyleCard = async (): Promise<StyleCard> => {
+    // Placeholder implementation - replace with actual logic to determine musical style
+    // Read local dummy responses JSON file (server-side filesystem)
+    try {
+      const dummyPath = new URL(
+        "../dummyData/dummyResponses_musicalStyle.json",
+        import.meta.url
+      );
+      const dummyText = await fs.readFile(dummyPath, "utf8");
+      const dummyResponses = JSON.parse(dummyText);
+      // console.log("Fetched dummy responses", dummyResponses?.length ?? null, dummyResponses);
+      const randomId = Math.floor(Math.random()*dummyResponses?.length);
+      const card = dummyResponses[randomId];
+      console.log(`Fetched dummy Style Card no.${randomId}:`, card);
+      return card;
+    } catch (e) {
+      console.warn("Could not read dummy responses file:", e);
+      return {} as StyleCard;
+    }
 };
 
 // find-musical-style with Gemini LLM
@@ -58,20 +81,20 @@ server.registerTool(
     inputSchema: findStyleInputSchema,
     outputSchema: styleCardSchema,
   },
-  async (args: any, extra: any) => {
+  async (args: FindStyleInput) => {
     // narrow & validate at runtime
     const directions = Array.isArray(args?.directions)
       ? args.directions.map(String)
       : [];
+    const dummyMode = args && args.dummyMode ? Boolean(args.dummyMode) : false;
 
-    console.log("directions length", directions.length);
-
-    // Placeholder implementation - replace with actual logic to determine musical style
+    // determine musical style
     let card = {} as StyleCard;
     try {
-      console.log("Calling getStyleCard with directions");
-      card = await getStyleCard(directions);
-      console.log("Generated Style Card:", card);
+
+      // query Gemini LLM (or get dummy data)
+      card = dummyMode ? await getDummyStyleCard() : await getStyleCardFromGemini(directions);
+
       return {
         content: [
           {
@@ -95,56 +118,6 @@ server.registerTool(
     }
   }
 );
-
-// dummy-find-musical-style (no LLM, local dummy data)
-server.registerTool(
-  "dummy-find-musical-style",
-  {
-    title: "DUMMY Find Musical Style",
-    description:
-      "Find a musical style based on given routing directions by drawing cultural references from the location.",
-    inputSchema: findStyleInputSchema,
-    outputSchema: styleCardSchema,
-  },
-  async (args: any, extra: any) => {
-    // narrow & validate at runtime
-    const directions = Array.isArray(args?.directions)
-      ? args.directions.map(String)
-      : [];
-
-    console.log("directions length", directions.length);
-
-    let card = {} as StyleCard;
-
-    // Placeholder implementation - replace with actual logic to determine musical style
-    // Read local dummy responses JSON file (server-side filesystem)
-    try {
-      const dummyPath = new URL(
-        "../dummyData/dummyResponses_musicalStyle.json",
-        import.meta.url
-      );
-      const dummyText = await fs.readFile(dummyPath, "utf8");
-      const dummyResponses = JSON.parse(dummyText);
-      // console.log("Fetched dummy responses", dummyResponses?.length ?? null, dummyResponses);
-      const randomId = Math.floor(Math.random()*dummyResponses?.length);
-      card = dummyResponses[randomId];
-      console.log(`Fetched dummy Style Card no.${randomId}:`, card);
-    } catch (e) {
-      console.warn("Could not read dummy responses file:", e);
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(card),
-        },
-      ],
-      structuredContent: card as any,
-    };
-  }
-);
-
 
 /*******************
 ** Generate music **
