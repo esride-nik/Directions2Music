@@ -1,6 +1,26 @@
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import fs from 'fs/promises';
+import { fileURLToPath } from 'url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { StyleCard, FindStyleInput, ElevenLabsGenerateMusicInput, styleCardSchema, findStyleInputSchema, elevenLabsGenerateMusicInputSchema } from "../../server/src/schemas.js";
+import { StyleCard } from "../../server/src/schemas.js";
+
+// ES module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = 3001;
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+
+// Serve static files (MP3s) from MCP server directory
+const serverDir = path.resolve(__dirname, '../../server');
+app.use('/audio', express.static(serverDir));
 
 // Helper function to extract and validate StyleCard from tool result
 function extractStyleCard(toolResult: any): StyleCard {
@@ -10,66 +30,213 @@ function extractStyleCard(toolResult: any): StyleCard {
   throw new Error('No structuredContent in tool result');
 }
 
-const baseUrl = 'http://localhost:3000/mcp';
-const client = new Client({
-    name: 'streamable-http-client',
+// Helper function to find the latest music file
+async function findLatestMusicFile(): Promise<string | null> {
+  try {
+    const files = await fs.readdir(serverDir);
+    const musicFiles = files.filter(file => 
+      file.startsWith('music_') && file.endsWith('.mp3')
+    );
+    
+    if (musicFiles.length === 0) return null;
+    
+    // Sort by modification time (newest first)
+    const fileStats = await Promise.all(
+      musicFiles.map(async file => {
+        const stats = await fs.stat(path.join(serverDir, file));
+        return { file, mtime: stats.mtime };
+      })
+    );
+    
+    fileStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+    return fileStats[0].file;
+  } catch (error) {
+    console.error('Error finding latest music file:', error);
+    return null;
+  }
+}
+
+// Create MCP client connection
+async function createMcpClient() {
+  const baseUrl = 'http://localhost:3000/mcp';
+  const client = new Client({
+    name: 'directions2music-client',
     version: '1.0.0'
-});
-const transport = new StreamableHTTPClientTransport(new URL(baseUrl));
-await client.connect(transport);
-console.log('Connected using Streamable HTTP transport');
+  });
+  
+  const transport = new StreamableHTTPClientTransport(new URL(baseUrl));
+  await client.connect(transport);
+  console.log('✅ Connected to MCP Server');
+  return client;
+}
 
-// List prompts
-// const prompts = await client.listPrompts();
-
-// // Get a prompt
-// const prompt = await client.getPrompt({
-//     name: 'example-prompt',
-//     arguments: {
-//         arg1: 'value'
-//     }
-// });
-
-// // List resources
-// const resources = await client.listResources();
-
-// // Read a resource
-// const resource = await client.readResource({
-//     uri: 'file:///example.txt'
-// });
-
-/****************************************
-// TODO: Replace with actual directions from web application
-*****************************************/
-const directionsInput = ["Start at SP414, 84069, Roccadaspide, Salernes","Go northwest on SP414","At the roundabout, take the second exit to stay on SP414 (Via di Ponente)","Turn left on SS166 (Via Santa Maria)","Continue forward on Via Serra (SS166)","Continue forward on SP11 (Via Serra)","Make a sharp right on SP419 (Via Vocitiello)","Make a sharp left on Frazione Canne","Continue forward on Via Doglie","Turn left to stay on Via Doglie","Bear right on Via Piano del Carpine","Continue forward on Via Palata","Continue forward on Via Santa Tecchia","Turn right to stay on Via Santa Tecchia","Bear left on Via Canale","Turn right, then turn left","Continue forward on Via Canale","Continue forward on Via San Nicola","Bear right on Via Fontana di Jacopo (SP11)","Make a sharp right on SP88","Turn left on Località Genzano","Continue forward on Località Rimati","Continue forward on Località Campoluongo","Continue forward on SP317 (Località Campoluongo)","Keep left at the fork onto SP317 (Località Scanno)","Turn left at Località Scanno to stay on SP317 (Località Scanno)","At the roundabout, take the second exit onto SP317","At the roundabout, take the first exit onto SP30 (Via Provinciale del Cornito)","At the roundabout, take the second exit onto SP30 (Via Provinciale del Cornito)","Turn left to merge onto the highway toward Salerno / Reggio di Calabria","Keep left at the fork to stay on E45 toward A3 / NAPOLI / SALERNO","Go forward on Autostrada del Mediterraneo Diramazione Napoli (A2dir)","Go forward on A3 toward NAPOLI","Take the exit on the right to merge onto the highway toward NAPOLI","Take the exit on the right to merge onto the highway toward centro / imbarco aliscafi / PORTO / imbarco traghetti","Take the exit to merge onto Via Ponte dei Granili","Continue forward on Via Reggia di Portici","At the roundabout, take the second exit onto Via Alessandro Volta","At the roundabout, take the second exit onto Via Amerigo Vespucci","At the traffic light, continue forward on Via Nuova Marina (Via Marina)","Make a U-turn at Via Cristoforo Colombo / Via Alcide De Gasperi and go back on Via Nuova Marina (Via Marina)","Turn right on Calata Porta di Massa","At the roundabout, take the first exit to stay on Calata Porta di Massa","At the roundabout, take the third exit","Continue forward on Calata Piliero","Continue forward on Molo Angioino","At the roundabout, take the second exit to stay on Molo Angioino","Turn left to stay on Molo Angioino","Finish at Totem Della Pace, on the right"];
-
-
-/****************************************
-* Find musical style based on directions
-*****************************************/
-const musicalStyleResult = await client.callTool({
-    name: 'find-musical-style',
-    arguments: {
-        directions: directionsInput,
-        dummyMode: true
+// Main orchestration endpoint
+app.post('/orchestrate', async (req, res) => {
+  console.log('🎯 Starting music orchestration...');
+  
+  try {
+    const { directions, dummyMode = false } = req.body;
+    
+    if (!directions || !Array.isArray(directions)) {
+      return res.status(400).json({
+        error: 'Invalid request: directions array is required'
+      });
     }
-});
-// Extract the StyleCard from the result
-const styleCard: StyleCard = extractStyleCard(musicalStyleResult);
-console.log('Musical Style Result:', JSON.stringify(styleCard));
-
-
-/*************************************************
-// Use the StyleCard and lyrics to generate music
-**************************************************/
-const musicGenerationResult = await client.callTool({
-    name: 'generate-music',
-    arguments: {
+    
+    console.log(`📍 Processing ${directions.length} direction steps (dummy: ${dummyMode})`);
+    
+    // Create MCP client
+    const client = await createMcpClient();
+    
+    try {
+      // Step 1: Find musical style
+      console.log('🎨 Finding musical style...');
+      const musicalStyleResult = await client.callTool({
+        name: 'find-musical-style',
+        arguments: {
+          directions: directions,
+          dummyMode: dummyMode
+        }
+      });
+      
+      const styleCard: StyleCard = extractStyleCard(musicalStyleResult);
+      console.log(`🎵 Style: ${styleCard.genre} - ${styleCard.songTitle}`);
+      
+      // Step 2: Generate music
+      console.log('🎼 Generating music...');
+      const musicGenerationResult = await client.callTool({
+        name: 'generate-music',
+        arguments: {
+          styleCard: styleCard,
+          lyrics: directions,
+          dummyMode: dummyMode
+        }
+      });
+      
+      console.log('✅ Music generation completed');
+      
+      // Step 3: Find the generated audio file
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a moment for file to be written
+      const audioFile = await findLatestMusicFile();
+      
+      if (!audioFile) {
+        console.warn('⚠️  No audio file found');
+        return res.json({
+          success: true,
+          styleCard: styleCard,
+          musicResult: musicGenerationResult,
+          audioUrl: null,
+          message: 'Music generated but audio file not found'
+        });
+      }
+      
+      console.log(`🎵 Audio file ready: ${audioFile}`);
+      
+      // Return success response
+      res.json({
+        success: true,
         styleCard: styleCard,
-        lyrics: directionsInput,
-        dummyMode: true
+        musicResult: musicGenerationResult,
+        audioUrl: `/audio/${audioFile}`,
+        audioFile: audioFile,
+        message: `Successfully generated ${styleCard.genre} music: "${styleCard.songTitle}"`
+      });
+      
+    } finally {
+      await client.close();
     }
+    
+  } catch (error) {
+    console.error('❌ Error during orchestration:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      message: 'Failed to generate music'
+    });
+  }
 });
-console.log('Music Generation Result:', JSON.stringify(musicGenerationResult, null, 2));
 
-await client.close();
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    mcpServer: 'http://localhost:3000'
+  });
+});
+
+// List available audio files
+app.get('/audio-files', async (req, res) => {
+  try {
+    const files = await fs.readdir(serverDir);
+    const musicFiles = files.filter(file => 
+      file.startsWith('music_') && file.endsWith('.mp3')
+    );
+    
+    const fileDetails = await Promise.all(
+      musicFiles.map(async file => {
+        const stats = await fs.stat(path.join(serverDir, file));
+        return {
+          filename: file,
+          url: `/audio/${file}`,
+          size: stats.size,
+          created: stats.mtime,
+          sizeKB: Math.round(stats.size / 1024)
+        };
+      })
+    );
+    
+    fileDetails.sort((a, b) => b.created.getTime() - a.created.getTime());
+    
+    res.json({
+      files: fileDetails,
+      total: fileDetails.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to list audio files' });
+  }
+});
+
+// Test endpoint with sample directions
+app.get('/test', (req, res) => {
+  const sampleDirections = [
+    "Start at SP414, 84069, Roccadaspide, Salernes",
+    "Go northwest on SP414",
+    "At the roundabout, take the second exit to stay on SP414",
+    "Turn left on SS166",
+    "Continue forward on Via Serra"
+  ];
+  
+  res.json({
+    message: "Test endpoint - use POST /orchestrate with this sample data",
+    sampleRequest: {
+      method: "POST",
+      url: "/orchestrate", 
+      body: {
+        directions: sampleDirections,
+        dummyMode: true
+      }
+    },
+    directTestUrl: `http://localhost:${PORT}/orchestrate`
+  });
+});
+
+// Start the server
+function startServer() {
+  app.listen(PORT, () => {
+    console.log(`🚀 Directions2Music Client Server running on http://localhost:${PORT}`);
+    console.log(`📁 Audio files served from: ${serverDir}`);
+    console.log(`🎵 Audio endpoint: http://localhost:${PORT}/audio/`);
+    console.log(`🎯 Orchestration: POST http://localhost:${PORT}/orchestrate`);
+    console.log(`🧪 Test endpoint: GET http://localhost:${PORT}/test`);
+  });
+}
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 Shutting down gracefully...');
+  process.exit(0);
+});
+
+// Start the server
+startServer();
