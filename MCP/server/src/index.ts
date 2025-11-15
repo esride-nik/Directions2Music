@@ -7,12 +7,13 @@ import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
-import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, ElevenLabsCompositionPlan, FindStyleInput } from "./schemas.js";
+import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, FindStyleInput } from "./schemas.js";
 
-// Load configuration
+/*********************
+** Load configuration
+**********************/
 const configPath = new URL("../config.json", import.meta.url);
 const config = JSON.parse(await fs.readFile(configPath, "utf8"));
-
 const ai = new GoogleGenAI({
   apiKey: config.googleGenAIApiKey,
 });
@@ -22,6 +23,7 @@ const server = new McpServer({
   name: "directions2Music_mcp_server",
   version: "1.0.0",
 });
+
 
 /***********************
 ** Find musical style **
@@ -123,10 +125,12 @@ server.registerTool(
   }
 );
 
+
 /*******************
 ** Generate music **
 ********************/
 
+// helper to call ElevenLabs Music API to generate music
 const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, description?: string, songTitle?: string) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
@@ -319,7 +323,29 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
     return musicResponse;
 }
 
-// concatenate lines to fit maxLines
+// get dummy ElevenLabs response for testing
+const getDummyMusicResponse = async () => {
+    try {
+      const dummyPath = new URL(
+        "../dummyData/dummyResponses_generateMusic.json",
+        import.meta.url
+      );
+      const dummyText = await fs.readFile(dummyPath, "utf8");
+      const dummyResponse = JSON.parse(dummyText);
+      console.log("📦 Loaded dummy ElevenLabs response:", {
+        hasAudio: !!dummyResponse.audio,
+        hasJson: !!dummyResponse.json,
+        hasFilename: !!dummyResponse.filename,
+        audioDataLength: dummyResponse.audio?.data?.length
+      });
+      return dummyResponse;
+    } catch (e) {
+      console.warn("Could not read dummy music response file:", e);
+      return {};
+    }
+};
+
+// concatenate lines to fit maxLines for ElevenLabs composition plan
 const shortenDirectionsInput = (directionsInput: string[], maxLines: number): string[] => {
   let lineCount = 0;
   while (directionsInput.length > maxLines) {
@@ -351,7 +377,7 @@ const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInp
   };
 }
 
-// generate-music with ElevenLabs
+// generate-music
 server.registerTool(
   "generate-music",
   {
@@ -361,15 +387,16 @@ server.registerTool(
     inputSchema: generateMusicInputSchema,
     outputSchema: styleCardSchema,
   },
-  async (args: GenerateMusicInput, extra: any) => {
+  async (args: GenerateMusicInput) => {
     // narrow & validate at runtime
     const styleCard = args?.styleCard as StyleCard;
     const lyrics = Array.isArray(args?.lyrics)
       ? args.lyrics.map(String)
       : [];
+    const dummyMode = args && args.dummyMode ? Boolean(args.dummyMode) : false;
 
     // ElevenLabs music generation call
-    const musicResponse = await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
+    const musicResponse = dummyMode ? await getDummyMusicResponse() : await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
 
     // TODO: adjust tool output according to model output
     return {
@@ -385,6 +412,9 @@ server.registerTool(
 );
 
 
+/******************
+ ** Server runtime
+ ******************/
 
 // Set up Express and HTTP transport
 const app = express();
@@ -431,8 +461,7 @@ const port = parseInt(process.env.PORT || "3000");
 app
   .listen(port, () => {
     console.log(`Demo MCP Server running on http://localhost:${port}/mcp`);
+  }).on("error", (error) => {
+    console.error("Server error:", error);
+    process.exit(1);
   });
-  // .on("error", (error) => {
-  //   console.error("Server error:", error);
-  //   process.exit(1);
-  // });
