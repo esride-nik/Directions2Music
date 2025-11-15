@@ -1,0 +1,56 @@
+{
+  "json": {
+    "compositionPlan": {
+      "positiveGlobalStyles": [
+        "North-African desert raï + electronic",
+        "oud",
+        "derbouka",
+        "bass",
+        "synth pad",
+        "adventurous",
+        "journey"
+      ],
+      "negativeGlobalStyles": [],
+      "sections": [
+        {
+          "sectionName": "Desert Voyage",
+          "positiveLocalStyles": [
+            "North-African desert raï + electronic",
+            "oud",
+            "derbouka",
+            "bass",
+            "synth pad",
+            "adventurous",
+            "journey"
+          ],
+          "negativeLocalStyles": [],
+          "durationMs": 15000,
+          "lines": [
+            "Start at SP414, 84069, Roccadaspide, Salernes",
+            "Go northwest on SP414"
+          ]
+        }
+      ]
+    },
+    "songMetadata": {
+      "title": null,
+      "description": null,
+      "genres": [],
+      "languages": [],
+      "isExplicit": null
+    }
+  },
+  "audio": {
+    "type": "Buffer",
+    "data": [
+      121,
+      29,
+      73,
+      199,
+      191,
+      123,
+      -1
+    ]
+  },
+  "filename": "music.mp3"
+}

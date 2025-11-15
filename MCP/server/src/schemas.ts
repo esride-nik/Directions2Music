@@ -210,3 +210,69 @@ export const elevenLabsGenerateMusicInputSchema = {
     .describe("If true, guarantees instrumental generation (default: false). Can only be used with prompt.")
 };
 
+/*************************
+** Output Schemas       **
+**************************/
+
+/**
+ * Output schema for generate-music tool - represents ElevenLabs music generation response
+ */
+export const generateMusicOutputSchema = {
+  json: z.object({
+    compositionPlan: z.object({
+      positiveGlobalStyles: z.array(z.string()).describe("Global styles applied to the entire song"),
+      negativeGlobalStyles: z.array(z.string()).describe("Styles to avoid in the entire song"),
+      sections: z.array(z.object({
+        sectionName: z.string().describe("Name of this section of the song"),
+        positiveLocalStyles: z.array(z.string()).describe("Styles for this specific section"),
+        negativeLocalStyles: z.array(z.string()).describe("Styles to avoid in this section"),
+        durationMs: z.number().describe("Duration of this section in milliseconds"),
+        lines: z.array(z.string()).describe("Lyric lines for this section")
+      })).describe("Sections that make up the song")
+    }).describe("The composition plan used to generate the music"),
+    songMetadata: z.object({
+      title: z.string().nullable().describe("Generated song title"),
+      description: z.string().nullable().describe("Generated song description"),
+      genres: z.array(z.string()).describe("Detected or assigned genres"),
+      languages: z.array(z.string()).describe("Languages detected in the song"),
+      isExplicit: z.boolean().nullable().describe("Whether the song contains explicit content")
+    }).describe("Metadata about the generated song")
+  }).describe("JSON metadata about the generated music"),
+  audio: z.object({
+    type: z.literal("Buffer").describe("Type indicator for serialized audio data"),
+    data: z.array(z.number()).describe("Raw audio bytes as array of numbers")
+  }).describe("Audio data in serialized Buffer format"),
+  filename: z.string().describe("Suggested filename for the audio file")
+};
+
+/**********************
+** Type Definitions  **
+***********************/
+
+export type GenerateMusicOutput = {
+  json: {
+    compositionPlan: {
+      positiveGlobalStyles: string[];
+      negativeGlobalStyles: string[];
+      sections: Array<{
+        sectionName: string;
+        positiveLocalStyles: string[];
+        negativeLocalStyles: string[];
+        durationMs: number;
+        lines: string[];
+      }>;
+    };
+    songMetadata: {
+      title: string | null;
+      description: string | null;
+      genres: string[];
+      languages: string[];
+      isExplicit: boolean | null;
+    };
+  };
+  audio: {
+    type: "Buffer";
+    data: number[];
+  };
+  filename: string;
+};
