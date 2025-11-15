@@ -7,7 +7,7 @@ import fs from "fs/promises";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
-import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, FindStyleInput } from "./schemas.js";
+import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, FindStyleInput, generateMusicOutputSchema, GenerateMusicOutput } from "./schemas.js";
 
 /*********************
 ** Load configuration
@@ -327,7 +327,8 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
 const getDummyMusicResponse = async () => {
     try {
       const dummyPath = new URL(
-        "../dummyData/dummyResponses_generateMusic.json",
+        "../dummyData/dummyResponses_generateMusic_short.json",
+        // "../dummyData/dummyResponses_generateMusic.json",
         import.meta.url
       );
       const dummyText = await fs.readFile(dummyPath, "utf8");
@@ -385,7 +386,7 @@ server.registerTool(
     description:
       "Generate music based on the provided routing directions and style card using the ElevenLabs Music API.",
     inputSchema: generateMusicInputSchema,
-    outputSchema: styleCardSchema,
+    outputSchema: generateMusicOutputSchema,
   },
   async (args: GenerateMusicInput) => {
     // narrow & validate at runtime
@@ -398,15 +399,14 @@ server.registerTool(
     // ElevenLabs music generation call
     const musicResponse = dummyMode ? await getDummyMusicResponse() : await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
 
-    // TODO: adjust tool output according to model output
     return {
       content: [
         {
           type: "text",
-          text: `Music generation requested: "${lyrics.slice(0, 50).join(" ")}..."`,
+          text: JSON.stringify(musicResponse),
         },
       ],
-      structuredContent: musicResponse as any,
+      structuredContent: musicResponse as GenerateMusicOutput,
     };
   }
 );
