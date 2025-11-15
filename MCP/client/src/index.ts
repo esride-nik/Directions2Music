@@ -72,7 +72,7 @@ async function createMcpClient() {
 
 // Main orchestration endpoint
 app.post('/orchestrate', async (req, res) => {
-  console.log('🎯 Starting music orchestration...');
+  console.log('\n**********************************\n🎯 Starting music orchestration...\n**********************************');
   
   try {
     const { directions, dummyMode = false } = req.body;
@@ -229,6 +229,7 @@ function startServer() {
     console.log(`🎵 Audio endpoint: http://localhost:${PORT}/audio/`);
     console.log(`🎯 Orchestration: POST http://localhost:${PORT}/orchestrate`);
     console.log(`🧪 Test endpoint: GET http://localhost:${PORT}/test`);
+    console.log(`🥼 Health endpoint: GET http://localhost:${PORT}/health`);
   });
 }
 
