@@ -31,8 +31,9 @@ export interface FindStyleInput {
  * Input interface for generate-music tool
  */
 export interface GenerateMusicInput {
-    styleCard: StyleCard;
-    lyrics: string[];
+  styleCard: StyleCard;
+  lyrics: string[];
+  dummyMode?: boolean;
 }
 
 /**
@@ -40,7 +41,7 @@ export interface GenerateMusicInput {
  */
 export interface ElevenLabsGenerateMusicInput {
   prompt?: string;
-  compositionPlan?: CompositionPlan;
+  compositionPlan?: ElevenLabsCompositionPlan;
   musicLengthMs?: number;
   outputFormat?: "mp3_44100_128" | "mp3_44100_192" | "mp3_22050_32" | "mp3_22050_64" | "mp3_22050_128" | "pcm_44100_16" | "ulaw_8000_8";
   modelId?: "music_v1";
@@ -52,18 +53,18 @@ export interface ElevenLabsGenerateMusicInput {
  * Composition Plan Interface
  * Detailed guide for music generation with sections, styles, and song metadata
  */
-export interface CompositionPlan {
+export interface ElevenLabsCompositionPlan {
   positiveGlobalStyles: string[];
   negativeGlobalStyles: string[];
-  sections: CompositionSection[];
-  songMetadata?: SongMetadata;
+  sections: ElevenLabsCompositionSection[];
+  songMetadata?: ElevenLabsSongMetadata;
 }
 
 /**
  * Composition Section Interface
  * Individual section within a composition plan
  */
-export interface CompositionSection {
+export interface ElevenLabsCompositionSection {
   sectionName: string;
   positiveLocalStyles: string[];
   negativeLocalStyles: string[];
@@ -75,7 +76,7 @@ export interface CompositionSection {
  * Song Metadata Interface
  * Metadata about the generated song
  */
-export interface SongMetadata {
+export interface ElevenLabsSongMetadata {
   title?: string;
   description?: string;
   genres?: string[];
@@ -118,8 +119,9 @@ export const findStyleInputSchema = {
 /** * Input schema for generate-music tool
  */
 export const generateMusicInputSchema = {
-    styleCard: z.object(styleCardSchema),
-    lyrics: z.array(z.string()).describe("An array of lyrics lines as strings."),
+  styleCard: z.object(styleCardSchema),
+  lyrics: z.array(z.string()).describe("An array of lyrics lines as strings."),
+  dummyMode: z.boolean().optional().describe("If true, activates dummy mode for testing."),
 }
 
 /**
