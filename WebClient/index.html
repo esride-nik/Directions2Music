@@ -42,33 +42,374 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         height: 100%;
         margin: 0;
       }
+      
+      .music-panel {
+        background: rgba(40, 44, 52, 0.95);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 400px;
+        font-size: 13px;
+      }
+      
+      .music-panel h4 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .directions-input {
+        width: 100%;
+        height: 80px;
+        padding: 8px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        background: rgba(0,0,0,0.3);
+        color: white;
+        font-size: 11px;
+        resize: vertical;
+        margin-bottom: 10px;
+        font-family: inherit;
+      }
+      
+      .directions-input::placeholder {
+        color: #aaa;
+      }
+      
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+      
+      .generate-btn {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .generate-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      
+      .generate-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+      }
+      
+      .status-section {
+        background: rgba(0,0,0,0.3);
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+      }
+      
+      .status-indicator {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      
+      .status-pending { background: #ffc107; color: #000; }
+      .status-processing { background: #17a2b8; color: white; }
+      .status-completed { background: #28a745; color: white; }
+      .status-failed { background: #dc3545; color: white; }
+      
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 8px 0;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        transition: width 0.3s ease;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+      
+      .style-info {
+        background: rgba(255,255,255,0.1);
+        padding: 8px;
+        border-radius: 4px;
+        margin: 8px 0;
+        font-size: 11px;
+      }
+      
+      .error-message {
+        background: rgba(220, 53, 69, 0.2);
+        border: 1px solid #dc3545;
+        padding: 8px;
+        border-radius: 4px;
+        color: #fff;
+        margin: 8px 0;
+        font-size: 11px;
+      }
+      
+      .audio-controls {
+        margin-top: 10px;
+      }
+      
+      .audio-controls audio {
+        width: 100%;
+        height: 32px;
+      }
     </style>
   </head>
 
   <body>
     <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
       <arcgis-directions slot="top-right"></arcgis-directions>
-      <audio controls slot="bottom-right" id="audioPlayer">
-        <source id="audioSource" src="" type="audio/mpeg">
-      </audio>
+      
+      <!-- Enhanced Music Generation Panel -->
+      <div slot="bottom-right" class="music-panel">
+        <h4>🎵 Directions2Music</h4>
+        
+        <textarea 
+          id="directionsInput" 
+          class="directions-input" 
+          placeholder="Route directions will appear here automatically when you plan a route..."
+        ></textarea>
+        
+        <div class="controls">
+          <button id="generateBtn" class="generate-btn">🎼 Generate Music</button>
+          <div class="checkbox-container">
+            <input type="checkbox" id="dummyMode" checked>
+            <label for="dummyMode">Fast Test Mode</label>
+          </div>
+        </div>
+        
+        <div id="statusSection" class="status-section">
+          <div id="jobStatus"></div>
+          <div id="progressBar" class="progress-bar" style="display: none;">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+          <div id="styleInfo" class="style-info" style="display: none;"></div>
+          <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+        
+        <div class="audio-controls">
+          <audio controls id="audioPlayer" style="display: none;">
+            <source id="audioSource" src="" type="audio/mpeg">
+          </audio>
+        </div>
+      </div>
     </arcgis-map>
     <script type="module">
-      // call the orchestration endpoint of local MCP client
-      async function generateMusic(directions) {
-        const response = await fetch('http://localhost:3001/orchestrate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ directions, dummyMode: true })
-        });
+      // Async job queue system for music generation
+      const API_BASE = 'http://localhost:3001';
+      let currentJobId = null;
+      let pollInterval = null;
+      
+      // DOM elements
+      const directionsInput = document.getElementById('directionsInput');
+      const generateBtn = document.getElementById('generateBtn');
+      const dummyModeCheckbox = document.getElementById('dummyMode');
+      const statusSection = document.getElementById('statusSection');
+      const jobStatus = document.getElementById('jobStatus');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = progressBar.querySelector('.progress-fill');
+      const styleInfo = document.getElementById('styleInfo');
+      const errorMessage = document.getElementById('errorMessage');
+      const audioPlayer = document.getElementById('audioPlayer');
+      const audioSource = document.getElementById('audioSource');
+
+      // Show/hide UI elements
+      function showElement(element) { element.style.display = 'block'; }
+      function hideElement(element) { element.style.display = 'none'; }
+
+      // Update job status display
+      function updateJobStatus(jobData) {
+        const statusClass = `status-${jobData.status}`;
+        const elapsed = jobData.elapsedTime ? Math.round(jobData.elapsedTime / 1000) : 0;
+        const duration = jobData.duration ? Math.round(jobData.duration / 1000) : 0;
         
-        const result = await response.json();
-        if (result.success && result.audioUrl) {
-          document.getElementById('audioSource').src = 
-            `http://localhost:3001${result.audioUrl}`;
-          document.querySelector('audio').load();
-          document.querySelector('audio').play();
+        jobStatus.innerHTML = `
+          <div style="margin-bottom: 5px;">
+            <strong>Status:</strong> <span class="status-indicator ${statusClass}">${jobData.status}</span>
+            ${elapsed > 0 ? `<span style="margin-left: 10px;">⏱️ ${elapsed}s</span>` : ''}
+          </div>
+          <div style="font-size: 10px; color: #ccc;">${jobData.message || 'Processing...'}</div>
+        `;
+        
+        showElement(statusSection);
+      }
+
+      // Update progress bar
+      function updateProgress(status, elapsedTime = 0) {
+        if (status === 'pending') {
+          showElement(progressBar);
+          progressFill.style.width = '10%';
+        } else if (status === 'processing') {
+          showElement(progressBar);
+          // Estimate progress based on elapsed time
+          const expectedDuration = dummyModeCheckbox.checked ? 10000 : 180000; // ms
+          const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
+          progressFill.style.width = `${progress}%`;
+        } else if (status === 'completed') {
+          progressFill.style.width = '100%';
+          setTimeout(() => hideElement(progressBar), 2000);
+        } else if (status === 'failed') {
+          hideElement(progressBar);
         }
       }
+
+      // Show style card information
+      function showStyleCard(styleCardData) {
+        if (!styleCardData) return;
+        
+        styleInfo.innerHTML = `
+          <strong>🎨 ${styleCardData.songTitle}</strong><br>
+          <small>${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}</small>
+        `;
+        showElement(styleInfo);
+      }
+
+      // Show audio player
+      function showAudio(audioUrl) {
+        audioSource.src = audioUrl;
+        audioPlayer.load();
+        showElement(audioPlayer);
+        audioPlayer.play().catch(e => console.log('Audio autoplay prevented'));
+      }
+
+      // Show error message
+      function showError(error) {
+        errorMessage.innerHTML = `<strong>❌ Error:</strong> ${error}`;
+        showElement(errorMessage);
+      }
+
+      // Start music generation job
+      async function generateMusic() {
+        const directions = directionsInput.value.trim().split('\n').filter(line => line.trim());
+        
+        if (directions.length === 0) {
+          showError('Please enter some navigation directions or plan a route');
+          return;
+        }
+
+        // Reset UI
+        generateBtn.disabled = true;
+        generateBtn.textContent = '🔄 Starting...';
+        hideElement(errorMessage);
+        hideElement(styleInfo);
+        hideElement(progressBar);
+        hideElement(audioPlayer);
+
+        try {
+          const response = await fetch(`${API_BASE}/orchestrate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              directions: directions,
+              dummyMode: dummyModeCheckbox.checked
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to start job');
+          }
+
+          currentJobId = result.jobId;
+          generateBtn.textContent = '🎼 Generate Music';
+          generateBtn.disabled = false;
+          
+          startPolling();
+
+        } catch (error) {
+          showError(error.message);
+          generateBtn.disabled = false;
+          generateBtn.textContent = '🎼 Generate Music';
+        }
+      }
+
+      // Check job status
+      async function checkJobStatus() {
+        if (!currentJobId) return;
+
+        try {
+          const response = await fetch(`${API_BASE}/status/${currentJobId}`);
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to check status');
+          }
+
+          updateJobStatus(result);
+          updateProgress(result.status, result.elapsedTime);
+
+          if (result.status === 'completed') {
+            showStyleCard(result.styleCard);
+            if (result.audioUrl) {
+              showAudio(`${API_BASE}${result.audioUrl}`);
+            }
+            stopPolling();
+          } else if (result.status === 'failed') {
+            showError(result.error);
+            stopPolling();
+          }
+
+        } catch (error) {
+          showError(error.message);
+          stopPolling();
+        }
+      }
+
+      // Start polling for job status
+      function startPolling() {
+        if (pollInterval) clearInterval(pollInterval);
+        checkJobStatus(); // Check immediately
+        pollInterval = setInterval(checkJobStatus, 2000); // Then every 2 seconds
+      }
+
+      // Stop polling
+      function stopPolling() {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+      }
+
+      // Event listeners
+      generateBtn.addEventListener('click', generateMusic);
+
+      // Cleanup on page unload
+      window.addEventListener('beforeunload', stopPolling);
 
       // import RouteLayer module to load a RouteLayer from a portal item
       const RouteLayer = await $arcgis.import(
@@ -110,13 +451,20 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       await viewElement.viewOnReady();
       await directionsElement.componentOnReady();
 
+      // Route event handler - populate directions textarea instead of generating music immediately
       directionsElement.addEventListener("arcgisPropertyChange", (event) => {
         if (event.detail.name === "lastRoute") {
           const route = directionsElement.lastRoute;
           if (route) {
             console.log("New route:", route);
-            console.log(route.directionPoints.items.map((pt) => pt.displayText));
-            generateMusic(route.directionPoints.items.map((pt) => pt.displayText));
+            const directions = route.directionPoints.items.map((pt) => pt.displayText);
+            console.log("Route directions:", directions);
+            
+            // Populate the directions textarea
+            directionsInput.value = directions.join('\n');
+            
+            // Optional: Auto-generate if user wants (you can uncomment this line)
+            // generateMusic();
           }
         }
       });
@@ -126,7 +474,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       const routeLayer = new RouteLayer();
       directionsElement.layer = routeLayer;
       viewElement.map.add(routeLayer);
-
     </script>
   </body>
 </html>
