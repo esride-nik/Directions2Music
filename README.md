@@ -190,8 +190,82 @@ Dummy mode uses pre-recorded responses for both style detection and music genera
 
 ## WebClient Integration
 
-To integrate with a web frontend:
+The Client Server provides REST API endpoints for web integration with **async job processing** to handle long-running music generation:
 
+### Job-Based Endpoints (Recommended)
+- **POST** `/orchestrate` - Start music generation job (returns immediately)
+  - Input: `{ "directions": ["step1", "step2", ...], "dummyMode": boolean }`
+  - Output: `{ "success": true, "jobId": "job_123...", "status": "pending", "statusUrl": "/status/job_123..." }`
+
+- **GET** `/status/:jobId` - Check job progress and results
+  - Output: Job status, progress, and results when completed
+
+- **GET** `/jobs` - List all jobs with statistics
+
+### Utility Endpoints
+- **GET** `/health` - Health check with active job count
+- **GET** `/audio-files` - List available audio files 
+- **GET** `/test` - Test endpoint with sample data
+- **Static** `/audio/*` - Serve generated MP3 files
+
+### WebClient Usage Pattern
+
+#### Async Job Pattern (Recommended for Production)
+```javascript
+// Start job
+const startResponse = await fetch('http://localhost:3001/orchestrate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    directions: [
+      "Start at SP414, 84069, Roccadaspide, Salernes",
+      "Go northwest on SP414", 
+      "At the roundabout, take the second exit to stay on SP414"
+    ],
+    dummyMode: false  // Set to true for quick testing
+  })
+});
+
+const { jobId } = await startResponse.json();
+
+// Poll for completion
+const pollStatus = async () => {
+  const statusResponse = await fetch(`http://localhost:3001/status/${jobId}`);
+  const status = await statusResponse.json();
+  
+  if (status.status === 'completed') {
+    // Play the generated music
+    const audio = new Audio('http://localhost:3001' + status.audioUrl);
+    audio.play();
+    console.log('Generated:', status.styleCard.songTitle);
+  } else if (status.status === 'failed') {
+    console.error('Generation failed:', status.error);
+  } else {
+    // Still processing, check again in 2 seconds
+    setTimeout(pollStatus, 2000);
+  }
+};
+
+pollStatus();
+```
+
+### Live Example
+A complete WebClient example is available in `webclient_async_example.html` that demonstrates:
+- ✅ Async job submission
+- ✅ Real-time status polling  
+- ✅ Progress indication
+- ✅ Audio playback
+- ✅ Error handling
+- ✅ Job management
+
+**Why Async Jobs?**
+- Music generation can take 2-5 minutes (ElevenLabs processing time)
+- Prevents HTTP timeout errors
+- Better user experience with progress indication
+- Allows multiple concurrent jobs
+
+#### Legacy Direct Pattern (Not Recommended)
+For simple testing only (will timeout on real ElevenLabs API):
 ```html
 <audio controls>
   <source id="audioSource" src="" type="audio/mpeg">
@@ -202,7 +276,7 @@ async function generateMusic(directions) {
   const response = await fetch('http://localhost:3001/orchestrate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ directions, dummyMode: false })
+    body: JSON.stringify({ directions, dummyMode: true }) // Only works with dummy mode
   });
   
   const result = await response.json();
