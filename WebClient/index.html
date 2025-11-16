@@ -48,8 +48,28 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
   <body>
     <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
       <arcgis-directions slot="top-right"></arcgis-directions>
+      <audio controls slot="bottom-right" id="audioPlayer">
+        <source id="audioSource" src="" type="audio/mpeg">
+      </audio>
     </arcgis-map>
     <script type="module">
+      // call the orchestration endpoint of local MCP client
+      async function generateMusic(directions) {
+        const response = await fetch('http://localhost:3001/orchestrate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ directions, dummyMode: true })
+        });
+        
+        const result = await response.json();
+        if (result.success && result.audioUrl) {
+          document.getElementById('audioSource').src = 
+            `http://localhost:3001${result.audioUrl}`;
+          document.querySelector('audio').load();
+          document.querySelector('audio').play();
+        }
+      }
+
       // import RouteLayer module to load a RouteLayer from a portal item
       const RouteLayer = await $arcgis.import(
         "@arcgis/core/layers/RouteLayer.js"
@@ -96,6 +116,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           if (route) {
             console.log("New route:", route);
             console.log(route.directionPoints.items.map((pt) => pt.displayText));
+            generateMusic(route.directionPoints.items.map((pt) => pt.displayText));
           }
         }
       });
@@ -106,42 +127,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       directionsElement.layer = routeLayer;
       viewElement.map.add(routeLayer);
 
-
-      // /*************
-      //  * Music GenAI
-      //  * ************/
-
-      // // SunoAPI running locally => https://github.com/gcui-art/suno-api
-      // const sunoApiBaseUrl = "http://localhost:3000";
-      // let songLyrics = "";
-      // let songTitle = "";
-
-      // // Source: official documentation https://github.com/gcui-art/suno-api?tab=readme-ov-file
-      // const customGenerateAudio = async (payload) => {
-      //   const url = `${sunoApiBaseUrl}/api/custom_generate`;
-      //   const response = await fetch(url, {
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(payload),
-      //     cache: "default",
-      //   });
-      //   // Parse response body as JSON
-      //   return await response.json();
-      // };
-
-      // const sunoGenerate = async (directionsText, title) => {
-      //   const musicalStyle = document.getElementById("musicalStyle").value;
-      //   return await customGenerateAudio({
-      //     tags: musicalStyle.substring(0, 200),
-      //     title: title.substring(0, 80),
-      //     prompt: directionsText.substring(0, 3000),
-      //     make_instrumental: false,
-      //     wait_audio: true,
-      //   });
-      // };
     </script>
   </body>
 </html>
