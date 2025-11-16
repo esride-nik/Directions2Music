@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directions2Music - Async Job Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .input-section {
+            margin-bottom: 30px;
+        }
+        .input-section h3 {
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .generate-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .generate-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status-btn {
+            background: linear-gradient(45deg, #007bff, #6610f2);
+            color: white;
+        }
+        .status-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .status-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-container input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+        .status-section {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .job-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .job-info div {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #ffc107; color: #000; }
+        .status-processing { background: #17a2b8; color: white; }
+        .status-completed { background: #28a745; color: white; }
+        .status-failed { background: #dc3545; color: white; }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .audio-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        audio {
+            width: 100%;
+            margin: 15px 0;
+        }
+        .style-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+            margin: 15px 0;
+        }
+        .logs {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .timestamp {
+            color: #aaa;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Directions2Music - Async Generation</h1>
+        
+        <div class="input-section">
+            <h3>📍 Navigation Directions</h3>
+            <textarea id="directionsInput" placeholder="Enter turn-by-turn directions, one per line:
+
+Example:
+Start at SP414, 84069, Roccadaspide, Salernes
+Go northwest on SP414
+At the roundabout, take the second exit to stay on SP414
+Turn left on SS166
+Continue forward on Via Serra">Start at SP414, 84069, Roccadaspide, Salernes
+Go northwest on SP414  
+At the roundabout, take the second exit to stay on SP414
+Turn left on SS166
+Continue forward on Via Serra</textarea>
+        </div>
+
+        <div class="controls">
+            <button id="generateBtn" class="generate-btn">🎼 Generate Music (Async)</button>
+            <button id="statusBtn" class="status-btn" disabled>📊 Check Status</button>
+            <div class="checkbox-container">
+                <input type="checkbox" id="dummyMode" checked>
+                <label for="dummyMode">Dummy Mode (fast testing)</label>
+            </div>
+        </div>
+
+        <div id="statusSection" class="status-section" style="display: none;">
+            <h3>🔄 Job Status</h3>
+            <div id="jobInfo" class="job-info"></div>
+            <div id="progressBar" class="progress-bar" style="display: none;">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="styleCard" style="display: none;"></div>
+            <div id="errorDisplay" style="display: none;"></div>
+        </div>
+
+        <div id="audioSection" class="audio-section" style="display: none;">
+            <h3>🎵 Generated Music</h3>
+            <audio id="audioPlayer" controls preload="none">
+                Your browser does not support the audio element.
+            </audio>
+            <div id="downloadLink"></div>
+        </div>
+
+        <div id="logs" class="logs" style="display: none;">
+            <h4>📋 Activity Log</h4>
+            <div id="logContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        let currentJobId = null;
+        let pollInterval = null;
+        
+        // DOM elements
+        const generateBtn = document.getElementById('generateBtn');
+        const statusBtn = document.getElementById('statusBtn');
+        const directionsInput = document.getElementById('directionsInput');
+        const dummyModeCheckbox = document.getElementById('dummyMode');
+        const statusSection = document.getElementById('statusSection');
+        const jobInfo = document.getElementById('jobInfo');
+        const progressBar = document.getElementById('progressBar');
+        const styleCard = document.getElementById('styleCard');
+        const errorDisplay = document.getElementById('errorDisplay');
+        const audioSection = document.getElementById('audioSection');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const downloadLink = document.getElementById('downloadLink');
+        const logs = document.getElementById('logs');
+        const logContent = document.getElementById('logContent');
+
+        // Logging function
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            logContent.appendChild(logEntry);
+            logs.style.display = 'block';
+            logEntry.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show status section
+        function showStatus() {
+            statusSection.style.display = 'block';
+        }
+
+        // Update job info display
+        function updateJobInfo(jobData) {
+            jobInfo.innerHTML = `
+                <div><strong>Job ID:</strong> ${jobData.jobId}</div>
+                <div><strong>Status:</strong> <span class="status-indicator status-${jobData.status}">${jobData.status}</span></div>
+                <div><strong>Started:</strong> ${new Date(jobData.startTime).toLocaleString()}</div>
+                <div><strong>Message:</strong> ${jobData.message || 'Processing...'}</div>
+            `;
+
+            if (jobData.elapsedTime) {
+                const elapsed = Math.round(jobData.elapsedTime / 1000);
+                jobInfo.innerHTML += `<div><strong>Elapsed:</strong> ${elapsed}s</div><div></div>`;
+            }
+
+            if (jobData.duration) {
+                const duration = Math.round(jobData.duration / 1000);
+                jobInfo.innerHTML += `<div><strong>Duration:</strong> ${duration}s</div><div></div>`;
+            }
+        }
+
+        // Update progress bar
+        function updateProgress(status, elapsedTime = 0) {
+            const progressFill = progressBar.querySelector('.progress-fill');
+            
+            if (status === 'pending') {
+                progressBar.style.display = 'block';
+                progressFill.style.width = '10%';
+            } else if (status === 'processing') {
+                progressBar.style.display = 'block';
+                // Simulate progress based on elapsed time (dummy mode: ~10s, real: ~3min)
+                const expectedDuration = dummyModeCheckbox.checked ? 10000 : 180000; // ms
+                const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
+                progressFill.style.width = `${progress}%`;
+            } else if (status === 'completed') {
+                progressFill.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                }, 2000);
+            } else if (status === 'failed') {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        // Show style card
+        function showStyleCard(styleCardData) {
+            if (!styleCardData) return;
+            
+            styleCard.innerHTML = `
+                <h4>🎨 Musical Style</h4>
+                <div><strong>Genre:</strong> ${styleCardData.genre}</div>
+                <div><strong>Song Title:</strong> "${styleCardData.songTitle}"</div>
+                <div><strong>Artist:</strong> ${styleCardData.artistName}</div>
+                <div><strong>Mood:</strong> ${styleCardData.mood}</div>
+                <div><strong>Tempo:</strong> ${styleCardData.tempo}</div>
+                <div><strong>Key:</strong> ${styleCardData.key}</div>
+            `;
+            styleCard.style.display = 'block';
+        }
+
+        // Show audio player
+        function showAudio(audioUrl, filename) {
+            audioPlayer.src = audioUrl;
+            downloadLink.innerHTML = `
+                <a href="${audioUrl}" download="${filename}" style="color: #20c997; text-decoration: none;">
+                    📥 Download ${filename}
+                </a>
+            `;
+            audioSection.style.display = 'block';
+            addLog(`🎵 Audio ready: ${filename}`, 'success');
+        }
+
+        // Show error
+        function showError(error) {
+            errorDisplay.innerHTML = `<strong>❌ Error:</strong> ${error}`;
+            errorDisplay.style.display = 'block';
+        }
+
+        // Start music generation
+        async function generateMusic() {
+            const directions = directionsInput.value.trim().split('\n').filter(line => line.trim());
+            
+            if (directions.length === 0) {
+                alert('Please enter some navigation directions');
+                return;
+            }
+
+            // Reset UI
+            generateBtn.disabled = true;
+            generateBtn.textContent = '🔄 Starting Job...';
+            statusSection.style.display = 'none';
+            audioSection.style.display = 'none';
+            errorDisplay.style.display = 'none';
+            styleCard.style.display = 'none';
+            progressBar.style.display = 'none';
+            logContent.innerHTML = '';
+
+            addLog(`🚀 Starting music generation for ${directions.length} directions (dummy: ${dummyModeCheckbox.checked})`);
+
+            try {
+                const response = await fetch(`${API_BASE}/orchestrate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        directions: directions,
+                        dummyMode: dummyModeCheckbox.checked
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to start job');
+                }
+
+                currentJobId = result.jobId;
+                addLog(`📋 Job created: ${currentJobId}`);
+                addLog(`⏱️ Estimated time: ${result.estimatedTime}`);
+                
+                // Enable status button and start polling
+                statusBtn.disabled = false;
+                generateBtn.textContent = '🎼 Generate Music (Async)';
+                generateBtn.disabled = false;
+                
+                showStatus();
+                startPolling();
+
+            } catch (error) {
+                addLog(`❌ Failed to start job: ${error.message}`, 'error');
+                showError(error.message);
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🎼 Generate Music (Async)';
+            }
+        }
+
+        // Check job status
+        async function checkStatus() {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/status/${currentJobId}`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to check status');
+                }
+
+                updateJobInfo(result);
+                updateProgress(result.status, result.elapsedTime);
+
+                if (result.status === 'completed') {
+                    addLog(`✅ Job completed successfully!`, 'success');
+                    showStyleCard(result.styleCard);
+                    if (result.audioUrl) {
+                        showAudio(`${API_BASE}${result.audioUrl}`, result.audioFile);
+                    }
+                    stopPolling();
+                } else if (result.status === 'failed') {
+                    addLog(`❌ Job failed: ${result.error}`, 'error');
+                    showError(result.error);
+                    stopPolling();
+                } else if (result.status === 'processing') {
+                    addLog(`🔄 Job in progress... (${Math.round((result.elapsedTime || 0) / 1000)}s elapsed)`, 'info');
+                }
+
+            } catch (error) {
+                addLog(`❌ Failed to check status: ${error.message}`, 'error');
+                showError(error.message);
+                stopPolling();
+            }
+        }
+
+        // Start polling for job status
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            
+            // Check immediately, then every 2 seconds
+            checkStatus();
+            pollInterval = setInterval(checkStatus, 2000);
+        }
+
+        // Stop polling
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generateMusic);
+        statusBtn.addEventListener('click', checkStatus);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopPolling();
+        });
+
+        // Initial log
+        addLog('🎵 Directions2Music WebClient ready');
+        addLog('ℹ️ Make sure both servers are running: MCP (port 3000) and Client (port 3001)');
+    </script>
+</body>
+</html>
