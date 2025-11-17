@@ -210,6 +210,10 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
             <input type="checkbox" id="dummyMode" checked>
             <label for="dummyMode">Fast Test Mode</label>
           </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="shortMode">
+            <label for="shortMode">Short (30s max)</label>
+          </div>
         </div>
         
         <div id="statusSection" class="status-section">
@@ -238,6 +242,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       const directionsInput = document.getElementById('directionsInput');
       const generateBtn = document.getElementById('generateBtn');
       const dummyModeCheckbox = document.getElementById('dummyMode');
+      const shortModeCheckbox = document.getElementById('shortMode');
       const statusSection = document.getElementById('statusSection');
       const jobStatus = document.getElementById('jobStatus');
       const progressBar = document.getElementById('progressBar');
@@ -276,7 +281,18 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         } else if (status === 'processing') {
           showElement(progressBar);
           // Estimate progress based on elapsed time
-          const expectedDuration = dummyModeCheckbox.checked ? 10000 : 180000; // ms
+          const isDummy = dummyModeCheckbox.checked;
+          const isShort = shortModeCheckbox.checked;
+          let expectedDuration;
+          
+          if (isDummy) {
+            expectedDuration = 10000; // 10 seconds for dummy
+          } else if (isShort) {
+            expectedDuration = 60000; // 1 minute for short real songs
+          } else {
+            expectedDuration = 180000; // 3 minutes for full songs
+          }
+          
           const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
           progressFill.style.width = `${progress}%`;
         } else if (status === 'completed') {
@@ -335,7 +351,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               directions: directions,
-              dummyMode: dummyModeCheckbox.checked
+              dummyMode: dummyModeCheckbox.checked,
+              short: shortModeCheckbox.checked
             })
           });
 

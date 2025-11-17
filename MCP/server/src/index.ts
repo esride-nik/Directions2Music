@@ -130,7 +130,7 @@ server.registerTool(
 ** Generate music **
 ********************/
 
-// helper to call ElevenLabs Music API to generate music
+// call ElevenLabs Music API to generate music
 const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, description?: string, songTitle?: string) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
@@ -144,9 +144,36 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
 
     try {
       finalCompositionPlan = await client.music.compositionPlan.create({
-          prompt: description ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
-          sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
+        prompt: `Create hilariously cliché music for navigation directions. 
+              Keep the original text EXACTLY as provided - do not change or poeticize the lyrics. 
+              Do not add instrumental intro or outro sections. 
+              Focus only on the vocal section with the provided directions.
+              Make the musical arrangement as stereotypical and over-the-top as possible for this style.
+              Use the most obvious, exaggerated musical tropes and clichés that would make people smile.
+              Think cheesy tourist music, overly dramatic folk ballads, or comically intense travel anthems.
+              Style: ${description}. 
+              Original directions: ${elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines.join(', ')}`,
+        sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
       });
+      // add original positiveGlobalStyles to final plan
+      finalCompositionPlan.positiveGlobalStyles = [
+        ...new Set([
+          "sung in local dialect",
+          ...finalCompositionPlan.positiveGlobalStyles,
+          ...elevenLabsGenerateMusicInput.compositionPlan?.positiveGlobalStyles || []
+        ])
+      ];
+      // add original positiveGlobalStyles to positiveGlobalStyles of each section of final plan
+      finalCompositionPlan.sections = finalCompositionPlan.sections.map((section, index) => ({
+        ...section,
+        positiveLocalStyles: [
+          ...new Set([
+            "sung in local dialect",
+            ...section.positiveLocalStyles,
+            ...(elevenLabsGenerateMusicInput.compositionPlan?.sections[index]?.positiveLocalStyles || [])
+          ])
+        ]
+      }));
       console.log("+++ Final Composition Plan: +++\n", JSON.stringify(finalCompositionPlan));
     } catch (error) {
       console.error("Error generating final composition plan:", error);
@@ -350,32 +377,75 @@ const getDummyMusicResponse = async () => {
 const shortenDirectionsInput = (directionsInput: string[], maxLines: number): string[] => {
   let lineCount = 0;
   while (directionsInput.length > maxLines) {
-    directionsInput[lineCount] = `${directionsInput[lineCount]}\n${directionsInput[lineCount+1]}`;
-    directionsInput.splice(lineCount+1, 1);
+    if ( directionsInput[lineCount].length > 200) {
+      // truncate to 200 chars
+       directionsInput[lineCount] = directionsInput[lineCount].substring(0, 200);
+    }
+    else {
+      // try to merge with next line
+      const newLine = directionsInput[lineCount] = `${directionsInput[lineCount]}\n${directionsInput[lineCount+1]}`;
+      if (newLine.length <= 200) {
+        directionsInput[lineCount] = newLine;
+        directionsInput.splice(lineCount+1, 1);
+      }
+    }
     lineCount++;
   }
   return directionsInput;
 }
 
 // helper to prepare ElevenLabs music generation input, meeting some API-specific constraints
-const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInput: string[]): ElevenLabsGenerateMusicInput => {
-  const lines = directionsInput.length <= 30 ? directionsInput : shortenDirectionsInput(directionsInput, 30);
-  const calcLengthFromLines = lines.length * 5000;
-  console.log(`getElevenLabsInitialCompositionPlan: Original directions length ${directionsInput.length}. Using ${lines.length} lines for composition plan, calculated length ${calcLengthFromLines} ms.`, JSON.stringify(lines));
-  return {
-    forceInstrumental: false,
-    compositionPlan: {
-        positiveGlobalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-        negativeGlobalStyles: [],
-        sections: [{
-            sectionName: styleCard.songTitle || directionsInput[0],
-            positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
-            negativeLocalStyles: [],
-            durationMs: calcLengthFromLines <= 120000 ? calcLengthFromLines : 120000,
-            lines: lines
-        }]
-    }
-  };
+const getElevenLabsInitialCompositionPlan = (styleCard: StyleCard, directionsInput: string[], short: boolean = false): ElevenLabsGenerateMusicInput => {
+  let lines: string[];
+  let durationMs: number;
+  
+  if (short) {
+    // For short songs: drastically reduce content for clarity
+    lines = directionsInput.slice(0, 3); // Only first 3 directions
+    durationMs = 30000; // Fixed 30 seconds
+    
+    // Simplified styles for short songs - focus on core elements and vocals
+    const coreStyles = [styleCard.genre, styleCard.instrumentation[0] || "vocals"];
+    
+    console.log(`getElevenLabsInitialCompositionPlan: SHORT MODE - Using ${lines.length} lines for 30-second composition.`, JSON.stringify(lines));
+    
+    return {
+      forceInstrumental: false,
+      compositionPlan: {
+          positiveGlobalStyles: [...coreStyles, "vocals", "sung lyrics", "clear singing"],
+          negativeGlobalStyles: ["instrumental", "no vocals"],
+          sections: [{
+              sectionName: styleCard.songTitle || directionsInput[0],
+              positiveLocalStyles: [...coreStyles, "vocals", "sung directions", "clear lyrics"],
+              negativeLocalStyles: ["instrumental", "complex arrangements"],
+              durationMs: durationMs,
+              lines: lines
+          }]
+      }
+    };
+  } else {
+    // Regular mode - existing logic
+    lines = directionsInput.length <= 30 ? directionsInput : shortenDirectionsInput(directionsInput, 30);
+    const calcLengthFromLines = lines.length * 5000;
+    durationMs = calcLengthFromLines <= 120000 ? calcLengthFromLines : 120000;
+    
+    console.log(`getElevenLabsInitialCompositionPlan: Original directions length ${directionsInput.length}. Using ${lines.length} lines for composition plan, calculated length ${durationMs} ms.`, JSON.stringify(lines));
+    
+    return {
+      forceInstrumental: false,
+      compositionPlan: {
+          positiveGlobalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+          negativeGlobalStyles: [],
+          sections: [{
+              sectionName: styleCard.songTitle || directionsInput[0],
+              positiveLocalStyles: [styleCard.genre, ...styleCard.instrumentation, ...styleCard.mood],
+              negativeLocalStyles: [],
+              durationMs: durationMs,
+              lines: lines
+          }]
+      }
+    };
+  }
 }
 
 // generate-music
@@ -395,9 +465,10 @@ server.registerTool(
       ? args.lyrics.map(String)
       : [];
     const dummyMode = args && args.dummyMode ? Boolean(args.dummyMode) : false;
+    const short = args && args.short ? Boolean(args.short) : false;
 
     // ElevenLabs music generation call
-    const musicResponse = dummyMode ? await getDummyMusicResponse() : await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
+    const musicResponse = dummyMode ? await getDummyMusicResponse() : await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics, short),styleCard.description, styleCard.songTitle);
 
     return {
       content: [

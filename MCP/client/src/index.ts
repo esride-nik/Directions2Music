@@ -33,6 +33,7 @@ interface MusicJob {
   error?: string;
   directions: string[];
   dummyMode: boolean;
+  short: boolean;
 }
 
 const jobs = new Map<string, MusicJob>();
@@ -125,7 +126,8 @@ async function processJob(jobId: string) {
       arguments: {
         styleCard: styleCard,
         lyrics: job.directions,
-        dummyMode: job.dummyMode
+        dummyMode: job.dummyMode,
+        short: job.short
       }
     });
     
@@ -164,7 +166,7 @@ app.post('/orchestrate', async (req, res) => {
   console.log('\n**********************************\n🎯 Starting async music generation...\n**********************************');
   
   try {
-    const { directions, dummyMode = false } = req.body;
+    const { directions, dummyMode = false, short = false } = req.body;
     
     if (!directions || !Array.isArray(directions)) {
       return res.status(400).json({
@@ -179,12 +181,13 @@ app.post('/orchestrate', async (req, res) => {
       status: 'pending',
       startTime: new Date(),
       directions,
-      dummyMode
+      dummyMode,
+      short
     };
     
     jobs.set(jobId, job);
     
-    console.log(`📋 Created job ${jobId} for ${directions.length} directions (dummy: ${dummyMode})`);
+    console.log(`📋 Created job ${jobId} for ${directions.length} directions (dummy: ${dummyMode}, short: ${short})`);
     
     // Start processing in background (don't await!)
     processJob(jobId).catch(error => {
@@ -198,7 +201,7 @@ app.post('/orchestrate', async (req, res) => {
       status: 'pending',
       message: 'Music generation started. Use /status/:jobId to check progress.',
       statusUrl: `/status/${jobId}`,
-      estimatedTime: dummyMode ? '5-10 seconds' : '2-5 minutes'
+      estimatedTime: dummyMode ? '5-10 seconds' : (short ? '30-60 seconds' : '2-5 minutes')
     });
     
   } catch (error) {
@@ -262,7 +265,8 @@ app.get('/jobs', (req, res) => {
     audioFile: job.audioFile,
     error: job.error,
     directionsCount: job.directions.length,
-    dummyMode: job.dummyMode
+    dummyMode: job.dummyMode,
+    short: job.short
   }));
   
   // Sort by start time (newest first)

@@ -34,6 +34,7 @@ export interface GenerateMusicInput {
   styleCard: StyleCard;
   lyrics: string[];
   dummyMode?: boolean;
+  short?: boolean;
 }
 
 /**
@@ -122,6 +123,7 @@ export const generateMusicInputSchema = {
   styleCard: z.object(styleCardSchema),
   lyrics: z.array(z.string()).describe("An array of lyrics lines as strings."),
   dummyMode: z.boolean().optional().describe("If true, activates dummy mode for testing."),
+  short: z.boolean().optional().describe("If true, generates a shorter song (30 seconds max) to save credits."),
 }
 
 /**
