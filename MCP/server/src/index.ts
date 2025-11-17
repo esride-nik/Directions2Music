@@ -144,9 +144,46 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
 
     try {
       finalCompositionPlan = await client.music.compositionPlan.create({
-          prompt: description ?? elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines[0] ?? "",
-          sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
+        prompt: `Create hilariously cliché music for navigation directions. 
+              Keep the original text EXACTLY as provided - do not change or poeticize the lyrics. 
+              Do not add instrumental intro or outro sections. 
+              Focus only on the vocal section with the provided directions.
+              Make the musical arrangement as stereotypical and over-the-top as possible for this style.
+              Use the most obvious, exaggerated musical tropes and clichés that would make people smile.
+              Think cheesy tourist music, overly dramatic folk ballads, or comically intense travel anthems.
+              Style: ${description}. 
+              Original directions: ${elevenLabsGenerateMusicInput.compositionPlan?.sections[0].lines.join(', ')}`,
+        sourceCompositionPlan: elevenLabsGenerateMusicInput.compositionPlan
       });
+      // add original positiveGlobalStyles to final plan
+      finalCompositionPlan.positiveGlobalStyles = [
+        ...new Set([
+            "vocals", 
+            "clear lyrics",
+            "sung in local dialect",
+          ...finalCompositionPlan.positiveGlobalStyles,
+          ...elevenLabsGenerateMusicInput.compositionPlan?.positiveGlobalStyles || []
+        ])
+      ];
+      // add original positiveGlobalStyles to positiveGlobalStyles of each section of final plan
+      finalCompositionPlan.sections = finalCompositionPlan.sections.map((section, index) => ({
+        ...section,
+        positiveLocalStyles: [
+          ...new Set([
+            "vocals", 
+            "clear lyrics",
+            "sung in local dialect",
+            ...section.positiveLocalStyles,
+            ...(elevenLabsGenerateMusicInput.compositionPlan?.sections[index]?.positiveLocalStyles || [])
+          ])
+        ]
+      }));
+      // add negative styles to avoid instrumental / no vocals
+      finalCompositionPlan.negativeGlobalStyles = ["instrumental", "no vocals"];
+      finalCompositionPlan.sections = finalCompositionPlan.sections.map((section) => ({
+        ...section,
+        negativeLocalStyles: ["instrumental", "no vocals"]
+      }));
       console.log("+++ Final Composition Plan: +++\n", JSON.stringify(finalCompositionPlan));
     } catch (error) {
       console.error("Error generating final composition plan:", error);
