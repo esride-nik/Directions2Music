@@ -382,10 +382,40 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
               item.geometry = { ...item.geometry, type: expectedGeometryType };
             }
             
+            // Add fallback symbology for old route graphics files
+            let symbol = item.symbol || {};
+            
+            // For simple-line symbols without visual properties
+            if (symbol.type === 'simple-line' && !symbol.color && !symbol.width) {
+              symbol = {
+                ...symbol,
+                color: [0, 122, 255, 0.8], // Blue color
+                width: 3,
+                style: "solid"
+              };
+              console.log('🎨 Added fallback line symbology');
+            }
+            
+            // For simple-marker symbols without visual properties
+            if (symbol.type === 'simple-marker' && !symbol.color && !symbol.size) {
+              // Determine if this is a stop or direction point based on context
+              const isStop = expectedGeometryType === 'point' && item.geometry;
+              symbol = {
+                ...symbol,
+                color: isStop ? [255, 0, 0, 0.8] : [255, 255, 255, 0.9], // Red for stops, white for direction points
+                size: isStop ? 12 : 8,
+                outline: {
+                  color: [0, 0, 0, 0.8],
+                  width: 1
+                }
+              };
+              console.log(`🎨 Added fallback marker symbology for ${isStop ? 'stop' : 'direction point'}`);
+            }
+            
             // Create graphic - ArcGIS should now properly autocast
             const graphic = new Graphic({
               geometry: item.geometry,
-              symbol: item.symbol
+              symbol: symbol
             });
             return graphic;
           } catch (error) {
@@ -698,9 +728,19 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
               const fullAudioUrl = `${API_BASE}${result.audioUrl}`;
               showAudio(fullAudioUrl);
               
-              // Add to music history
-              const directions = directionsInput.value.trim().split('\n').filter(line => line.trim());
-              addToMusicHistory(fullAudioUrl, result.styleCard, directions);
+              // Refresh complete music history from server to get all tracks
+              console.log('🔄 Refreshing music history after generation');
+              musicHistory = []; // Clear current history
+              await loadMusicHistory(); // Reload from server
+              
+              // Find the newly generated track and set it as current
+              const newTrackIndex = musicHistory.findIndex(track => 
+                track.audioUrl === fullAudioUrl
+              );
+              if (newTrackIndex !== -1) {
+                currentMusicIndex = newTrackIndex;
+                console.log(`🎯 Set current track index to ${newTrackIndex} for new track`);
+              }
             }
             stopPolling();
             // Reset button state on completion
