@@ -1,0 +1,38 @@
+{
+  "trackId": "music_Neon Navigator_2025-11-18T02-43-03-877Z",
+  "songTitle": "Neon Navigator",
+  "audioFile": "music_Neon Navigator_2025-11-18T02-43-03-877Z.mp3",
+  "timestamp": "2025-11-18T02-43-03-877Z",
+  "styleCard": {
+    "songTitle": "Neon Navigator",
+    "genre": "Synthwave Pop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Driving",
+      "Sleek",
+      "Urban",
+      "Energetic",
+      "Anticipatory",
+      "Retrofuturistic"
+    ],
+    "description": "A pulsing, neon-lit synthwave pop anthem designed for cruising through the shimmering streets of Las Vegas, blending modern electronic beats with nostalgic 80s synths to evoke a sense of nocturnal adventure and discovery."
+  },
+  "directions": [
+    "Start at Roberto's Taco Shop",
+    "Go east on E Highway 372 (NV-372) toward Raindance Dr",
+    "Take the exit on the right to merge onto Pahrump Valley Hwy (NV-160)",
+    "Continue forward on State Highway 160 (NV-160)",
+    "At the traffic light, turn left on Las Vegas Blvd S (S Vegas Blvd)",
+    "At the traffic light, turn right on Garces Ave",
+    "Finish at 700 S 7th St, Las Vegas, Nevada, 89101, on the right"
+  ],
+  "routeGraphicsFile": "music_Neon Navigator_2025-11-18T02-43-03-877Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763433783880,
+    "timestamp": "2025-11-18T02:43:03.880Z"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "trackId": "music_The Irkutsk Way_2025-11-18T03-02-55-377Z",
+  "songTitle": "The Irkutsk Way",
+  "audioFile": "music_The Irkutsk Way_2025-11-18T03-02-55-377Z.mp3",
+  "timestamp": "2025-11-18T03-02-55-377Z",
+  "styleCard": {
+    "songTitle": "The Irkutsk Way",
+    "genre": "Russian Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Pensive",
+      "Journey",
+      "Expansive",
+      "Steady",
+      "Contemplative"
+    ],
+    "description": "A steady, flowing Russian folk piece that conjures images of a long, contemplative journey through the Siberian landscape. Melodies weave like winding roads, driven by traditional instrumentation."
+  },
+  "directions": [
+    "Start at Yubileynoye SNT poselok, 42, Yubileynoye SNT, Irkutsk, Irkutsk Oblast, 664024",
+    "Go southeast on Юбилейное СНТ поселок (Yubileynoye SNT poselok) ",
+    "Continue forward on Набережная улица (Naberezhnaya ulitsa)",
+    "Continue forward on Иркутная улица (Irkutnaya ulitsa)",
+    "Continue forward on Рабочая улица (Rabochaya ulitsa)",
+    "Continue forward on Трактовая улица (Traktovaya ulitsa)",
+    "Continue forward on Рабочая улица (Rabochaya ulitsa)",
+    "Continue forward on Трактовая улица (Traktovaya ulitsa)",
+    "Finish at 664001, Ushakovskoye, Irkutsk Oblast, on the left"
+  ],
+  "routeGraphicsFile": "music_The Irkutsk Way_2025-11-18T03-02-55-377Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763434975381,
+    "timestamp": "2025-11-18T03:02:55.381Z"
+  }
+}

@@ -217,6 +217,7 @@ const generateMusicElevenLabs = async (
     });
     let finalCompositionPlan;
     let musicResponse;
+    let audioFilename = ""; // Initialize filename variable at function scope
 
     console.log("+++ Initial Composition Plan: +++\n", JSON.stringify(elevenLabsGenerateMusicInput.compositionPlan));
 
@@ -282,6 +283,7 @@ const generateMusicElevenLabs = async (
         : `music_${timestamp}`;
       const audioFile = `./generated-music/audio/${trackId}.mp3`;
       const metadataFile = `./generated-music/metadata/${trackId}.json`;
+      audioFilename = `${trackId}.mp3`; // Set the filename for return
       
       let audioSaved = false;
 
@@ -449,7 +451,36 @@ const generateMusicElevenLabs = async (
       
       return error;
     }
-    return musicResponse;
+    
+    // Return a schema-compliant response (files are already saved)
+    // Use the actual filename that was generated for saving
+    return {
+      json: {
+        compositionPlan: {
+          positiveGlobalStyles: ["generated"],
+          negativeGlobalStyles: [],
+          sections: [{
+            sectionName: "Generated Music",
+            positiveLocalStyles: ["real-generation"],
+            negativeLocalStyles: [],
+            durationMs: 30000,
+            lines: directions || []
+          }]
+        },
+        songMetadata: {
+          title: songTitle || "Generated Music",
+          description: description || "Music generated from route directions",
+          genres: ["Generated"],
+          languages: ["en"],
+          isExplicit: false
+        }
+      },
+      audio: {
+        type: "Buffer" as const,
+        data: [] // Empty for real mode - file is saved to disk
+      },
+      filename: audioFilename
+    };
 }
 
 // get dummy ElevenLabs response for testing
