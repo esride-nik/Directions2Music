@@ -137,7 +137,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         <!-- Style Info -->
         <calcite-card id="styleInfo" style="display: none; margin: 0.5rem;">
           <h4 slot="heading">Song Information</h4>
-          <div>Style details will appear here</p>
+          <div id="styleDetails"></div>
         </calcite-card>
         
         <!-- Error Display -->
@@ -152,7 +152,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         
         <!-- Audio Player -->
         <div id="audioSection" style="padding:0.5rem; display: none;">
-          <calcite-label>Generated Music</calcite-label>
           <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
             <source id="audioSource" src="" type="audio/mpeg">
           </audio>
@@ -371,7 +370,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         
         // Update the style info card
         const heading = styleInfo.querySelector('h4[slot="heading"]');
-        const details = styleInfo.querySelector('p');
+        const details = styleInfo.querySelector('#styleDetails');
         
         if (heading && details) {
           // Show track position if we're browsing history
