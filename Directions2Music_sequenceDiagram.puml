@@ -1,91 +1,82 @@
 @startuml
 !theme plain
 
-' Sequence diagram mapping the flow you described
-' Actors: User, MapClient, DirectionsComponent, EsriRoutingService, LLM, MusicGenAI, MCP
+' Simplified sequence diagram showing the actual implementation
+' User interacts with Web Client, which calls MCP Server that orchestrates LLM and ElevenLabs
 
 '' Participant colors
 skinparam participant {
   BackgroundColor<<User>> LightGoldenRodYellow
-  BackgroundColor<<MapClient>> #FFF2CC
+  BackgroundColor<<WebClient>> #FFF2CC
   BackgroundColor<<DirectionsComponent>> #E6F2FF
-  BackgroundColor<<EsriRoutingService>> #F2E6FF
-  BackgroundColor<<LLM>> #E8F8E8
-  BackgroundColor<<MusicGenAI>> #FFE6E6
-  BackgroundColor<<MCP>> #FFF0D9
+  BackgroundColor<<RoutingService>> #F2E6FF
+  BackgroundColor<<MCPServer>> #FFF0D9
+  BackgroundColor<<Gemini>> #E8F8E8
+  BackgroundColor<<ElevenLabs>> #FFE6E6
 }
 
 actor User <<User>>
-participant "Map Client\n(local)" as MapClient <<MapClient>>
-participant "Directions\n(component)" as DirectionsComponent <<DirectionsComponent>>
-participant "Esri Routing\nService (cloud)" as EsriRoutingService <<EsriRoutingService>>
-participant LLM <<LLM>>
-participant "Music GenAI\n(e.g. Suno)" as MusicGenAI <<MusicGenAI>>
-participant MCP <<MCP>>
+participant "Web Client\n(index.html)" as WebClient <<WebClient>>
+participant "Directions\nComponent" as DirectionsComponent <<DirectionsComponent>>
+participant "Esri Routing\nService" as RoutingService <<RoutingService>>
+participant "MCP Server\n(Node.js)" as MCPServer <<MCPServer>>
+participant "Google Gemini\n(LLM)" as Gemini <<Gemini>>
+participant "ElevenLabs\n(Music API)" as ElevenLabs <<ElevenLabs>>
 
-== Authentication / Startup ==
-User -> MapClient: Open Map Client (local)
-note right of MapClient #yellow
- Map Client must have ArcGIS access credentials to call
- cloud routing: either an OAuth2 token (via login) or an
- API key if routing supports it.
-end note
-MapClient -> MapClient: Ensure ArcGIS token/API key present
-alt #FFF2CC no token
- MapClient -> User: Prompt for OAuth2 login
- User -> MapClient: Complete OAuth2 login (token returned)
-end
-
-== Request directions ==
-User -> MapClient: Use Directions component to request route
-MapClient -> DirectionsComponent: createRoute(params)
-note over DirectionsComponent #E6F2FF
- Uses ArcGIS Directions component API
-end note
-DirectionsComponent -> EsriRoutingService: Request route (token/API-key)
-EsriRoutingService --> DirectionsComponent: JSON route result
-note right of DirectionsComponent #yellow
- JSON contains: array of routing directions, each with
- - humanReadableText
- - compressedGeometry
- - summarized route data (distance, time, attributes)
+== Get Directions ==
+User -> WebClient: Click on map to set start/end points
+WebClient -> DirectionsComponent: createRoute()
+DirectionsComponent -> RoutingService: Request route with waypoints
+RoutingService --> DirectionsComponent: Route result with directions & geometry
+DirectionsComponent --> WebClient: Directions array + route graphics
+note right of WebClient #lightblue
+ Web client extracts:
+ - Human-readable text directions
+ - Route graphics (polylines, points)
+ - Route metadata
 end note
 
-== Map client handles result ==
-DirectionsComponent -> MapClient: Return route JSON
-MapClient -> MapClient: Extract human-readable directions
-MapClient -> LLM: Send human-readable directions + location context
-note right of LLM #lightblue
- Prompt: Analyze text & location to choose a musical style
- Examples (notes):
- - US heartland -> Country
- - Los Angeles -> West Coast Rap
- - India -> Bollywood
- - Brazil -> Samba
- - Bavaria -> Alpen-Schlager
- - Rheinland -> Kölsche Karnevalsmusik
+== Find Musical Style ==
+WebClient -> MCPServer: Call "find-musical-style" tool\n(directions text array)
+MCPServer -> Gemini: Analyze directions for cultural context
+note right of Gemini #lightgreen
+ Gemini analyzes location/culture from directions:
+ - Street names, place names
+ - Geographic context
+ - Cultural references
+ → Returns StyleCard with genre, mood, instrumentation
 end note
+Gemini --> MCPServer: StyleCard (genre, mood, BPM, etc.)
+MCPServer --> WebClient: Musical style description
 
-LLM --> MapClient: Style + tonality suggestion
-
-== Generate song ==
-MapClient -> LLM: Instruct to prompt Music GenAI with:\n- chosen style/tonality\n- exact, unchanged human-readable directions (as lyrics)
-LLM -> MusicGenAI: Prompt to generate song (lyrics = directions)
-MusicGenAI --> LLM: Song artifact (audio file / stream URL, metadata)
-
-== Final instructions and playback ==
-LLM -> MapClient: Instruct MapClient via MCP to:\n- visualize route (use compressedGeometry)\n- display human-readable directions\n- play generated song
-note left of MCP #yellow
- MCP = Model Context Protocol (local server or Docker container)
- Runs as a local service that lets the LLM instruct the Music GenAI
- and the local MapClient with structured commands and payloads.
+== Generate Music ==
+WebClient -> MCPServer: Call "generate-music" tool\n(StyleCard + lyrics + routeGraphics)
+MCPServer -> MCPServer: Create composition plan from StyleCard
+MCPServer -> ElevenLabs: Create composition plan
+ElevenLabs --> MCPServer: Enhanced composition plan
+MCPServer -> ElevenLabs: Generate music with plan
+note right of ElevenLabs #pink
+ ElevenLabs process:
+ 1. Refine composition plan with vocal focus
+ 2. Generate music with lyrics = directions
+ 3. Return audio stream
 end note
-LLM -> MCP: Send visualization + playback instructions
-MCP -> MapClient: Command: visualize route & play song
-MapClient -> MapClient: Render route and directions
-MapClient -> MapClient: Play song (from Music GenAI URL)
+ElevenLabs --> MCPServer: Audio stream + metadata
+
+== Save and Respond ==
+MCPServer -> MCPServer: Save audio to /generated-music/audio/
+MCPServer -> MCPServer: Save metadata to /generated-music/metadata/
+MCPServer -> MCPServer: Save route graphics to /generated-music/route-graphics/
+MCPServer --> WebClient: Audio filename + metadata
+
+== Playback ==
+WebClient -> MCPServer: GET /audio/{filename}
+MCPServer --> WebClient: Audio file stream
+WebClient -> WebClient: Load route graphics from routeGraphics data
+WebClient -> WebClient: Display route on map
+WebClient -> WebClient: Play generated music
 
 == End ==
-User <-- MapClient: Route displayed + music playing
+User <-- WebClient: Route visualized + music playing
 
 @enduml
