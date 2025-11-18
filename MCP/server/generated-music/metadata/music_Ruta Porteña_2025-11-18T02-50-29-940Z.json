@@ -1,0 +1,37 @@
+{
+  "trackId": "music_Ruta Porteña_2025-11-18T02-50-29-940Z",
+  "songTitle": "Ruta Porteña",
+  "audioFile": "music_Ruta Porteña_2025-11-18T02-50-29-940Z.mp3",
+  "timestamp": "2025-11-18T02-50-29-940Z",
+  "styleCard": {
+    "songTitle": "Ruta Porteña",
+    "genre": "Chilean Folk Fusion",
+    "artistName": "AI Composer",
+    "mood": [
+      "Contemplative",
+      "Wandering",
+      "Melancholic",
+      "Hopeful",
+      "Urban Exploration"
+    ],
+    "description": "A soulful, acoustic journey through the winding streets and historic hills of Valparaíso, evoking a sense of discovery and nostalgic charm."
+  },
+  "directions": [
+    "Start at 243, Quilpué, Valparaíso",
+    "Go southwest toward Huella La Pradera",
+    "Restriction: Avoid Unpaved Roads",
+    "Turn left on Huella La Pradera",
+    "Continue forward on Avenida España",
+    "Continue forward on Calle San Francisco",
+    "Finish at Calle Félix Vicuña 1-47, Valparaíso, 2360000, on the left"
+  ],
+  "routeGraphicsFile": "music_Ruta Porteña_2025-11-18T02-50-29-940Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763434229942,
+    "timestamp": "2025-11-18T02:50:29.942Z"
+  }
+}

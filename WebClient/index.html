@@ -284,32 +284,46 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         return {
           directionLines: route.directionLines.items.map(item => ({
             geometry: {
-              ...item.geometry,
+              ...item.geometry.toJSON(), // Use toJSON() to properly serialize geometry
               type: "polyline" // Explicitly add geometry type for JSON serialization
             },
             symbol: {
               ...item.symbol,
-              type: item.symbol.type || "simple-line" // Ensure symbol has type
+              type: item.symbol.type || "simple-line", // Ensure symbol has type
+              // Add default visual properties if missing
+              color: item.symbol.color || [51, 122, 183, 0.8], // Blue color
+              width: item.symbol.width || 3,
+              style: item.symbol.style || "solid"
             }
           })),
           directionPoints: route.directionPoints.items.map(item => ({
             geometry: {
-              ...item.geometry,
+              ...item.geometry.toJSON(), // Use toJSON() to properly serialize geometry
               type: "point" // Explicitly add geometry type for JSON serialization
             },
             symbol: {
               ...item.symbol,
-              type: item.symbol.type || "simple-marker" // Ensure symbol has type
+              type: item.symbol.type || "simple-marker", // Ensure symbol has type
+              // Add default visual properties if missing
+              color: item.symbol.color || [255, 255, 255],
+              outline: item.symbol.outline || { color: [50, 50, 50], width: 1 },
+              size: item.symbol.size || 8,
+              style: item.symbol.style || "circle"
             }
           })),
           stops: route.stops.items.map(item => ({
             geometry: {
-              ...item.geometry,
+              ...item.geometry.toJSON(), // Use toJSON() to properly serialize geometry
               type: "point" // Explicitly add geometry type for JSON serialization
             },
             symbol: {
               ...item.symbol,
-              type: item.symbol.type || "simple-marker" // Ensure symbol has type
+              type: item.symbol.type || "simple-marker", // Ensure symbol has type
+              // Add default visual properties if missing
+              color: item.symbol.color || [255, 0, 0],
+              outline: item.symbol.outline || { color: [255, 255, 255], width: 2 },
+              size: item.symbol.size || 12,
+              style: item.symbol.style || "circle"
             }
           }))
         };
@@ -650,8 +664,9 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           }
 
           currentJobId = result.jobId;
-          generateBtn.loading = false;
-          generateBtn.disabled = false;
+          // Keep button in loading state until job completes
+          // generateBtn.loading = false;  // Don't reset loading here
+          // generateBtn.disabled = false; // Keep disabled until job completes
           
           startPolling();
 
@@ -688,14 +703,23 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
               addToMusicHistory(fullAudioUrl, result.styleCard, directions);
             }
             stopPolling();
+            // Reset button state on completion
+            generateBtn.loading = false;
+            generateBtn.disabled = false;
           } else if (result.status === 'failed') {
             showError(result.error);
             stopPolling();
+            // Reset button state on failure
+            generateBtn.loading = false;
+            generateBtn.disabled = false;
           }
 
         } catch (error) {
           showError(error.message);
           stopPolling();
+          // Reset button state on error
+          generateBtn.loading = false;
+          generateBtn.disabled = false;
         }
       }
 

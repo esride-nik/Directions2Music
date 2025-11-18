@@ -167,11 +167,17 @@ async function processJob(jobId: string) {
       console.log(`🎵 [${jobId}] Dummy mode: Using existing file ${musicResult.filename}`);
       console.log(`🎵 [${jobId}] Audio filename: ${audioFile}`);
     } else {
-      // Real mode: find the newly generated file
-      console.log(`🔍 [${jobId}] Looking for latest music file...`);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for file system
-      audioFile = await findLatestMusicFile();
-      console.log(`🔍 [${jobId}] Found audio file: ${audioFile}`);
+      // Real mode: use the filename from the response if available
+      if (musicResult?.filename) {
+        audioFile = musicResult.filename; // Use the actual filename returned by server
+        console.log(`🔍 [${jobId}] Real mode: Using filename from response: ${audioFile}`);
+      } else {
+        // Fallback: find the newly generated file
+        console.log(`🔍 [${jobId}] Real mode: No filename in response, searching for latest file...`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for file system
+        audioFile = await findLatestMusicFile();
+        console.log(`🔍 [${jobId}] Found audio file: ${audioFile}`);
+      }
     }
     
     if (audioFile) {

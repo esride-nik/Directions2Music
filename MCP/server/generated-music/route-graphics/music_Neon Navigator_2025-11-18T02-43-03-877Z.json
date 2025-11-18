@@ -1,0 +1,305 @@
+{
+  "directionLines": [
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    },
+    {
+      "geometry": {
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line"
+      }
+    }
+  ],
+  "directionPoints": [
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker"
+      }
+    }
+  ],
+  "stops": [
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym44",
+        "type": "simple-marker"
+      }
+    },
+    {
+      "geometry": {
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym50",
+        "type": "simple-marker"
+      }
+    }
+  ]
+}
