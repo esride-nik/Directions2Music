@@ -10,6 +10,7 @@ skinparam participant {
   BackgroundColor<<WebClient>> #FFF2CC
   BackgroundColor<<DirectionsComponent>> #E6F2FF
   BackgroundColor<<RoutingService>> #F2E6FF
+  BackgroundColor<<MCPClient>> #E1F5FE
   BackgroundColor<<MCPServer>> #FFF0D9
   BackgroundColor<<Gemini>> #E8F8E8
   BackgroundColor<<ElevenLabs>> #FFE6E6
@@ -19,6 +20,7 @@ actor User <<User>>
 participant "Web Client\n(index.html)" as WebClient <<WebClient>>
 participant "Directions\nComponent" as DirectionsComponent <<DirectionsComponent>>
 participant "Esri Routing\nService" as RoutingService <<RoutingService>>
+participant "MCP Client\n(orchestrator)" as MCPClient <<MCPClient>>
 participant "MCP Server\n(Node.js)" as MCPServer <<MCPServer>>
 participant "Google Gemini\n(LLM)" as Gemini <<Gemini>>
 participant "ElevenLabs\n(Music API)" as ElevenLabs <<ElevenLabs>>
@@ -37,7 +39,8 @@ note right of WebClient #lightblue
 end note
 
 == Find Musical Style ==
-WebClient -> MCPServer: Call "find-musical-style" tool\n(directions text array)
+WebClient -> MCPClient: Request music generation\n(directions text array + route graphics)
+MCPClient -> MCPServer: Call "find-musical-style" tool\n(directions text array)
 MCPServer -> Gemini: Analyze directions for cultural context
 note right of Gemini #lightgreen
  Gemini analyzes location/culture from directions:
@@ -47,10 +50,10 @@ note right of Gemini #lightgreen
  → Returns StyleCard with genre, mood, instrumentation
 end note
 Gemini --> MCPServer: StyleCard (genre, mood, BPM, etc.)
-MCPServer --> WebClient: Musical style description
+MCPServer --> MCPClient: Musical style description
 
 == Generate Music ==
-WebClient -> MCPServer: Call "generate-music" tool\n(StyleCard + lyrics + routeGraphics)
+MCPClient -> MCPServer: Call "generate-music" tool\n(StyleCard + lyrics + routeGraphics)
 MCPServer -> MCPServer: Create composition plan from StyleCard
 MCPServer -> ElevenLabs: Create composition plan
 ElevenLabs --> MCPServer: Enhanced composition plan
@@ -67,7 +70,8 @@ ElevenLabs --> MCPServer: Audio stream + metadata
 MCPServer -> MCPServer: Save audio to /generated-music/audio/
 MCPServer -> MCPServer: Save metadata to /generated-music/metadata/
 MCPServer -> MCPServer: Save route graphics to /generated-music/route-graphics/
-MCPServer --> WebClient: Audio filename + metadata
+MCPServer --> MCPClient: Audio filename + metadata (jobID)
+MCPClient --> WebClient: Job completion with audio filename
 
 == Playback ==
 WebClient -> MCPServer: GET /audio/{filename}
