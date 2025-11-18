@@ -4,10 +4,61 @@ import express from "express";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 import { GoogleGenAI } from "@google/genai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
 import { StyleCard, styleCardSchema, findStyleInputSchema, ElevenLabsGenerateMusicInput, generateMusicInputSchema, GenerateMusicInput, FindStyleInput, generateMusicOutputSchema, GenerateMusicOutput } from "./schemas.js";
+
+// ES module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Helper function to save track metadata
+async function saveTrackMetadata(
+  trackId: string,
+  songTitle: string | undefined,
+  directions: string[],
+  styleCard: StyleCard,
+  timestamp: string,
+  audioFile: string,
+  metadataFile: string
+) {
+  const metadata = {
+    trackId,
+    songTitle: songTitle || `Generated Track ${timestamp}`,
+    audioFile: path.basename(audioFile),
+    timestamp,
+    styleCard: {
+      songTitle: songTitle || styleCard.songTitle || `Generated Track ${timestamp}`,
+      genre: styleCard.genre || 'AI Generated Music',
+      artistName: 'AI Composer', // This is our custom addition
+      mood: styleCard.mood || ['Generated'],
+      description: styleCard.description || `Generated music based on navigation directions`
+    },
+    directions: directions || [],
+    composition: {
+      durationMs: 120000, // Default duration
+      style: "AI generated music based on geographic and cultural context"
+    },
+    generationMetadata: {
+      elapsedTimeMs: Date.now(), // Will be updated by caller if needed
+      timestamp: new Date().toISOString()
+    }
+  };
+
+  try {
+    // Ensure the metadata directory exists
+    const metadataDir = path.dirname(metadataFile);
+    await fs.mkdir(metadataDir, { recursive: true });
+    
+    await fs.writeFile(metadataFile, JSON.stringify(metadata, null, 2));
+    console.log(`📋 Metadata saved: ${metadataFile}`);
+  } catch (error) {
+    console.error(`❌ Failed to save metadata: ${error}`);
+  }
+}
 
 /*********************
 ** Load configuration
@@ -131,7 +182,13 @@ server.registerTool(
 ********************/
 
 // helper to call ElevenLabs Music API to generate music
-const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, description?: string, songTitle?: string) => {
+const generateMusicElevenLabs = async (
+  elevenLabsGenerateMusicInput: ElevenLabsGenerateMusicInput, 
+  description?: string, 
+  songTitle?: string,
+  directions?: string[],
+  styleCard?: StyleCard
+) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
         environment: "https://api.elevenlabs.io",
@@ -197,11 +254,13 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
 
       console.log("✅ ElevenLabs music generation succeeded");
       
-      // Create filename
+      // Create filename with new folder structure
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const audioFile = songTitle 
-        ? `./music_${songTitle.substring(0, 20)}_${timestamp}.mp3` 
-        : `./music_${timestamp}.mp3`;
+      const trackId = songTitle 
+        ? `music_${songTitle.substring(0, 20)}_${timestamp}` 
+        : `music_${timestamp}`;
+      const audioFile = `./generated-music/audio/${trackId}.mp3`;
+      const metadataFile = `./generated-music/metadata/${trackId}.json`;
       
       let audioSaved = false;
 
@@ -216,6 +275,9 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
         await fs.writeFile(audioFile, audioBuffer);
         console.log(`✅ Audio file saved (stream): ${audioFile} (${audioBuffer.length} bytes)`);
         audioSaved = true;
+        
+        // Save metadata
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
       }
       
       // Method 2: Check if it's a Buffer
@@ -224,6 +286,9 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
         await fs.writeFile(audioFile, musicResponse);
         console.log(`✅ Audio file saved (buffer): ${audioFile} (${(musicResponse as Buffer).length} bytes)`);
         audioSaved = true;
+        
+        // Save metadata
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
       }
       
       // Method 3: Try to access .body property (common in HTTP responses)
@@ -246,6 +311,9 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
             await fs.writeFile(audioFile, audioBuffer);
             console.log(`✅ Audio file saved (body): ${audioFile} (${audioBuffer.length} bytes)`);
             audioSaved = true;
+            
+            // Save metadata
+            await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
           }
         } catch (bodyErr) {
           console.warn("⚠️  Could not extract from .body:", bodyErr);
@@ -283,6 +351,9 @@ const generateMusicElevenLabs = async (elevenLabsGenerateMusicInput: ElevenLabsG
           await fs.writeFile(audioFile, audioBuffer);
           console.log(`✅ Audio file saved (audio property): ${audioFile} (${audioBuffer.length} bytes)`);
           audioSaved = true;
+          
+          // Save metadata
+          await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
         } catch (audioErr) {
           console.warn("⚠️  Could not extract from .audio:", audioErr);
         }
@@ -434,7 +505,15 @@ server.registerTool(
     const dummyMode = args && args.dummyMode ? Boolean(args.dummyMode) : false;
 
     // ElevenLabs music generation call
-    const musicResponse = dummyMode ? await getDummyMusicResponse() : await generateMusicElevenLabs(getElevenLabsInitialCompositionPlan(styleCard, lyrics),styleCard.description, styleCard.songTitle);
+    const musicResponse = dummyMode ? 
+      await getDummyMusicResponse() : 
+      await generateMusicElevenLabs(
+        getElevenLabsInitialCompositionPlan(styleCard, lyrics),
+        styleCard.description, 
+        styleCard.songTitle,
+        lyrics, // These are actually the directions
+        styleCard
+      );
 
     return {
       content: [
