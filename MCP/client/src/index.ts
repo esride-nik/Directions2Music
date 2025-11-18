@@ -36,6 +36,7 @@ interface MusicJob {
   error?: string;
   directions: string[];
   dummyMode: boolean;
+  routeGraphics?: any; // Route graphics data from the frontend
 }
 
 const jobs = new Map<string, MusicJob>();
@@ -128,15 +129,50 @@ async function processJob(jobId: string) {
       arguments: {
         styleCard: styleCard,
         lyrics: job.directions,
-        dummyMode: job.dummyMode
+        dummyMode: job.dummyMode,
+        routeGraphics: job.routeGraphics // Pass route graphics to server
       }
     });
     
     console.log(`✅ [${jobId}] Music generation completed`);
+    console.log(`🔍 [${jobId}] Raw MCP response:`, JSON.stringify(musicGenerationResult, null, 2));
     
-    // Step 3: Find the generated audio file
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for file system
-    const audioFile = await findLatestMusicFile();
+    // Extract the music generation result
+    let musicResult: any = null;
+    try {
+      if (musicGenerationResult && typeof musicGenerationResult === 'object') {
+        // Try to extract from content.text or structuredContent
+        const contentArray = (musicGenerationResult as any)?.content;
+        if (Array.isArray(contentArray) && contentArray.length > 0 && contentArray[0]?.text) {
+          musicResult = JSON.parse(contentArray[0].text);
+          console.log(`🔍 [${jobId}] Parsed from content.text:`, musicResult);
+        } else if ((musicGenerationResult as any)?.structuredContent) {
+          musicResult = (musicGenerationResult as any).structuredContent;
+          console.log(`🔍 [${jobId}] Using structuredContent:`, musicResult);
+        }
+      }
+    } catch (parseError) {
+      console.warn(`⚠️ [${jobId}] Could not parse music generation result:`, parseError);
+    }
+    
+    console.log(`🔍 [${jobId}] Final musicResult:`, musicResult);
+    console.log(`🔍 [${jobId}] Dummy mode: ${job.dummyMode}, existingFile: ${musicResult?.existingFile}, filename: ${musicResult?.filename}`);
+    
+    // Step 3: Handle audio file location
+    let audioFile = null;
+    
+    if (job.dummyMode && musicResult?.existingFile && musicResult?.filename) {
+      // Dummy mode: use existing file (just store filename, not full path)
+      audioFile = musicResult.filename; // Just the filename for URL construction
+      console.log(`🎵 [${jobId}] Dummy mode: Using existing file ${musicResult.filename}`);
+      console.log(`🎵 [${jobId}] Audio filename: ${audioFile}`);
+    } else {
+      // Real mode: find the newly generated file
+      console.log(`🔍 [${jobId}] Looking for latest music file...`);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for file system
+      audioFile = await findLatestMusicFile();
+      console.log(`🔍 [${jobId}] Found audio file: ${audioFile}`);
+    }
     
     if (audioFile) {
       job.audioFile = audioFile;
@@ -167,7 +203,7 @@ app.post('/orchestrate', async (req, res) => {
   console.log('\n**********************************\n🎯 Starting async music generation...\n**********************************');
   
   try {
-    const { directions, dummyMode = false } = req.body;
+    const { directions, dummyMode = false, routeGraphics } = req.body;
     
     if (!directions || !Array.isArray(directions)) {
       return res.status(400).json({
@@ -182,12 +218,13 @@ app.post('/orchestrate', async (req, res) => {
       status: 'pending',
       startTime: new Date(),
       directions,
-      dummyMode
+      dummyMode,
+      routeGraphics // Store route graphics in job
     };
     
     jobs.set(jobId, job);
     
-    console.log(`📋 Created job ${jobId} for ${directions.length} directions (dummy: ${dummyMode})`);
+    console.log(`📋 Created job ${jobId} for ${directions.length} directions (dummy: ${dummyMode}, hasRouteGraphics: ${!!routeGraphics})`);
     
     // Start processing in background (don't await!)
     processJob(jobId).catch(error => {

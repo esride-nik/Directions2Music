@@ -638,7 +638,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               directions: directions,
-              dummyMode: dummyModeCheckbox.checked
+              dummyMode: dummyModeCheckbox.checked,
+              routeGraphics: currentRouteGraphics // Send captured route graphics
             })
           });
 
