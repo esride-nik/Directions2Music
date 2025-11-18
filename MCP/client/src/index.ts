@@ -18,9 +18,10 @@ const PORT = 3001;
 app.use(express.json());
 app.use(cors());
 
-// Serve static files (MP3s) from MCP server directory
+// Serve static files (MP3s) from MCP server generated-music directory
 const serverDir = path.resolve(__dirname, '../../server');
-app.use('/audio', express.static(serverDir));
+const audioDir = path.join(serverDir, 'generated-music', 'audio');
+app.use('/audio', express.static(audioDir));
 
 // Job tracking system
 interface MusicJob {
@@ -288,23 +289,99 @@ app.get('/health', (req, res) => {
   });
 });
 
-// List available audio files
+// List available audio files with metadata
 app.get('/audio-files', async (req, res) => {
   try {
-    const files = await fs.readdir(serverDir);
-    const musicFiles = files.filter(file => 
+    const metadataDir = path.join(serverDir, 'generated-music', 'metadata');
+    const audioDir = path.join(serverDir, 'generated-music', 'audio');
+    
+    console.log('🔍 Debug paths:');
+    console.log('  serverDir:', serverDir);
+    console.log('  audioDir:', audioDir);
+    console.log('  metadataDir:', metadataDir);
+    
+    // Check if directories exist
+    try {
+      await fs.access(audioDir);
+      await fs.access(metadataDir);
+      console.log('✅ Both new directories exist');
+    } catch (dirError) {
+      console.log('❌ New directory structure not found, falling back to old structure');
+      console.log('  Error:', dirError);
+      
+      // Fall back to old structure if new structure doesn't exist
+      const files = await fs.readdir(serverDir);
+      const musicFiles = files.filter(file => 
+        file.startsWith('music_') && file.endsWith('.mp3')
+      );
+      
+      console.log('📁 Found old-structure files:', musicFiles);
+      
+      const fileDetails = await Promise.all(
+        musicFiles.map(async file => {
+          const stats = await fs.stat(path.join(serverDir, file));
+          return {
+            filename: file,
+            url: `/audio/${file}`,
+            size: stats.size,
+            created: stats.mtime,
+            sizeKB: Math.round(stats.size / 1024),
+            title: file.replace('music_', '').replace('.mp3', ''),
+            styleCard: {
+              songTitle: file.replace('music_', '').replace('.mp3', ''),
+              genre: 'Generated Music',
+              artistName: 'AI Composer',
+              mood: ['Generated']
+            }
+          };
+        })
+      );
+      
+      fileDetails.sort((a, b) => b.created.getTime() - a.created.getTime());
+      return res.json({ files: fileDetails, total: fileDetails.length });
+    }
+    
+    // New structure: read from organized folders
+    const audioFiles = await fs.readdir(audioDir);
+    const musicFiles = audioFiles.filter(file => 
       file.startsWith('music_') && file.endsWith('.mp3')
     );
     
+    console.log('🎵 Found audio files in new structure:', musicFiles);
+    
     const fileDetails = await Promise.all(
       musicFiles.map(async file => {
-        const stats = await fs.stat(path.join(serverDir, file));
+        const audioStats = await fs.stat(path.join(audioDir, file));
+        const metadataFile = file.replace('.mp3', '.json');
+        const metadataPath = path.join(metadataDir, metadataFile);
+        
+        console.log(`📋 Processing ${file}, looking for metadata at:`, metadataPath);
+        
+        // Try to load metadata
+        let metadata = null;
+        try {
+          const metadataContent = await fs.readFile(metadataPath, 'utf8');
+          metadata = JSON.parse(metadataContent);
+          console.log(`✅ Loaded metadata for ${file}`);
+        } catch (err) {
+          console.warn(`❌ No metadata found for ${file}:`, err instanceof Error ? err.message : String(err));
+        }
+        
         return {
           filename: file,
           url: `/audio/${file}`,
-          size: stats.size,
-          created: stats.mtime,
-          sizeKB: Math.round(stats.size / 1024)
+          size: audioStats.size,
+          created: audioStats.mtime,
+          sizeKB: Math.round(audioStats.size / 1024),
+          title: metadata?.songTitle || file.replace('music_', '').replace('.mp3', ''),
+          styleCard: metadata?.styleCard || {
+            songTitle: file.replace('music_', '').replace('.mp3', ''),
+            genre: 'Generated Music',
+            artistName: 'AI Composer',
+            mood: ['Generated']
+          },
+          directions: metadata?.directions || [],
+          metadata: metadata
         };
       })
     );
@@ -316,6 +393,7 @@ app.get('/audio-files', async (req, res) => {
       total: fileDetails.length
     });
   } catch (error) {
+    console.error('Error listing audio files:', error);
     res.status(500).json({ error: 'Failed to list audio files' });
   }
 });
