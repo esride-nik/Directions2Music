@@ -166,8 +166,11 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       let pollInterval = null;
       
       // Music history navigation
-      let musicHistory = []; // Array of {audioUrl, styleCard, timestamp, directions} objects
+      let musicHistory = []; // Array of {audioUrl, styleCard, timestamp, directions, routeGraphics} objects
       let currentMusicIndex = -1; // Current position in history (-1 = no music loaded)
+      let currentRouteGraphics = null; // Current route graphics from directions component
+      let routeGraphicsLayer = null; // GraphicsLayer for displaying historical routes
+      let pendingRouteGraphics = null; // Route graphics waiting for map to be ready
       
       // DOM elements
       const directionsInput = document.getElementById('directionsInput');
@@ -197,7 +200,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           audioUrl,
           styleCard,
           directions,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          routeGraphics: currentRouteGraphics // Store current route graphics
         };
         
         // If we're not at the end of history, remove everything after current position
@@ -250,6 +254,13 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         // Update directions input to show what was used for this music
         directionsInput.value = entry.directions.join('\n');
         
+        // Display historical route graphics
+        if (entry.routeGraphics) {
+          displayRouteGraphics(entry.routeGraphics);
+        } else {
+          clearRouteGraphics();
+        }
+        
         updateNavigationButtons();
       }
 
@@ -262,6 +273,176 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       function navigateForward() {
         if (currentMusicIndex > 0) {
           playMusicAtIndex(currentMusicIndex - 1);
+        }
+      }
+
+      // Route Graphics Management
+      function captureRouteGraphics() {
+        if (!directionsElement.lastRoute) return null;
+        
+        const route = directionsElement.lastRoute;
+        return {
+          directionLines: route.directionLines.items.map(item => ({
+            geometry: {
+              ...item.geometry,
+              type: "polyline" // Explicitly add geometry type for JSON serialization
+            },
+            symbol: {
+              ...item.symbol,
+              type: item.symbol.type || "simple-line" // Ensure symbol has type
+            }
+          })),
+          directionPoints: route.directionPoints.items.map(item => ({
+            geometry: {
+              ...item.geometry,
+              type: "point" // Explicitly add geometry type for JSON serialization
+            },
+            symbol: {
+              ...item.symbol,
+              type: item.symbol.type || "simple-marker" // Ensure symbol has type
+            }
+          })),
+          stops: route.stops.items.map(item => ({
+            geometry: {
+              ...item.geometry,
+              type: "point" // Explicitly add geometry type for JSON serialization
+            },
+            symbol: {
+              ...item.symbol,
+              type: item.symbol.type || "simple-marker" // Ensure symbol has type
+            }
+          }))
+        };
+      }
+
+      async function createRouteGraphicsLayer() {
+        if (routeGraphicsLayer) return routeGraphicsLayer;
+        
+        // Wait for map to be ready
+        if (!viewElement || !viewElement.map) {
+          console.log('⏳ Map not ready yet, waiting...');
+          return null;
+        }
+        
+        const GraphicsLayer = await $arcgis.import("@arcgis/core/layers/GraphicsLayer.js");
+        routeGraphicsLayer = new GraphicsLayer({
+          id: "historical-routes",
+          title: "Historical Routes"
+        });
+        
+        // Add to map
+        viewElement.map.add(routeGraphicsLayer);
+        return routeGraphicsLayer;
+      }
+
+      async function displayRouteGraphics(routeGraphics) {
+        if (!routeGraphics) return;
+        
+        // Check if map is ready
+        if (!viewElement || !viewElement.map) {
+          console.log('⏳ Map not ready, deferring route graphics display');
+          // Store for later display when map is ready
+          pendingRouteGraphics = routeGraphics;
+          return;
+        }
+        
+        const Graphic = await $arcgis.import("@arcgis/core/Graphic.js");
+        const layer = await createRouteGraphicsLayer();
+        
+        if (!layer) {
+          console.log('❌ Could not create route graphics layer');
+          return;
+        }
+        
+        // Clear existing graphics
+        layer.removeAll();
+        
+        const graphicsArray = [];
+        
+        // Helper function to safely create graphics with proper type validation
+        function createGraphicSafely(item, expectedGeometryType) {
+          try {
+            // Validate that geometry has the proper type
+            if (!item.geometry || !item.geometry.type) {
+              console.warn('⚠️ Missing geometry type, adding default:', expectedGeometryType);
+              item.geometry = { ...item.geometry, type: expectedGeometryType };
+            }
+            
+            // Create graphic - ArcGIS should now properly autocast
+            const graphic = new Graphic({
+              geometry: item.geometry,
+              symbol: item.symbol
+            });
+            return graphic;
+          } catch (error) {
+            console.warn('⚠️ Failed to create graphic:', error, item);
+            return null;
+          }
+        }
+        
+        // Add direction lines
+        if (routeGraphics.directionLines) {
+          routeGraphics.directionLines.forEach(item => {
+            const graphic = createGraphicSafely(item, 'polyline');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        // Add direction points
+        if (routeGraphics.directionPoints) {
+          routeGraphics.directionPoints.forEach(item => {
+            const graphic = createGraphicSafely(item, 'point');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        // Add stops
+        if (routeGraphics.stops) {
+          routeGraphics.stops.forEach(item => {
+            const graphic = createGraphicSafely(item, 'point');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        console.log('🗺️ Displayed route graphics:', {
+          lines: routeGraphics.directionLines?.length || 0,
+          points: routeGraphics.directionPoints?.length || 0,
+          stops: routeGraphics.stops?.length || 0,
+          totalGraphics: graphicsArray.length
+        });
+
+        // Navigate map to show the route graphics
+        if (viewElement && graphicsArray.length > 0) {
+          try {
+            await viewElement.goTo(graphicsArray);
+            console.log('📍 Map navigated to route graphics extent');
+          } catch (error) {
+            console.warn('⚠️ Could not navigate to route graphics:', error);
+            // Fallback: try to go to the first graphic's geometry
+            try {
+              if (graphicsArray[0] && graphicsArray[0].geometry) {
+                await viewElement.goTo(graphicsArray[0].geometry);
+                console.log('📍 Map navigated to first graphic');
+              }
+            } catch (fallbackError) {
+              console.warn('⚠️ Fallback navigation also failed:', fallbackError);
+            }
+          }
+        }
+      }
+
+      function clearRouteGraphics() {
+        if (routeGraphicsLayer) {
+          routeGraphicsLayer.removeAll();
         }
       }
 
@@ -292,10 +473,15 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
                 },
                 directions: file.directions || [`Generated music file: ${file.filename}`],
                 timestamp: file.created,
-                metadata: file.metadata // Store full metadata for future use
+                metadata: file.metadata, // Store full metadata for future use
+                routeGraphics: file.routeGraphics || null, // Extract route graphics from separate file
+                routeGraphicsUrl: file.routeGraphicsUrl || null // URL to route graphics file
               };
               musicHistory.push(musicEntry);
-              console.log(`✅ Added to history: ${musicEntry.styleCard.songTitle}`);
+              console.log(`✅ Added to history: ${musicEntry.styleCard.songTitle}`, {
+                hasRouteGraphics: !!musicEntry.routeGraphics,
+                routeGraphicsUrl: musicEntry.routeGraphicsUrl
+              });
             });
 
             console.log(`📚 Total music history length: ${musicHistory.length}`);
@@ -305,6 +491,27 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
             if (musicHistory.length > 0) {
               console.log('▶️ Playing most recent track at index 0');
               currentMusicIndex = 0;
+              
+              // For demo purposes, load dummy route graphics for the first track if no graphics exist
+              if (!musicHistory[0].routeGraphics) {
+                console.log('📍 Loading dummy route graphics for demo');
+                try {
+                  // Try to load from new organized location first
+                  let dummyResponse;
+                  try {
+                    dummyResponse = await fetch(`${API_BASE}/route-graphics/dummyRouteGraphics.json`);
+                  } catch (err) {
+                    console.log('📍 Fallback to local dummy route graphics');
+                    dummyResponse = await fetch('./dummyRouteGraphics.json');
+                  }
+                  const dummyGraphics = await dummyResponse.json();
+                  musicHistory[0].routeGraphics = dummyGraphics;
+                  console.log('✅ Loaded dummy route graphics');
+                } catch (err) {
+                  console.log('⚠️ Could not load dummy route graphics:', err);
+                }
+              }
+              
               playMusicAtIndex(0);
             } else {
               console.log('❌ No music in history to play');
@@ -511,9 +718,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       backBtn.addEventListener('click', navigateBack);
       forwardBtn.addEventListener('click', navigateForward);
       
-      // Initialize navigation buttons and load existing music on page load
+      // Initialize navigation buttons on page load
       updateNavigationButtons();
-      loadMusicHistory();
       
       // Cleanup on page unload
       window.addEventListener('beforeunload', stopPolling);
@@ -558,7 +764,17 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       await viewElement.viewOnReady();
       await directionsElement.componentOnReady();
 
-      // Route event handler - populate directions textarea instead of generating music immediately
+      // Handle any pending route graphics now that map is ready
+      if (pendingRouteGraphics) {
+        console.log('📍 Map ready, displaying pending route graphics');
+        displayRouteGraphics(pendingRouteGraphics);
+        pendingRouteGraphics = null;
+      }
+
+      // Load music history after map is ready
+      await loadMusicHistory();
+
+      // Route event handler - populate directions textarea and capture route graphics
       directionsElement.addEventListener("arcgisPropertyChange", (event) => {
         if (event.detail.name === "lastRoute") {
           const route = directionsElement.lastRoute;
@@ -569,6 +785,10 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
             
             // Populate the directions textarea
             directionsInput.value = directions.join('\n');
+            
+            // Capture route graphics for later use
+            currentRouteGraphics = captureRouteGraphics();
+            console.log("🗺️ Captured route graphics:", currentRouteGraphics);
             
             // Optional: Auto-generate if user wants (you can uncomment this line)
             // generateMusic();
