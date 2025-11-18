@@ -268,39 +268,56 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
       // Load existing music files from server
       async function loadMusicHistory() {
+        console.log('🔄 Starting to load music history...');
         try {
+          console.log(`📡 Fetching from: ${API_BASE}/audio-files`);
           const response = await fetch(`${API_BASE}/audio-files`);
+          console.log('📬 Response status:', response.status, response.statusText);
+          
           const result = await response.json();
+          console.log('📄 Raw response:', result);
           
           if (response.ok && result.files) {
-            // Convert server files to music history entries
-            result.files.forEach(file => {
+            console.log(`🎵 Found ${result.files.length} files from server`);
+            
+            // Convert server files to music history entries with rich metadata
+            result.files.forEach((file, index) => {
+              console.log(`📀 Processing file ${index + 1}:`, file.filename);
               const musicEntry = {
                 audioUrl: `${API_BASE}${file.url}`,
-                styleCard: {
-                  songTitle: file.filename.replace('music_', '').replace('.mp3', ''),
+                styleCard: file.styleCard || {
+                  songTitle: file.title || file.filename.replace('music_', '').replace('.mp3', ''),
                   genre: 'Generated Music',
                   artistName: 'AI Composer',
                   mood: ['Generated']
                 },
-                directions: [`Generated music file: ${file.filename}`],
-                timestamp: file.created
+                directions: file.directions || [`Generated music file: ${file.filename}`],
+                timestamp: file.created,
+                metadata: file.metadata // Store full metadata for future use
               };
               musicHistory.push(musicEntry);
+              console.log(`✅ Added to history: ${musicEntry.styleCard.songTitle}`);
             });
 
-            console.log(`Loaded ${musicHistory.length} music files from server`, musicHistory);
+            console.log(`📚 Total music history length: ${musicHistory.length}`);
+            console.log(`📋 Music history:`, musicHistory);
             
             // Set current index to the most recent (first in array since they're sorted by date desc)
             if (musicHistory.length > 0) {
+              console.log('▶️ Playing most recent track at index 0');
               currentMusicIndex = 0;
               playMusicAtIndex(0);
+            } else {
+              console.log('❌ No music in history to play');
             }
             
             updateNavigationButtons();
+            console.log('✅ Music history loading completed successfully');
+          } else {
+            console.log('❌ API response not OK or no files field:', response.status, result);
           }
         } catch (error) {
-          console.warn('Failed to load music history:', error);
+          console.error('💥 Failed to load music history:', error);
           // Continue without history - not a critical error
         }
       }

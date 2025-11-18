@@ -1,0 +1,33 @@
+{
+  "trackId": "music_Desert Navigator's P_2025-11-17T23-50-19-378Z",
+  "songTitle": "Desert Navigator's Path",
+  "audioFile": "music_Desert Navigator's P_2025-11-17T23-50-19-378Z.mp3",
+  "timestamp": "2025-11-17T23:50:19.378Z",
+  "styleCard": {
+    "songTitle": "Desert Navigator's Path",
+    "genre": "Arabic Instrumental Journey",
+    "artistName": "AI Desert Composer",
+    "mood": ["Determined", "Expansive", "Steady", "Contemplative", "Anticipatory"],
+    "description": "An epic folk ballad with Arabic instrumentation capturing the journey through Saudi Arabian roads"
+  },
+  "directions": [
+    "Start at Al Nisaay Street, Al Kharj, 16439",
+    "Go south on شارع النسائي (Shari' al-Nisa'i) toward طريق الملك سلمان",
+    "Bear right on طريق الملك سلمان (Tareeq al-Malik Salman)",
+    "Bear right on طريق الأمير سلطان بن عبد العزيز (Tareeq al-'Ameer Sultan Bin Abd al-Azeez)",
+    "Turn left on طريق الأمير سلطان بن عبد العزيز, then turn right on طريق الأمير سلطان بن عبد العزيز",
+    "Continue through Saudi Arabia toward destination..."
+  ],
+  "composition": {
+    "durationMs": 120000,
+    "instruments": ["oud", "darbuka", "ney", "qanun", "cello", "tabla", "bass"],
+    "style": "theatrical, grandiose, humorous Arabic folk ballad",
+    "vocals": "clear lyrics sung in local dialect",
+    "theme": "cheesy tourist music, over-the-top travel anthem"
+  },
+  "generationMetadata": {
+    "dummyMode": false,
+    "elapsedTimeMs": 180000,
+    "compositionPlanFile": "finalCompositionPlan_Desert Navigator's Path_2025-11-17T23-50-19-378Z.json"
+  }
+}
