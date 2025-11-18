@@ -838,6 +838,17 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       await viewElement.viewOnReady();
       await directionsElement.componentOnReady();
 
+      // Set padding to prevent controlsAccordion (30vw width) from covering route geometry
+      // The 30vw translates to roughly 30% of viewport width in pixels
+      const paddingLeft = Math.round(window.innerWidth * 0.3) + 20; // Add 20px buffer
+      viewElement.view.padding = {
+        left: paddingLeft,
+        top: 0,
+        right: 0,
+        bottom: 0
+      };
+      console.log(`🗺️ Set view padding - left: ${paddingLeft}px to prevent UI occlusion`);
+
       // Handle any pending route graphics now that map is ready
       if (pendingRouteGraphics) {
         console.log('📍 Map ready, displaying pending route graphics');
@@ -847,6 +858,23 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
       // Load music history after map is ready
       await loadMusicHistory();
+
+      // Update padding when window resizes (since controlsAccordion width is 30vw)
+      function updateViewPadding() {
+        const paddingLeft = Math.round(window.innerWidth * 0.3) + 20; // Add 20px buffer
+        if (viewElement.view) {
+          viewElement.view.padding = {
+            left: paddingLeft,
+            top: 0,
+            right: 0,
+            bottom: 0
+          };
+          console.log(`🗺️ Updated view padding - left: ${paddingLeft}px`);
+        }
+      }
+
+      // Listen for window resize events to update padding
+      window.addEventListener('resize', updateViewPadding);
 
       // Route event handler - populate directions textarea and capture route graphics
       directionsElement.addEventListener("arcgisPropertyChange", (event) => {
