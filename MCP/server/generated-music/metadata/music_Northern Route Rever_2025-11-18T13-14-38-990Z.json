@@ -1,0 +1,42 @@
+{
+  "trackId": "music_Northern Route Rever_2025-11-18T13-14-38-990Z",
+  "songTitle": "Northern Route Reverie",
+  "audioFile": "music_Northern Route Rever_2025-11-18T13-14-38-990Z.mp3",
+  "timestamp": "2025-11-18T13-14-38-990Z",
+  "styleCard": {
+    "songTitle": "Northern Route Reverie",
+    "genre": "Nordic Ambient Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Serene",
+      "Vast",
+      "Reflective",
+      "Exploratory",
+      "Calm"
+    ],
+    "description": "A tranquil musical journey across the vast, frozen landscapes of Finnish Lapland, blending traditional Nordic folk elements with ambient soundscapes to evoke a sense of peaceful contemplation and exploration."
+  },
+  "directions": [
+    "Start at Sompiontie 6, 99600, Sodankylä",
+    "Go east on Sompiontie toward Vasantie",
+    "Turn left on Vasantie",
+    "Bear left on Unarintie",
+    "Turn right on Jäämerentie",
+    "At the roundabout, take the first exit onto Ivalontie (E75)",
+    "Continue forward on Rovaniementie (E75)",
+    "Continue forward on Ivalontie (E75)",
+    "At the roundabout, take the second exit to stay on Ivalontie (E75)",
+    "Turn left to stay on Simmettijärventie",
+    "Restriction: Avoid Unpaved Roads",
+    "Finish at 99870, Inari, on the left"
+  ],
+  "routeGraphicsFile": "music_Northern Route Rever_2025-11-18T13-14-38-990Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763471678994,
+    "timestamp": "2025-11-18T13:14:38.994Z"
+  }
+}
