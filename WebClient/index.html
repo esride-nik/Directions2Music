@@ -44,40 +44,90 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
       
       .music-panel {
-        background: rgba(40, 44, 52, 0.95);
-        color: white;
-        padding: 15px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #333;
+        padding: 0;
         border-radius: 8px;
         backdrop-filter: blur(10px);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-shadow: 0 1px 20px rgba(0,0,0,0.3);
+        font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
         max-width: 400px;
+        min-width: 320px;
         font-size: 13px;
+        border: 1px solid rgba(0,0,0,0.1);
+        overflow: hidden;
       }
       
-      .music-panel h4 {
-        margin: 0 0 12px 0;
+      .panel-header {
+        background: rgba(0, 121, 193, 0.8);
+        color: white;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+      }
+      
+      .panel-title {
+        margin: 0;
         font-size: 14px;
+        font-weight: 500;
         display: flex;
         align-items: center;
         gap: 8px;
       }
       
+      .toggle-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 3px;
+        transition: background-color 0.2s;
+      }
+      
+      .toggle-btn:hover {
+        background: rgba(255,255,255,0.2);
+      }
+      
+      .collapsible-content {
+        padding: 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      
+      .collapsible-content.collapsed {
+        padding: 0 15px;
+        max-height: 0;
+        opacity: 0;
+      }
+      
       .directions-input {
         width: 100%;
-        height: 80px;
-        padding: 8px;
-        border: 1px solid #555;
+        height: 120px;
+        padding: 10px;
+        border: 1px solid #d4d4d4;
         border-radius: 4px;
-        background: rgba(0,0,0,0.3);
-        color: white;
-        font-size: 11px;
+        background: white;
+        color: #333;
+        font-size: 12px;
         resize: vertical;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         font-family: inherit;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+      }
+      
+      .directions-input:focus {
+        outline: none;
+        border-color: #0079c1;
+        box-shadow: 0 0 0 2px rgba(0,121,193,0.2);
       }
       
       .directions-input::placeholder {
-        color: #aaa;
+        color: #888;
       }
       
       .controls {
@@ -119,7 +169,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
       
       .status-section {
-        background: rgba(0,0,0,0.3);
+        background: rgba(0,121,193,0.1);
+        border: 1px solid rgba(0,121,193,0.2);
         padding: 10px;
         border-radius: 4px;
         margin: 10px 0;
@@ -143,7 +194,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       .progress-bar {
         width: 100%;
         height: 4px;
-        background: rgba(255,255,255,0.2);
+        background: rgba(0,121,193,0.2);
         border-radius: 2px;
         overflow: hidden;
         margin: 8px 0;
@@ -151,7 +202,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #28a745, #20c997);
+        background: linear-gradient(90deg, #0079c1, #20c997);
         transition: width 0.3s ease;
         animation: pulse 2s infinite;
       }
@@ -162,19 +213,21 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
       
       .style-info {
-        background: rgba(255,255,255,0.1);
+        background: rgba(0,121,193,0.1);
+        border: 1px solid rgba(0,121,193,0.2);
         padding: 8px;
         border-radius: 4px;
         margin: 8px 0;
         font-size: 11px;
+        color: #333;
       }
       
       .error-message {
-        background: rgba(220, 53, 69, 0.2);
+        background: rgba(220, 53, 69, 0.1);
         border: 1px solid #dc3545;
         padding: 8px;
         border-radius: 4px;
-        color: #fff;
+        color: #721c24;
         margin: 8px 0;
         font-size: 11px;
       }
@@ -192,39 +245,44 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
   <body>
     <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
-      <arcgis-directions slot="top-right"></arcgis-directions>
+      <arcgis-directions slot="top-left"></arcgis-directions>
       
-      <!-- Enhanced Music Generation Panel -->
-      <div slot="bottom-right" class="music-panel">
-        <h4>🎵 Directions2Music</h4>
-        
-        <textarea 
-          id="directionsInput" 
-          class="directions-input" 
-          placeholder="Route directions will appear here automatically when you plan a route..."
-        ></textarea>
-        
-        <div class="controls">
-          <button id="generateBtn" class="generate-btn">🎼 Generate Music</button>
-          <div class="checkbox-container">
-            <input type="checkbox" id="dummyMode" checked>
-            <label for="dummyMode">Fast Test Mode</label>
-          </div>
+      <!-- Enhanced Music Generation Panel - moved to top-left -->
+      <div slot="top-right" class="music-panel">
+        <div class="panel-header">
+          <h4 class="panel-title">🎵 Directions2Music</h4>
+          <button id="toggleBtn" class="toggle-btn" title="Collapse/Expand">▼</button>
         </div>
         
-        <div id="statusSection" class="status-section">
-          <div id="jobStatus"></div>
-          <div id="progressBar" class="progress-bar" style="display: none;">
-            <div class="progress-fill" style="width: 0%"></div>
+        <div id="collapsibleContent" class="collapsible-content">
+          <textarea 
+            id="directionsInput" 
+            class="directions-input" 
+            placeholder="Route directions will appear here automatically when you plan a route..."
+          ></textarea>
+          
+          <div class="controls">
+            <button id="generateBtn" class="generate-btn">🎼 Generate Music</button>
+            <div class="checkbox-container">
+              <input type="checkbox" id="dummyMode" checked>
+              <label for="dummyMode">Fast Test Mode</label>
+            </div>
           </div>
-          <div id="styleInfo" class="style-info" style="display: none;"></div>
-          <div id="errorMessage" class="error-message" style="display: none;"></div>
-        </div>
-        
-        <div class="audio-controls">
-          <audio controls id="audioPlayer" style="display: none;">
-            <source id="audioSource" src="" type="audio/mpeg">
-          </audio>
+          
+          <div id="statusSection" class="status-section">
+            <div id="jobStatus"></div>
+            <div id="progressBar" class="progress-bar" style="display: none;">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="styleInfo" class="style-info" style="display: none;"></div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+          </div>
+          
+          <div class="audio-controls">
+            <audio controls id="audioPlayer" style="display: none;">
+              <source id="audioSource" src="" type="audio/mpeg">
+            </audio>
+          </div>
         </div>
       </div>
     </arcgis-map>
@@ -238,6 +296,8 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       const directionsInput = document.getElementById('directionsInput');
       const generateBtn = document.getElementById('generateBtn');
       const dummyModeCheckbox = document.getElementById('dummyMode');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const collapsibleContent = document.getElementById('collapsibleContent');
       const statusSection = document.getElementById('statusSection');
       const jobStatus = document.getElementById('jobStatus');
       const progressBar = document.getElementById('progressBar');
@@ -407,6 +467,27 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
       // Event listeners
       generateBtn.addEventListener('click', generateMusic);
+      
+      // Collapsible panel toggle
+      toggleBtn.addEventListener('click', function() {
+        const isCollapsed = collapsibleContent.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          collapsibleContent.classList.remove('collapsed');
+          toggleBtn.textContent = '▼';
+          toggleBtn.title = 'Collapse';
+        } else {
+          collapsibleContent.classList.add('collapsed');
+          toggleBtn.textContent = '▶';
+          toggleBtn.title = 'Expand';
+        }
+      });
+      
+      // Also allow clicking the header to toggle
+      document.querySelector('.panel-header').addEventListener('click', function(e) {
+        if (e.target === toggleBtn) return; // Don't double-trigger if clicking the button
+        toggleBtn.click();
+      });
 
       // Cleanup on page unload
       window.addEventListener('beforeunload', stopPolling);
