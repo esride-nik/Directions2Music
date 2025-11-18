@@ -43,202 +43,10 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         margin: 0;
       }
       
-      .music-panel {
-        background: rgba(255, 255, 255, 0.92);
-        color: #333;
-        padding: 0;
-        border-radius: 8px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 1px 20px rgba(0,0,0,0.3);
-        font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      /* Custom styles for Calcite components */
+      calcite-panel[slot="top-left"] {
         max-width: 400px;
         min-width: 320px;
-        font-size: 13px;
-        border: 1px solid rgba(0,0,0,0.1);
-        overflow: hidden;
-      }
-      
-      .panel-header {
-        background: rgba(0, 121, 193, 0.8);
-        color: white;
-        padding: 12px 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
-      }
-      
-      .panel-title {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      
-      .toggle-btn {
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 12px;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 3px;
-        transition: background-color 0.2s;
-      }
-      
-      .toggle-btn:hover {
-        background: rgba(255,255,255,0.2);
-      }
-      
-      .collapsible-content {
-        padding: 15px;
-        transition: all 0.3s ease;
-        overflow: hidden;
-      }
-      
-      .collapsible-content.collapsed {
-        padding: 0 15px;
-        max-height: 0;
-        opacity: 0;
-      }
-      
-      .directions-input {
-        width: 100%;
-        height: 120px;
-        padding: 10px;
-        border: 1px solid #d4d4d4;
-        border-radius: 4px;
-        background: white;
-        color: #333;
-        font-size: 12px;
-        resize: vertical;
-        margin-bottom: 12px;
-        font-family: inherit;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-      }
-      
-      .directions-input:focus {
-        outline: none;
-        border-color: #0079c1;
-        box-shadow: 0 0 0 2px rgba(0,121,193,0.2);
-      }
-      
-      .directions-input::placeholder {
-        color: #888;
-      }
-      
-      .controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-      }
-      
-      .generate-btn {
-        background: linear-gradient(45deg, #28a745, #20c997);
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      
-      .generate-btn:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      }
-      
-      .generate-btn:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        transform: none;
-      }
-      
-      .checkbox-container {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11px;
-      }
-      
-      .status-section {
-        background: rgba(0,121,193,0.1);
-        border: 1px solid rgba(0,121,193,0.2);
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-        display: none;
-      }
-      
-      .status-indicator {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-size: 10px;
-        font-weight: bold;
-        text-transform: uppercase;
-      }
-      
-      .status-pending { background: #ffc107; color: #000; }
-      .status-processing { background: #17a2b8; color: white; }
-      .status-completed { background: #28a745; color: white; }
-      .status-failed { background: #dc3545; color: white; }
-      
-      .progress-bar {
-        width: 100%;
-        height: 4px;
-        background: rgba(0,121,193,0.2);
-        border-radius: 2px;
-        overflow: hidden;
-        margin: 8px 0;
-      }
-      
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #0079c1, #20c997);
-        transition: width 0.3s ease;
-        animation: pulse 2s infinite;
-      }
-      
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-      }
-      
-      .style-info {
-        background: rgba(0,121,193,0.1);
-        border: 1px solid rgba(0,121,193,0.2);
-        padding: 8px;
-        border-radius: 4px;
-        margin: 8px 0;
-        font-size: 11px;
-        color: #333;
-      }
-      
-      .error-message {
-        background: rgba(220, 53, 69, 0.1);
-        border: 1px solid #dc3545;
-        padding: 8px;
-        border-radius: 4px;
-        color: #721c24;
-        margin: 8px 0;
-        font-size: 11px;
-      }
-      
-      .audio-controls {
-        margin-top: 10px;
-      }
-      
-      .audio-controls audio {
-        width: 100%;
-        height: 32px;
       }
     </style>
   </head>
@@ -247,44 +55,80 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
     <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
       <arcgis-directions slot="top-left"></arcgis-directions>
       
-      <!-- Enhanced Music Generation Panel - moved to top-left -->
-      <div slot="top-right" class="music-panel">
-        <div class="panel-header">
-          <h4 class="panel-title">🎵 Directions2Music</h4>
-          <button id="toggleBtn" class="toggle-btn" title="Collapse/Expand">▼</button>
+      <!-- Enhanced Music Generation Panel with Calcite Components -->
+      <calcite-panel slot="bottom-right" heading="🎵 Directions2Music">
+        
+        <!-- Directions Accordion -->
+        <calcite-accordion id="directionsAccordion" icon-type="chevron">
+          <calcite-accordion-item heading="Route Directions" expanded>
+            <calcite-text-area 
+              id="directionsInput"
+              placeholder="Route directions will appear here automatically when you plan a route..."
+              rows="6"
+              resize="vertical"
+            ></calcite-text-area>
+          </calcite-accordion-item>
+        </calcite-accordion>
+        
+        <!-- Controls Section -->
+        <div style="padding: 1rem;">
+          <calcite-button 
+            id="generateBtn" 
+            icon-start="play" 
+            scale="m" 
+            width="full"
+          >
+            Generate Music
+          </calcite-button>
+          
+          <!-- Checkboxes -->
+          <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <calcite-label layout="inline">
+              <calcite-checkbox id="dummyMode" checked></calcite-checkbox>
+              Fast Test Mode
+            </calcite-label>
+          </div>
         </div>
         
-        <div id="collapsibleContent" class="collapsible-content">
-          <textarea 
-            id="directionsInput" 
-            class="directions-input" 
-            placeholder="Route directions will appear here automatically when you plan a route..."
-          ></textarea>
-          
-          <div class="controls">
-            <button id="generateBtn" class="generate-btn">🎼 Generate Music</button>
-            <div class="checkbox-container">
-              <input type="checkbox" id="dummyMode" checked>
-              <label for="dummyMode">Fast Test Mode</label>
-            </div>
-          </div>
-          
-          <div id="statusSection" class="status-section">
-            <div id="jobStatus"></div>
-            <div id="progressBar" class="progress-bar" style="display: none;">
-              <div class="progress-fill" style="width: 0%"></div>
-            </div>
-            <div id="styleInfo" class="style-info" style="display: none;"></div>
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
-          </div>
-          
-          <div class="audio-controls">
-            <audio controls id="audioPlayer" style="display: none;">
-              <source id="audioSource" src="" type="audio/mpeg">
-            </audio>
-          </div>
+        <!-- Status Section -->
+        <calcite-notice 
+          id="statusSection" 
+          kind="info" 
+          scale="s" 
+          style="display: none; margin: 1rem;"
+        >
+          <calcite-progress 
+            id="progressBar" 
+            type="indeterminate" 
+            style="display: none; margin-top: 0.5rem;"
+          ></calcite-progress>
+        </calcite-notice>
+        
+        <!-- Style Info -->
+        <calcite-card id="styleInfo" style="display: none; margin: 1rem;">
+          <h4 slot="heading">Song Information</h4>
+          <p>Style details will appear here</p>
+        </calcite-card>
+        
+        <!-- Error Display -->
+        <calcite-notice 
+          id="errorMessage" 
+          kind="danger" 
+          scale="s" 
+          style="display: none; margin: 1rem;"
+        >
+          <div id="errorContent"></div>
+        </calcite-notice>
+        
+        <!-- Audio Player -->
+        <div id="audioSection" style="padding: 1rem; display: none;">
+          <calcite-label>Generated Music</calcite-label>
+          <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
+            <source id="audioSource" src="" type="audio/mpeg">
+          </audio>
         </div>
-      </div>
+        
+      </calcite-panel>
     </arcgis-map>
     <script type="module">
       // Async job queue system for music generation
@@ -296,80 +140,99 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       const directionsInput = document.getElementById('directionsInput');
       const generateBtn = document.getElementById('generateBtn');
       const dummyModeCheckbox = document.getElementById('dummyMode');
-      const toggleBtn = document.getElementById('toggleBtn');
-      const collapsibleContent = document.getElementById('collapsibleContent');
       const statusSection = document.getElementById('statusSection');
-      const jobStatus = document.getElementById('jobStatus');
       const progressBar = document.getElementById('progressBar');
-      const progressFill = progressBar.querySelector('.progress-fill');
       const styleInfo = document.getElementById('styleInfo');
       const errorMessage = document.getElementById('errorMessage');
+      const audioSection = document.getElementById('audioSection');
       const audioPlayer = document.getElementById('audioPlayer');
       const audioSource = document.getElementById('audioSource');
 
-      // Show/hide UI elements
-      function showElement(element) { element.style.display = 'block'; }
-      function hideElement(element) { element.style.display = 'none'; }
-
-      // Update job status display
-      function updateJobStatus(jobData) {
-        const statusClass = `status-${jobData.status}`;
-        const elapsed = jobData.elapsedTime ? Math.round(jobData.elapsedTime / 1000) : 0;
-        const duration = jobData.duration ? Math.round(jobData.duration / 1000) : 0;
-        
-        jobStatus.innerHTML = `
-          <div style="margin-bottom: 5px;">
-            <strong>Status:</strong> <span class="status-indicator ${statusClass}">${jobData.status}</span>
-            ${elapsed > 0 ? `<span style="margin-left: 10px;">⏱️ ${elapsed}s</span>` : ''}
-          </div>
-          <div style="font-size: 10px; color: #ccc;">${jobData.message || 'Processing...'}</div>
-        `;
-        
-        showElement(statusSection);
+      // Show/hide UI elements  
+      function showElement(element) { 
+        if (element) element.style.display = 'block'; 
+      }
+      function hideElement(element) { 
+        if (element) element.style.display = 'none'; 
       }
 
-      // Update progress bar
+      // Update job status display using Calcite Notice
+      function updateJobStatus(jobData) {
+        const elapsed = jobData.elapsedTime ? Math.round(jobData.elapsedTime / 1000) : 0;
+        
+        // Update the status notice
+        statusSection.kind = jobData.status === 'completed' ? 'success' : 
+                            jobData.status === 'failed' ? 'danger' : 'info';
+        statusSection.open = true;
+        
+        // Create status content
+        const statusText = `Status: ${jobData.status.toUpperCase()}${elapsed > 0 ? ` • ${elapsed}s` : ''}`;
+        const messageText = jobData.message || 'Processing...';
+        
+        // Update notice content
+        statusSection.innerHTML = `
+          <div slot="title">${statusText}</div>
+          <div slot="message">${messageText}</div>
+        `;
+      }
+
+      // Update progress - using Calcite Progress component
       function updateProgress(status, elapsedTime = 0) {
-        if (status === 'pending') {
-          showElement(progressBar);
-          progressFill.style.width = '10%';
-        } else if (status === 'processing') {
-          showElement(progressBar);
-          // Estimate progress based on elapsed time
-          const expectedDuration = dummyModeCheckbox.checked ? 10000 : 180000; // ms
-          const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
-          progressFill.style.width = `${progress}%`;
-        } else if (status === 'completed') {
-          progressFill.style.width = '100%';
-          setTimeout(() => hideElement(progressBar), 2000);
-        } else if (status === 'failed') {
-          hideElement(progressBar);
+        if (progressBar) {
+          if (status === 'pending') {
+            progressBar.type = 'indeterminate';
+            showElement(progressBar);
+          } else if (status === 'processing') {
+            // For processing, we can show determinate progress based on time
+            const expectedDuration = dummyModeCheckbox.checked ? 10000 : 180000; // ms
+            const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
+            progressBar.type = 'determinate';
+            progressBar.value = progress / 100; // Calcite expects 0-1 range
+            showElement(progressBar);
+          } else if (status === 'completed') {
+            progressBar.type = 'determinate';
+            progressBar.value = 1;
+            setTimeout(() => hideElement(progressBar), 2000);
+          } else if (status === 'failed') {
+            hideElement(progressBar);
+          }
         }
       }
 
       // Show style card information
       function showStyleCard(styleCardData) {
-        if (!styleCardData) return;
+        if (!styleCardData || !styleInfo) return;
         
-        styleInfo.innerHTML = `
-          <strong>🎨 ${styleCardData.songTitle}</strong><br>
-          <small>${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}</small>
-        `;
+        // Update the style info card
+        const heading = styleInfo.querySelector('h4[slot="heading"]');
+        const details = styleInfo.querySelector('p');
+        
+        if (heading) heading.textContent = `🎨 ${styleCardData.songTitle}`;
+        if (details) details.textContent = 
+          `${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}`;
         showElement(styleInfo);
       }
 
       // Show audio player
       function showAudio(audioUrl) {
-        audioSource.src = audioUrl;
-        audioPlayer.load();
-        showElement(audioPlayer);
-        audioPlayer.play().catch(e => console.log('Audio autoplay prevented'));
+        if (audioSource && audioPlayer && audioSection) {
+          audioSource.src = audioUrl;
+          audioPlayer.load();
+          showElement(audioSection);
+          audioPlayer.play().catch(e => console.log('Audio autoplay prevented'));
+        }
       }
 
-      // Show error message
+      // Show error message using Calcite Notice
       function showError(error) {
-        errorMessage.innerHTML = `<strong>❌ Error:</strong> ${error}`;
-        showElement(errorMessage);
+        if (errorMessage) {
+          errorMessage.kind = 'danger';
+          errorMessage.open = true;
+          errorMessage.innerHTML = `
+            <div slot="title">Error</div>
+            <div slot="message">${error}</div>
+          `;
+        }
       }
 
       // Start music generation job
@@ -382,12 +245,14 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         }
 
         // Reset UI
+        generateBtn.loading = true;
         generateBtn.disabled = true;
-        generateBtn.textContent = '🔄 Starting...';
-        hideElement(errorMessage);
+        
+        // Hide previous results
+        if (errorMessage) errorMessage.open = false;
         hideElement(styleInfo);
         hideElement(progressBar);
-        hideElement(audioPlayer);
+        hideElement(audioSection);
 
         try {
           const response = await fetch(`${API_BASE}/orchestrate`, {
@@ -406,15 +271,15 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           }
 
           currentJobId = result.jobId;
-          generateBtn.textContent = '🎼 Generate Music';
+          generateBtn.loading = false;
           generateBtn.disabled = false;
           
           startPolling();
 
         } catch (error) {
           showError(error.message);
+          generateBtn.loading = false;
           generateBtn.disabled = false;
-          generateBtn.textContent = '🎼 Generate Music';
         }
       }
 
@@ -468,27 +333,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // Event listeners
       generateBtn.addEventListener('click', generateMusic);
       
-      // Collapsible panel toggle
-      toggleBtn.addEventListener('click', function() {
-        const isCollapsed = collapsibleContent.classList.contains('collapsed');
-        
-        if (isCollapsed) {
-          collapsibleContent.classList.remove('collapsed');
-          toggleBtn.textContent = '▼';
-          toggleBtn.title = 'Collapse';
-        } else {
-          collapsibleContent.classList.add('collapsed');
-          toggleBtn.textContent = '▶';
-          toggleBtn.title = 'Expand';
-        }
-      });
-      
-      // Also allow clicking the header to toggle
-      document.querySelector('.panel-header').addEventListener('click', function(e) {
-        if (e.target === toggleBtn) return; // Don't double-trigger if clicking the button
-        toggleBtn.click();
-      });
-
       // Cleanup on page unload
       window.addEventListener('beforeunload', stopPolling);
 
