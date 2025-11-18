@@ -1,0 +1,36 @@
+{
+  "trackId": "music_D-370 Batman Route_2025-11-18T09-09-01-473Z",
+  "songTitle": "D-370 Batman Route",
+  "audioFile": "music_D-370 Batman Route_2025-11-18T09-09-01-473Z.mp3",
+  "timestamp": "2025-11-18T09-09-01-473Z",
+  "styleCard": {
+    "songTitle": "D-370 Batman Route",
+    "genre": "Turkish Instrumental",
+    "artistName": "AI Composer",
+    "mood": [
+      "Journey",
+      "Focused",
+      "Deterministic",
+      "Explorative"
+    ],
+    "description": "An evocative instrumental journey through the heart of Batman, Turkey. This piece combines traditional Turkish instruments like the saz and ney with a steady, driving rhythm, reflecting the methodical progression of following precise routing directions. It evokes a focused and explorative mood, mirroring the landscape traversed."
+  },
+  "directions": [
+    "Start at Akça, Köyün Kendisi Küme Evleri 131-133, 72100, Batman",
+    "Continue forward on Batman-Beşiri Yolu (D-370)",
+    "Continue forward on Siirt-Batman Yolu (D-370)",
+    "Bear right on Diyarbakır Caddesi",
+    "At the roundabout, take the second exit onto Diyarbakır Caddesi",
+    "Make a sharp left",
+    "Finish at Bağdu, Beşiri, Batman, on the right"
+  ],
+  "routeGraphicsFile": "music_D-370 Batman Route_2025-11-18T09-09-01-473Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763456941476,
+    "timestamp": "2025-11-18T09:09:01.476Z"
+  }
+}
