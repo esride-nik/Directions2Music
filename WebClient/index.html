@@ -266,11 +266,43 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         // Display historical route graphics
         if (entry.routeGraphics) {
           displayRouteGraphics(entry.routeGraphics);
+        } else if (entry.routeGraphicsUrl) {
+          // Load route graphics from separate file
+          loadRouteGraphicsFromUrl(entry.routeGraphicsUrl, index);
         } else {
           clearRouteGraphics();
         }
         
         updateNavigationButtons();
+      }
+
+      // Load route graphics from separate file URL
+      async function loadRouteGraphicsFromUrl(routeGraphicsUrl, musicIndex) {
+        try {
+          console.log(`🗺️ Loading route graphics from: ${API_BASE}${routeGraphicsUrl}`);
+          const response = await fetch(`${API_BASE}${routeGraphicsUrl}`);
+          
+          if (response.ok) {
+            const routeGraphics = await response.json();
+            console.log(`✅ Loaded route graphics for track ${musicIndex}:`, routeGraphics);
+            
+            // Cache the loaded route graphics in the music history entry
+            if (musicHistory[musicIndex]) {
+              musicHistory[musicIndex].routeGraphics = routeGraphics;
+            }
+            
+            // Display only if this is still the current track
+            if (currentMusicIndex === musicIndex) {
+              displayRouteGraphics(routeGraphics);
+            }
+          } else {
+            console.warn(`⚠️ Failed to load route graphics: ${response.status} ${response.statusText}`);
+            clearRouteGraphics();
+          }
+        } catch (error) {
+          console.error(`💥 Error loading route graphics from ${routeGraphicsUrl}:`, error);
+          clearRouteGraphics();
+        }
       }
 
       function navigateBack() {
