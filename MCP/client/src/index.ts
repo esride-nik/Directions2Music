@@ -18,10 +18,12 @@ const PORT = 3001;
 app.use(express.json());
 app.use(cors());
 
-// Serve static files (MP3s) from MCP server generated-music directory
+// Serve static files from MCP server generated-music directory
 const serverDir = path.resolve(__dirname, '../../server');
 const audioDir = path.join(serverDir, 'generated-music', 'audio');
+const routeGraphicsDir = path.join(serverDir, 'generated-music', 'route-graphics');
 app.use('/audio', express.static(audioDir));
+app.use('/route-graphics', express.static(routeGraphicsDir));
 
 // Job tracking system
 interface MusicJob {
@@ -359,10 +361,24 @@ app.get('/audio-files', async (req, res) => {
         
         // Try to load metadata
         let metadata = null;
+        let routeGraphics = null;
         try {
           const metadataContent = await fs.readFile(metadataPath, 'utf8');
           metadata = JSON.parse(metadataContent);
           console.log(`✅ Loaded metadata for ${file}`);
+          
+          // Try to load route graphics if referenced
+          if (metadata.routeGraphicsFile) {
+            const routeGraphicsPath = path.join(routeGraphicsDir, metadata.routeGraphicsFile);
+            try {
+              const routeGraphicsContent = await fs.readFile(routeGraphicsPath, 'utf8');
+              routeGraphics = JSON.parse(routeGraphicsContent);
+              console.log(`🗺️ Loaded route graphics for ${file}`);
+            } catch (routeErr) {
+              console.warn(`❌ No route graphics file found for ${file}:`, routeErr instanceof Error ? routeErr.message : String(routeErr));
+            }
+          }
+          
         } catch (err) {
           console.warn(`❌ No metadata found for ${file}:`, err instanceof Error ? err.message : String(err));
         }
@@ -381,7 +397,9 @@ app.get('/audio-files', async (req, res) => {
             mood: ['Generated']
           },
           directions: metadata?.directions || [],
-          metadata: metadata
+          metadata: metadata,
+          routeGraphics: routeGraphics, // Include loaded route graphics
+          routeGraphicsUrl: routeGraphics ? `/route-graphics/${metadata.routeGraphicsFile}` : null
         };
       })
     );

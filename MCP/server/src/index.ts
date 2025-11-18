@@ -23,8 +23,16 @@ async function saveTrackMetadata(
   styleCard: StyleCard,
   timestamp: string,
   audioFile: string,
-  metadataFile: string
+  metadataFile: string,
+  routeGraphics?: {
+    directionLines: any[],
+    directionPoints: any[],
+    stops: any[]
+  }
 ) {
+  const routeGraphicsFile = routeGraphics ? 
+    `./generated-music/route-graphics/${trackId}.json` : null;
+
   const metadata = {
     trackId,
     songTitle: songTitle || `Generated Track ${timestamp}`,
@@ -38,6 +46,7 @@ async function saveTrackMetadata(
       description: styleCard.description || `Generated music based on navigation directions`
     },
     directions: directions || [],
+    routeGraphicsFile: routeGraphicsFile ? path.basename(routeGraphicsFile) : null, // Reference to separate route graphics file
     composition: {
       durationMs: 120000, // Default duration
       style: "AI generated music based on geographic and cultural context"
@@ -53,10 +62,21 @@ async function saveTrackMetadata(
     const metadataDir = path.dirname(metadataFile);
     await fs.mkdir(metadataDir, { recursive: true });
     
+    // Save main metadata
     await fs.writeFile(metadataFile, JSON.stringify(metadata, null, 2));
     console.log(`📋 Metadata saved: ${metadataFile}`);
+    
+    // Save route graphics to separate file if provided
+    if (routeGraphics && routeGraphicsFile) {
+      const routeGraphicsDir = path.dirname(routeGraphicsFile);
+      await fs.mkdir(routeGraphicsDir, { recursive: true });
+      
+      await fs.writeFile(routeGraphicsFile, JSON.stringify(routeGraphics, null, 2));
+      console.log(`🗺️ Route graphics saved: ${routeGraphicsFile}`);
+    }
+    
   } catch (error) {
-    console.error(`❌ Failed to save metadata: ${error}`);
+    console.error(`❌ Failed to save metadata or route graphics: ${error}`);
   }
 }
 
@@ -277,7 +297,7 @@ const generateMusicElevenLabs = async (
         audioSaved = true;
         
         // Save metadata
-        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
       }
       
       // Method 2: Check if it's a Buffer
@@ -288,7 +308,7 @@ const generateMusicElevenLabs = async (
         audioSaved = true;
         
         // Save metadata
-        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
       }
       
       // Method 3: Try to access .body property (common in HTTP responses)
@@ -313,7 +333,7 @@ const generateMusicElevenLabs = async (
             audioSaved = true;
             
             // Save metadata
-            await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
+            await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
           }
         } catch (bodyErr) {
           console.warn("⚠️  Could not extract from .body:", bodyErr);
@@ -353,7 +373,7 @@ const generateMusicElevenLabs = async (
           audioSaved = true;
           
           // Save metadata
-          await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile);
+          await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
         } catch (audioErr) {
           console.warn("⚠️  Could not extract from .audio:", audioErr);
         }
