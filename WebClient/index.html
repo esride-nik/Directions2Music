@@ -76,14 +76,40 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         
         <!-- Controls Section -->
         <div style="padding:0.5rem;">
-          <calcite-button 
-            id="generateBtn" 
-            icon-start="play" 
-            scale="m" 
-            width="full"
-          >
-            Generate Music
-          </calcite-button>
+          <!-- Music Navigation and Generation Controls -->
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem;">
+            <!-- Navigation Buttons -->
+            <div style="display: flex; gap: 0.25rem;">
+              <calcite-button 
+                id="backBtn" 
+                icon-start="chevron-left" 
+                scale="s" 
+                kind="neutral" 
+                appearance="outline"
+                disabled
+                title="Play previous music"
+              ></calcite-button>
+              <calcite-button 
+                id="forwardBtn" 
+                icon-start="chevron-right" 
+                scale="s" 
+                kind="neutral" 
+                appearance="outline"
+                disabled
+                title="Play next music"
+              ></calcite-button>
+            </div>
+            
+            <!-- Generate Button -->
+            <calcite-button 
+              id="generateBtn" 
+              icon-start="play" 
+              scale="m" 
+              style="flex: 1;"
+            >
+              Generate Music
+            </calcite-button>
+          </div>
           
           <!-- Checkboxes -->
           <div style="margin: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
@@ -140,9 +166,15 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       let currentJobId = null;
       let pollInterval = null;
       
+      // Music history navigation
+      let musicHistory = []; // Array of {audioUrl, styleCard, timestamp, directions} objects
+      let currentMusicIndex = -1; // Current position in history (-1 = no music loaded)
+      
       // DOM elements
       const directionsInput = document.getElementById('directionsInput');
       const generateBtn = document.getElementById('generateBtn');
+      const backBtn = document.getElementById('backBtn');
+      const forwardBtn = document.getElementById('forwardBtn');
       const dummyModeCheckbox = document.getElementById('dummyMode');
       const statusSection = document.getElementById('statusSection');
       const progressBar = document.getElementById('progressBar');
@@ -158,6 +190,119 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
       function hideElement(element) { 
         if (element) element.style.display = 'none'; 
+      }
+
+      // Music History Management
+      function addToMusicHistory(audioUrl, styleCard, directions) {
+        const musicEntry = {
+          audioUrl,
+          styleCard,
+          directions,
+          timestamp: new Date().toISOString()
+        };
+        
+        // If we're not at the end of history, remove everything after current position
+        if (currentMusicIndex < musicHistory.length - 1) {
+          musicHistory.splice(currentMusicIndex + 1);
+        }
+        
+        musicHistory.push(musicEntry);
+        currentMusicIndex = musicHistory.length - 1;
+        updateNavigationButtons();
+      }
+
+      function updateNavigationButtons() {
+        // Back button: enabled if we can go back to older music (higher index)
+        const canGoBack = currentMusicIndex < musicHistory.length - 1;
+        // Forward button: enabled if we can go forward to newer music (lower index)
+        const canGoForward = currentMusicIndex > 0;
+        
+        backBtn.disabled = !canGoBack;
+        forwardBtn.disabled = !canGoForward;
+        
+        // Update tooltips with track info
+        if (musicHistory.length > 0) {
+          const currentTrack = currentMusicIndex + 1;
+          const totalTracks = musicHistory.length;
+          
+          backBtn.title = canGoBack ? 
+            `Previous music (older - ${currentTrack + 1}/${totalTracks})` : 
+            'No older music available';
+            
+          forwardBtn.title = canGoForward ? 
+            `Next music (newer - ${currentTrack - 1}/${totalTracks})` : 
+            'No newer music available';
+        } else {
+          backBtn.title = 'No music history';
+          forwardBtn.title = 'No music history';
+        }
+      }
+
+      function playMusicAtIndex(index) {
+        if (index < 0 || index >= musicHistory.length) return;
+        
+        currentMusicIndex = index;
+        const entry = musicHistory[index];
+        
+        // Update UI with historical data
+        showStyleCard(entry.styleCard);
+        showAudio(entry.audioUrl);
+        
+        // Update directions input to show what was used for this music
+        directionsInput.value = entry.directions.join('\n');
+        
+        updateNavigationButtons();
+      }
+
+      function navigateBack() {
+        if (currentMusicIndex < musicHistory.length - 1) {
+          playMusicAtIndex(currentMusicIndex + 1);
+        }
+      }
+
+      function navigateForward() {
+        if (currentMusicIndex > 0) {
+          playMusicAtIndex(currentMusicIndex - 1);
+        }
+      }
+
+      // Load existing music files from server
+      async function loadMusicHistory() {
+        try {
+          const response = await fetch(`${API_BASE}/audio-files`);
+          const result = await response.json();
+          
+          if (response.ok && result.files) {
+            // Convert server files to music history entries
+            result.files.forEach(file => {
+              const musicEntry = {
+                audioUrl: `${API_BASE}${file.url}`,
+                styleCard: {
+                  songTitle: file.filename.replace('music_', '').replace('.mp3', ''),
+                  genre: 'Generated Music',
+                  artistName: 'AI Composer',
+                  mood: ['Generated']
+                },
+                directions: [`Generated music file: ${file.filename}`],
+                timestamp: file.created
+              };
+              musicHistory.push(musicEntry);
+            });
+
+            console.log(`Loaded ${musicHistory.length} music files from server`, musicHistory);
+            
+            // Set current index to the most recent (first in array since they're sorted by date desc)
+            if (musicHistory.length > 0) {
+              currentMusicIndex = 0;
+              playMusicAtIndex(0);
+            }
+            
+            updateNavigationButtons();
+          }
+        } catch (error) {
+          console.warn('Failed to load music history:', error);
+          // Continue without history - not a critical error
+        }
       }
 
       // Update job status display using Calcite Notice
@@ -211,9 +356,15 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         const heading = styleInfo.querySelector('h4[slot="heading"]');
         const details = styleInfo.querySelector('p');
         
-        if (heading) heading.textContent = `🎨 ${styleCardData.songTitle}`;
-        if (details) details.textContent = 
-          `${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}`;
+        if (heading && details) {
+          // Show track position if we're browsing history
+          const trackInfo = musicHistory.length > 0 ? 
+            ` (${currentMusicIndex + 1}/${musicHistory.length})` : '';
+            
+          heading.textContent = `🎨 ${styleCardData.songTitle}${trackInfo}`;
+          details.textContent = `${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}`;
+        }
+        
         showElement(styleInfo);
       }
 
@@ -305,7 +456,12 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           if (result.status === 'completed') {
             showStyleCard(result.styleCard);
             if (result.audioUrl) {
-              showAudio(`${API_BASE}${result.audioUrl}`);
+              const fullAudioUrl = `${API_BASE}${result.audioUrl}`;
+              showAudio(fullAudioUrl);
+              
+              // Add to music history
+              const directions = directionsInput.value.trim().split('\n').filter(line => line.trim());
+              addToMusicHistory(fullAudioUrl, result.styleCard, directions);
             }
             stopPolling();
           } else if (result.status === 'failed') {
@@ -336,6 +492,12 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 
       // Event listeners
       generateBtn.addEventListener('click', generateMusic);
+      backBtn.addEventListener('click', navigateBack);
+      forwardBtn.addEventListener('click', navigateForward);
+      
+      // Initialize navigation buttons and load existing music on page load
+      updateNavigationButtons();
+      loadMusicHistory();
       
       // Cleanup on page unload
       window.addEventListener('beforeunload', stopPolling);
