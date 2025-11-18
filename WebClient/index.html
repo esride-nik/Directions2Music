@@ -52,112 +52,121 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       calcite-card {
         margin:0px;
       }
+
+      #controlsAccordion {
+        width:30vw;
+      }
     </style>
   </head>
 
   <body>
     <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
-      <arcgis-directions slot="top-left"></arcgis-directions>
-      
-      <!-- Enhanced Music Generation Panel with Calcite Components -->
-      <calcite-panel slot="bottom-right" heading="🎵 Directions2Music">
-        
-        <!-- Directions Accordion -->
-        <calcite-accordion id="directionsAccordion" icon-type="chevron">
-          <calcite-accordion-item heading="Route Directions" expanded>
-            <calcite-text-area 
-              id="directionsInput"
-              placeholder="Route directions will appear here automatically when you plan a route..."
-              rows="6"
-              resize="vertical"
-            ></calcite-text-area>
-          </calcite-accordion-item>
-        </calcite-accordion>
-        
-        <!-- Controls Section -->
-        <div style="padding:0.5rem;">
-          <!-- Music Navigation and Generation Controls -->
-          <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem;">
-            <!-- Navigation Buttons -->
-            <div style="display: flex; gap: 0.25rem;">
-              <calcite-button 
-                id="backBtn" 
-                icon-start="chevron-left" 
-                scale="s" 
-                kind="neutral" 
-                appearance="outline"
-                disabled
-                title="Play previous music"
-              ></calcite-button>
-              <calcite-button 
-                id="forwardBtn" 
-                icon-start="chevron-right" 
-                scale="s" 
-                kind="neutral" 
-                appearance="outline"
-                disabled
-                title="Play next music"
-              ></calcite-button>
+    <arcgis-zoom slot="top-right"></arcgis-zoom>
+    <calcite-accordion slot="top-left" id="controlsAccordion" selection-mode="single">
+        <calcite-accordion-item description="Routing Directions" heading="🐍 Routing Directions" icon-start="embark" expanded>
+          <arcgis-directions></arcgis-directions>
+        </calcite-accordion-item>
+        <calcite-accordion-item description="Routing Directions" heading="🎵 Directions2Music" icon-start="embark">
+          <!-- Enhanced Music Generation Panel with Calcite Components -->
+          <calcite-panel heading="🎵 Directions2Music">
+            
+            <!-- Directions Accordion -->
+            <calcite-accordion id="directionsAccordion" icon-type="chevron">
+              <calcite-accordion-item heading="Route Directions" expanded>
+                <calcite-text-area 
+                  id="directionsInput"
+                  placeholder="Route directions will appear here automatically when you plan a route..."
+                  rows="6"
+                  resize="vertical"
+                ></calcite-text-area>
+              </calcite-accordion-item>
+            </calcite-accordion>
+            
+            <!-- Controls Section -->
+            <div style="padding:0.5rem;">
+              <!-- Music Navigation and Generation Controls -->
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem;">
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 0.25rem;">
+                  <calcite-button 
+                    id="backBtn" 
+                    icon-start="chevron-left" 
+                    scale="s" 
+                    kind="neutral" 
+                    appearance="outline"
+                    disabled
+                    title="Play previous music"
+                  ></calcite-button>
+                  <calcite-button 
+                    id="forwardBtn" 
+                    icon-start="chevron-right" 
+                    scale="s" 
+                    kind="neutral" 
+                    appearance="outline"
+                    disabled
+                    title="Play next music"
+                  ></calcite-button>
+                </div>
+                
+                <!-- Generate Button -->
+                <calcite-button 
+                  id="generateBtn" 
+                  icon-start="play" 
+                  scale="m" 
+                  style="flex: 1;"
+                >
+                  Generate Music
+                </calcite-button>
+              </div>
+              
+              <!-- Checkboxes -->
+              <div style="margin: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <calcite-label layout="inline">
+                  <calcite-checkbox id="dummyMode" checked></calcite-checkbox>
+                  Fast Test Mode
+                </calcite-label>
+              </div>
             </div>
             
-            <!-- Generate Button -->
-            <calcite-button 
-              id="generateBtn" 
-              icon-start="play" 
-              scale="m" 
-              style="flex: 1;"
+            <!-- Status Section -->
+            <calcite-notice 
+              id="statusSection" 
+              kind="info" 
+              scale="s" 
+              style="display: none; margin: 0.5rem;"
             >
-              Generate Music
-            </calcite-button>
-          </div>
-          
-          <!-- Checkboxes -->
-          <div style="margin: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <calcite-label layout="inline">
-              <calcite-checkbox id="dummyMode" checked></calcite-checkbox>
-              Fast Test Mode
-            </calcite-label>
-          </div>
-        </div>
-        
-        <!-- Status Section -->
-        <calcite-notice 
-          id="statusSection" 
-          kind="info" 
-          scale="s" 
-          style="display: none; margin: 0.5rem;"
-        >
-          <calcite-progress 
-            id="progressBar" 
-            type="indeterminate" 
-            style="display: none; margin-top: 0.5rem;"
-          ></calcite-progress>
-        </calcite-notice>
-        
-        <!-- Style Info -->
-        <calcite-card id="styleInfo" style="display: none; margin: 0.5rem;">
-          <h4 slot="heading">Song Information</h4>
-          <div id="styleDetails"></div>
-        </calcite-card>
-        
-        <!-- Error Display -->
-        <calcite-notice 
-          id="errorMessage" 
-          kind="danger" 
-          scale="s" 
-          style="display: none; margin:0.5rem;"
-        >
-          <div id="errorContent"></div>
-        </calcite-notice>
-        
-        <!-- Audio Player -->
-        <div id="audioSection" style="padding:0.5rem; display: none;">
-          <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
-            <source id="audioSource" src="" type="audio/mpeg">
-          </audio>
-        </div>
-        
-      </calcite-panel>
+              <calcite-progress 
+                id="progressBar" 
+                type="indeterminate" 
+                style="display: none; margin-top: 0.5rem;"
+              ></calcite-progress>
+            </calcite-notice>
+            
+            <!-- Style Info -->
+            <calcite-card id="styleInfo" style="display: none; margin: 0.5rem;">
+              <h4 slot="heading">Song Information</h4>
+              <div id="styleDetails"></div>
+            </calcite-card>
+            
+            <!-- Error Display -->
+            <calcite-notice 
+              id="errorMessage" 
+              kind="danger" 
+              scale="s" 
+              style="display: none; margin:0.5rem;"
+            >
+              <div id="errorContent"></div>
+            </calcite-notice>
+            
+            <!-- Audio Player -->
+            <div id="audioSection" style="padding:0.5rem; display: none;">
+              <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
+                <source id="audioSource" src="" type="audio/mpeg">
+              </audio>
+            </div>
+            
+          </calcite-panel>    
+        </calcite-accordion-item>
     </arcgis-map>
     <script type="module">
       // Async job queue system for music generation
