@@ -207,7 +207,8 @@ const generateMusicElevenLabs = async (
   description?: string, 
   songTitle?: string,
   directions?: string[],
-  styleCard?: StyleCard
+  styleCard?: StyleCard,
+  routeGraphics?: any // Route graphics data from the frontend
 ) => {
     // Create ElevenLabs API client
     const client = new ElevenLabsClient({
@@ -297,7 +298,7 @@ const generateMusicElevenLabs = async (
         audioSaved = true;
         
         // Save metadata
-        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, routeGraphics);
       }
       
       // Method 2: Check if it's a Buffer
@@ -308,7 +309,7 @@ const generateMusicElevenLabs = async (
         audioSaved = true;
         
         // Save metadata
-        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
+        await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, routeGraphics);
       }
       
       // Method 3: Try to access .body property (common in HTTP responses)
@@ -333,7 +334,7 @@ const generateMusicElevenLabs = async (
             audioSaved = true;
             
             // Save metadata
-            await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
+            await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, routeGraphics);
           }
         } catch (bodyErr) {
           console.warn("⚠️  Could not extract from .body:", bodyErr);
@@ -373,7 +374,7 @@ const generateMusicElevenLabs = async (
           audioSaved = true;
           
           // Save metadata
-          await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, undefined);
+          await saveTrackMetadata(trackId, songTitle, directions || [], styleCard || {} as StyleCard, timestamp, audioFile, metadataFile, routeGraphics);
         } catch (audioErr) {
           console.warn("⚠️  Could not extract from .audio:", audioErr);
         }
@@ -474,6 +475,59 @@ const getDummyMusicResponse = async () => {
     }
 };
 
+// get dummy music response by returning an existing file (for dummy mode)
+const getDummyMusicWithExistingFile = async () => {
+  try {
+    const musicDir = path.join(process.cwd(), 'generated-music', 'audio');
+    
+    // Try to find any existing mp3 files
+    const files = await fs.readdir(musicDir);
+    const mp3Files = files.filter(file => file.endsWith('.mp3'));
+    
+    if (mp3Files.length === 0) {
+      console.warn("⚠️ No existing audio files found for dummy mode, falling back to generated response");
+      return await getDummyMusicResponse();
+    }
+    
+    // Pick a random existing file (or the first one)
+    const selectedFile = mp3Files[Math.floor(Math.random() * mp3Files.length)];
+    console.log(`🎵 Dummy mode: Using existing file ${selectedFile}`);
+    
+    // Return a response that matches GenerateMusicOutput schema but indicates existing file
+    return {
+      json: {
+        compositionPlan: {
+          positiveGlobalStyles: ["dummy", "existing-file"],
+          negativeGlobalStyles: [],
+          sections: [{
+            sectionName: "Existing Music",
+            positiveLocalStyles: ["reused"],
+            negativeLocalStyles: [],
+            durationMs: 30000,
+            lines: ["Using existing audio file for demo"]
+          }]
+        },
+        songMetadata: {
+          title: "Existing File (Dummy Mode)",
+          description: `Reusing existing file: ${selectedFile}`,
+          genres: ["Demo"],
+          languages: ["en"],
+          isExplicit: false
+        }
+      },
+      audio: {
+        type: "Buffer",
+        data: [] // Empty for dummy mode - we'll use existing file
+      },
+      filename: selectedFile,
+      existingFile: true // Custom flag to indicate this is an existing file
+    };
+  } catch (error) {
+    console.warn("⚠️ Could not access existing files for dummy mode:", error);
+    return await getDummyMusicResponse(); // Fallback to original dummy response
+  }
+};
+
 // concatenate lines to fit maxLines for ElevenLabs composition plan
 const shortenDirectionsInput = (directionsInput: string[], maxLines: number): string[] => {
   let lineCount = 0;
@@ -523,16 +577,18 @@ server.registerTool(
       ? args.lyrics.map(String)
       : [];
     const dummyMode = args && args.dummyMode ? Boolean(args.dummyMode) : false;
+    const routeGraphics = args?.routeGraphics;
 
     // ElevenLabs music generation call
     const musicResponse = dummyMode ? 
-      await getDummyMusicResponse() : 
+      await getDummyMusicWithExistingFile() : 
       await generateMusicElevenLabs(
         getElevenLabsInitialCompositionPlan(styleCard, lyrics),
         styleCard.description, 
         styleCard.songTitle,
         lyrics, // These are actually the directions
-        styleCard
+        styleCard,
+        routeGraphics // Pass route graphics to generateMusicElevenLabs
       );
 
     return {

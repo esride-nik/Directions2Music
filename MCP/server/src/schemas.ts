@@ -34,6 +34,7 @@ export interface GenerateMusicInput {
   styleCard: StyleCard;
   lyrics: string[];
   dummyMode?: boolean;
+  routeGraphics?: any; // Route graphics data from the frontend
 }
 
 /**
@@ -122,6 +123,7 @@ export const generateMusicInputSchema = {
   styleCard: z.object(styleCardSchema),
   lyrics: z.array(z.string()).describe("An array of lyrics lines as strings."),
   dummyMode: z.boolean().optional().describe("If true, activates dummy mode for testing."),
+  routeGraphics: z.any().optional().describe("Route graphics data from the frontend (ArcGIS graphics)."),
 }
 
 /**
