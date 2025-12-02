@@ -1,0 +1,49 @@
+{
+  "trackId": "music_Øresund Journey_2025-11-18T17-35-53-515Z",
+  "songTitle": "Øresund Journey",
+  "audioFile": "music_Øresund Journey_2025-11-18T17-35-53-515Z.mp3",
+  "timestamp": "2025-11-18T17-35-53-515Z",
+  "styleCard": {
+    "songTitle": "Øresund Journey",
+    "genre": "Ambient Electronic",
+    "artistName": "AI Composer",
+    "mood": [
+      "Contemplative",
+      "Expansive",
+      "Driving",
+      "Melancholic",
+      "Cinematic"
+    ],
+    "description": "An atmospheric electronic piece evoking the long, steady drive across the Øresund bridge from Copenhagen to Malmö. It features a driving rhythm, expansive synth pads, and reflective melodies, capturing the feeling of a journey across a vast landscape."
+  },
+  "directions": [
+    "Start at Copenhagen",
+    "Go northwest on H.C. Andersens Boulevard toward Rådhuspladsen",
+    "At the traffic light, make a U-turn and go back on H.C. Andersens Boulevard",
+    "Make a sharp right to stay on Tietgensgade",
+    "At the traffic light, continue forward on Tietgensbro",
+    "Go forward on Øresundsbron (E20)",
+    "Go forward on Yttre Ringvägen (E20)",
+    "Entering Sweden",
+    "Take the exit on the right to merge onto the highway toward MALMÖ V / LIMHAMN",
+    "At the roundabout, take the second exit to stay on Lorensborgsgatan",
+    "At the roundabout, take the second exit to stay on Lorensborgsgatan",
+    "At the roundabout, take the first exit toward Hyllievång",
+    "Take the exit on the right toward Tygelsjö / Centrum / Svågertop / Hyllievång / Lindeborg",
+    "At the roundabout, take the third exit toward Centrum",
+    "At the roundabout, take the second exit to stay on Pildammsvägen",
+    "Make a sharp left at Drottninggatan to stay on Amiralsgatan",
+    "Continue forward on Studentgatan",
+    "Turn left on Stora Nygatan",
+    "Finish at Malmö, on the left"
+  ],
+  "routeGraphicsFile": "music_Øresund Journey_2025-11-18T17-35-53-515Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763487353528,
+    "timestamp": "2025-11-18T17:35:53.528Z"
+  }
+}

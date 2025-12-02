@@ -1,0 +1,39 @@
+{
+  "trackId": "music_Emerald Isle Journey_2025-11-18T17-20-08-810Z",
+  "songTitle": "Emerald Isle Journey",
+  "audioFile": "music_Emerald Isle Journey_2025-11-18T17-20-08-810Z.mp3",
+  "timestamp": "2025-11-18T17-20-08-810Z",
+  "styleCard": {
+    "songTitle": "Emerald Isle Journey",
+    "genre": "Sri Lankan Folk Fusion",
+    "artistName": "AI Composer",
+    "mood": [
+      "Explorative",
+      "Serene",
+      "Cultural",
+      "Meditative",
+      "Evocative"
+    ],
+    "description": "A steady, rhythmic piece that guides the listener through the diverse landscapes of Sri Lanka, blending traditional folk instrumentation with a cinematic atmosphere to evoke the spirit of discovery and cultural immersion. The Tamil road names inspire a deep connection to the local heritage."
+  },
+  "directions": [
+    "Start at Sri Lanka",
+    "Go north on Opalgala Road (ஒப்பல்கல வீதி)",
+    "Turn right on Naula-Elahera-Pallegama-Hettipola Road (நாவுல-எலஹெர-பல்லேகம-ஹெட்டிபொல வீதி)",
+    "Turn right to stay on Naula-Elahera-Pallegama-Hettipola Road (நாவுல-எலஹெர-பல்லேகம-ஹெட்டிபொல வீதி)",
+    "Turn left",
+    "Turn right on Theldeniyaya-Diwulapelessa Road (தெல்தெனிய-திவுல்பெலெஸ்ஸ வீதி)",
+    "Turn left on Mahiyanganaya-Dimbulagala-Dalukana Road (மகியங்கணை-திம்புலாகல-தளுக்கன வீதி)",
+    "Turn right on Dolakanda-Salasumgama Road (தொளக்கநதை-செலசும்கம வீதி)",
+    "Finish at Dolakanda-Salasumgama Road, Dehiattakandiya, 32150, on the right"
+  ],
+  "routeGraphicsFile": "music_Emerald Isle Journey_2025-11-18T17-20-08-810Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763486408812,
+    "timestamp": "2025-11-18T17:20:08.812Z"
+  }
+}

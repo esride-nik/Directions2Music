@@ -119,6 +119,19 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
                 </calcite-button>
               </div>
               
+              <!-- Playlist Dropdown -->
+              <div style="margin: 0 0.5rem 0.5rem 0.5rem;">
+                <calcite-label>Playlist
+                  <calcite-select 
+                    id="playlistSelect" 
+                    scale="s"
+                    disabled
+                  >
+                    <calcite-option value="" label="No songs yet"></calcite-option>
+                  </calcite-select>
+                </calcite-label>
+              </div>
+              
               <!-- Checkboxes -->
               <div style="margin: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
                 <calcite-label layout="inline">
@@ -186,6 +199,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       const generateBtn = document.getElementById('generateBtn');
       const backBtn = document.getElementById('backBtn');
       const forwardBtn = document.getElementById('forwardBtn');
+      const playlistSelect = document.getElementById('playlistSelect');
       const dummyModeCheckbox = document.getElementById('dummyMode');
       const statusSection = document.getElementById('statusSection');
       const progressBar = document.getElementById('progressBar');
@@ -247,6 +261,40 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         } else {
           backBtn.title = 'No music history';
           forwardBtn.title = 'No music history';
+        }
+        
+        // Update playlist dropdown
+        updatePlaylistDropdown();
+      }
+      
+      function updatePlaylistDropdown() {
+        // Clear existing options
+        playlistSelect.innerHTML = '';
+        
+        if (musicHistory.length === 0) {
+          playlistSelect.disabled = true;
+          const option = document.createElement('calcite-option');
+          option.value = '';
+          option.label = 'No songs yet';
+          playlistSelect.appendChild(option);
+        } else {
+          playlistSelect.disabled = false;
+          
+          // Add options in reverse order (newest first)
+          musicHistory.forEach((entry, index) => {
+            const option = document.createElement('calcite-option');
+            option.value = index.toString();
+            const songTitle = entry.styleCard?.songTitle || `Track ${musicHistory.length - index}`;
+            const genre = entry.styleCard?.genre || '';
+            option.label = genre ? `${songTitle} (${genre})` : songTitle;
+            
+            // Mark current selection
+            if (index === currentMusicIndex) {
+              option.selected = true;
+            }
+            
+            playlistSelect.appendChild(option);
+          });
         }
       }
 
@@ -823,6 +871,12 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       generateBtn.addEventListener('click', generateMusic);
       backBtn.addEventListener('click', navigateBack);
       forwardBtn.addEventListener('click', navigateForward);
+      playlistSelect.addEventListener('calciteSelectChange', (event) => {
+        const selectedIndex = parseInt(event.target.value);
+        if (!isNaN(selectedIndex) && selectedIndex >= 0) {
+          playMusicAtIndex(selectedIndex);
+        }
+      });
       
       // Initialize navigation buttons on page load
       updateNavigationButtons();
@@ -869,6 +923,9 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // and load the RouteLayer
       await viewElement.viewOnReady();
       await directionsElement.componentOnReady();
+      directionsElement.searchProperties = {
+        autoNavigate: true,
+      };
 
       // Set padding to prevent controlsAccordion (30vw width) from covering route geometry
       // The 30vw translates to roughly 30% of viewport width in pixels

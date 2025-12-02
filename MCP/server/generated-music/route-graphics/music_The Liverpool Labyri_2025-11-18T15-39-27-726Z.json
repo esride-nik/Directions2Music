@@ -1,0 +1,903 @@
+{
+  "directionLines": [
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331774.23825323675,
+              7062341.951909702
+            ],
+            [
+              -331837.24608690233,
+              7062237.913108371
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331837.24608690233,
+              7062237.913108371
+            ],
+            [
+              -331859.63243650383,
+              7062193.729696239
+            ],
+            [
+              -331918.0529052714,
+              7062042.648570911
+            ],
+            [
+              -331922.2385181236,
+              7062021.743668136
+            ],
+            [
+              -331925.8118737778,
+              7062003.2300781105
+            ],
+            [
+              -331931.34445246775,
+              7061980.830746855
+            ],
+            [
+              -331934.62837745046,
+              7061968.444821836
+            ],
+            [
+              -331945.3707083102,
+              7061909.018804709
+            ],
+            [
+              -331957.0147270456,
+              7061856.169067463
+            ],
+            [
+              -331959.33017245587,
+              7061832.6679540295
+            ],
+            [
+              -331964.32841759,
+              7061761.679321447
+            ],
+            [
+              -331965.58632784034,
+              7061737.412563358
+            ],
+            [
+              -331964.91841089097,
+              7061727.17533892
+            ],
+            [
+              -331955.7122890016,
+              7061617.088647959
+            ],
+            [
+              -331941.3186788454,
+              7061444.423931787
+            ],
+            [
+              -331934.7174330378,
+              7061369.57196412
+            ],
+            [
+              -331932.22387644654,
+              7061330.904016584
+            ],
+            [
+              -331928.5837290954,
+              7061285.212568564
+            ],
+            [
+              -331927.6486453776,
+              7061268.998332137
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331927.6486453776,
+              7061268.998332137
+            ],
+            [
+              -331842.52263076906,
+              7061272.454128604
+            ],
+            [
+              -331795.23411107797,
+              7061279.234966031
+            ],
+            [
+              -331703.47345481336,
+              7061287.192650397
+            ],
+            [
+              -331632.908029603,
+              7061294.048220555
+            ],
+            [
+              -331546.9025910156,
+              7061301.183997416
+            ],
+            [
+              -331534.5127316887,
+              7061301.034556993
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331534.5127316887,
+              7061301.034556993
+            ],
+            [
+              -331531.61842492904,
+              7061252.746768927
+            ],
+            [
+              -331516.59029367194,
+              7061115.805319578
+            ],
+            [
+              -331516.000300371,
+              7061097.891587519
+            ],
+            [
+              -331500.58255089703,
+              7060970.964893611
+            ],
+            [
+              -331499.4359601435,
+              7060964.296394912
+            ],
+            [
+              -331490.59719257406,
+              7060865.633155227
+            ],
+            [
+              -331482.4152099961,
+              7060796.091437716
+            ],
+            [
+              -331475.3018945359,
+              7060731.163969573
+            ],
+            [
+              -331493.1018811169,
+              7060594.8478994295
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331493.1018811169,
+              7060594.8478994295
+            ],
+            [
+              -331523.42531040584,
+              7060540.064366387
+            ],
+            [
+              -331599.52331431233,
+              7060406.011607129
+            ],
+            [
+              -331621.353066455,
+              7060278.479606511
+            ],
+            [
+              -331611.4567637256,
+              7060219.439782325
+            ],
+            [
+              -331587.17798278545,
+              7060152.873420514
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331587.17798278545,
+              7060152.873420514
+            ],
+            [
+              -331598.7329459272,
+              7060127.1921028895
+            ],
+            [
+              -331719.2028988683,
+              7060086.363648135
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331719.2028988683,
+              7060086.363648135
+            ],
+            [
+              -331671.9255111225,
+              7059971.331632679
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331671.9255111225,
+              7059971.331632679
+            ],
+            [
+              -331664.9680429528,
+              7059961.13403805
+            ],
+            [
+              -331661.1497844143,
+              7059951.496762846
+            ],
+            [
+              -331659.34640866297,
+              7059763.310763298
+            ],
+            [
+              -331606.63662977255,
+              7059638.329035984
+            ],
+            [
+              -331551.90083614975,
+              7059507.242275014
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "paths": [
+          [
+            [
+              -331551.90083614975,
+              7059507.242275014
+            ],
+            [
+              -331636.1923998591,
+              7059482.187749324
+            ]
+          ]
+        ],
+        "type": "polyline"
+      },
+      "symbol": {
+        "id": "sym29",
+        "type": "simple-line",
+        "color": [
+          0,
+          122,
+          194,
+          255
+        ],
+        "width": 6,
+        "style": "solid"
+      }
+    }
+  ],
+  "directionPoints": [
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331774.23825323675,
+        "y": 7062341.951909702,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331774.23825323675,
+        "y": 7062341.951909702,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331838.2204664024,
+        "y": 7062237.820257552,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331926.600795006,
+        "y": 7061269.227161858,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331534.8610503745,
+        "y": 7061301.20716068,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331494.2539265248,
+        "y": 7060594.82249682,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331587.4115310751,
+        "y": 7060152.864455382,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331718.78767716733,
+        "y": 7060086.629984948,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331671.0144724135,
+        "y": 7059971.292037593,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331551.5816831721,
+        "y": 7059507.101832741,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331636.1923998591,
+        "y": 7059482.187749324,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym30",
+        "type": "simple-marker",
+        "color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            0,
+            122,
+            194,
+            255
+          ],
+          "width": 2,
+          "style": "esriSLSSolid"
+        },
+        "size": 6,
+        "style": "circle"
+      }
+    }
+  ],
+  "stops": [
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331774.2377000004,
+        "y": 7062341.950999998,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym44",
+        "type": "simple-marker",
+        "color": [
+          0,
+          255,
+          0,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "width": 4,
+          "style": "esriSLSSolid"
+        },
+        "size": 20,
+        "style": "circle"
+      }
+    },
+    {
+      "geometry": {
+        "spatialReference": {
+          "latestWkid": 3857,
+          "wkid": 102100
+        },
+        "x": -331635.6420999989,
+        "y": 7059453.756499998,
+        "type": "point"
+      },
+      "symbol": {
+        "id": "sym50",
+        "type": "simple-marker",
+        "color": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "outline": {
+          "type": "esriSLS",
+          "color": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "width": 4,
+          "style": "esriSLSSolid"
+        },
+        "size": 20,
+        "style": "circle"
+      }
+    }
+  ]
+}

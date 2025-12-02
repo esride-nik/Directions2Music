@@ -1,0 +1,50 @@
+{
+  "trackId": "music_El Camino Andaluz_2025-11-18T16-56-55-004Z",
+  "songTitle": "El Camino Andaluz",
+  "audioFile": "music_El Camino Andaluz_2025-11-18T16-56-55-004Z.mp3",
+  "timestamp": "2025-11-18T16-56-55-004Z",
+  "styleCard": {
+    "songTitle": "El Camino Andaluz",
+    "genre": "Flamenco",
+    "artistName": "AI Composer",
+    "mood": [
+      "Passionate",
+      "Lively",
+      "Melancholic",
+      "Evocative",
+      "Journey"
+    ],
+    "description": "A traditional Flamenco style infused with the spirit of an Andalusian journey, featuring intricate guitar work, rhythmic percussion, and soulful vocals, perfect for a walk through historic Spanish cities."
+  },
+  "directions": [
+    "Start at Almería, Andalucía",
+    "Go south on Calle de la Alhóndiga Vieja toward Calle Milagro",
+    "Bear left on Calle Juez",
+    "Bear left on Plaza de la Administración (Plaza de San Fernando)",
+    "Turn right on Calle de Cervantes",
+    "Bear right on Plaza de la Catedral",
+    "Turn right on Calle General Castaños, then turn left on Calle de Velázquez",
+    "Take the exit on the left to merge onto E-15 / A-7 toward Almuñécar / Málaga / GR-14 / Salobreña / Motril",
+    "Take exit 981A on the right toward P de Sancha / LIMONAR",
+    "At the roundabout, take the third exit toward Limonar / Paseo de Sancha / E-15 / A-7 / Ronda de Málaga",
+    "At the roundabout, take the first exit onto Avenida Pintor Fermín Durante",
+    "At the roundabout, take the first exit onto Avenida Camarón de la Isla",
+    "At the roundabout, take the second exit to stay on Avenida Camarón de la Isla",
+    "At the roundabout, take the third exit onto Camino de los Almendrales",
+    "At the roundabout, take the second exit onto Plaza de Olletas",
+    "Continue forward on Alameda de los Capuchinos",
+    "Continue forward on Alameda de Barceló",
+    "At the traffic light, make a sharp left on Calle de Eduardo Domínguez Ávila",
+    "Turn right at Plaza del Siglo / Calle del Duque de la Victoria to stay on Calle Granada",
+    "Finish at Pampa Grill Málaga, on the left"
+  ],
+  "routeGraphicsFile": "music_El Camino Andaluz_2025-11-18T16-56-55-004Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763485015008,
+    "timestamp": "2025-11-18T16:56:55.008Z"
+  }
+}
