@@ -1,0 +1,42 @@
+{
+  "trackId": "music_Seto Inland Drive_2025-11-18T17-14-11-116Z",
+  "songTitle": "Seto Inland Drive",
+  "audioFile": "music_Seto Inland Drive_2025-11-18T17-14-11-116Z.mp3",
+  "timestamp": "2025-11-18T17-14-11-116Z",
+  "styleCard": {
+    "songTitle": "Seto Inland Drive",
+    "genre": "Instrumental Pop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Scenic",
+      "Reflective",
+      "Calm",
+      "Journey",
+      "Peaceful"
+    ],
+    "description": "An gentle, instrumental pop piece ideal for a coastal road trip, inspired by the scenic routes and tranquil atmosphere of Onomichi and the Seto Inland Sea."
+  },
+  "directions": [
+    "Start at Onomichi, Hiroshima",
+    "Go west on 海岸通り toward 水尾町通り",
+    "Turn left at 渡し場通り to stay on 海岸通り",
+    "Continue forward at 田尻",
+    "Turn left on 国道317号線",
+    "Turn right at 向島インター入口 to stay on 国道317号線",
+    "Go forward on 西瀬戸道 / 国道317号線",
+    "Keep left at the fork onto 国道317号線",
+    "Go forward on 西瀬戸道 / 国道317号線",
+    "Keep left at the fork onto 国道317号線",
+    "Make a sharp left at 因島北インター on 県道367号線",
+    "Finish at 1654-16, Innoshimashigeicho, Onomichi, Hiroshima, 7222102, on the right"
+  ],
+  "routeGraphicsFile": "music_Seto Inland Drive_2025-11-18T17-14-11-116Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763486051120,
+    "timestamp": "2025-11-18T17:14:11.120Z"
+  }
+}

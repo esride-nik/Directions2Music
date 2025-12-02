@@ -1,0 +1,41 @@
+{
+  "trackId": "music_Autobahn Rhythm_2025-11-20T13-56-02-871Z",
+  "songTitle": "Autobahn Rhythm",
+  "audioFile": "music_Autobahn Rhythm_2025-11-20T13-56-02-871Z.mp3",
+  "timestamp": "2025-11-20T13-56-02-871Z",
+  "styleCard": {
+    "songTitle": "Autobahn Rhythm",
+    "genre": "Krautrock",
+    "artistName": "AI Composer",
+    "mood": [
+      "driving",
+      "hypnotic",
+      "expansive",
+      "determined",
+      "focused"
+    ],
+    "description": "A relentless, rhythm-driven track with atmospheric synthesizers and a propulsive motorik beat, perfectly capturing the experience of traversing German autobahns on a long journey from Bonn to Frankfurt."
+  },
+  "directions": [
+    "Start at Winzerstraße 79, 53129, Bonn, Dottendorf, Nordrhein-Westfalen",
+    "Go northeast on Winzerstraße toward Damaschkestraße",
+    "Make a sharp left on Damaschkestraße",
+    "Bear right on Villenstraße",
+    "Take the exit on the right to merge onto A59 toward Köln / Bonn-Nordost",
+    "Take exit 39 on the right to merge onto A560 toward Frankfurt a.M. / Sankt Augustin / Siegburg",
+    "Take exit 5 on the right to A3 toward Köln / Frankfurt a.M.",
+    "Keep right at the fork to merge onto A3 toward Frankfurt a.M.",
+    "Keep right at exit 47 toward Frankfurt / Hannover / A66 / Mainz / Wiesbaden",
+    "Continue forward on Braubachstraße",
+    "Finish at Frankfurt am Main, Hessen, on the right"
+  ],
+  "routeGraphicsFile": "music_Autobahn Rhythm_2025-11-20T13-56-02-871Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763646962874,
+    "timestamp": "2025-11-20T13:56:02.874Z"
+  }
+}
