@@ -1,0 +1,38 @@
+{
+  "trackId": "music_The Wicklow Wayfarer_2025-11-18T17-27-35-761Z",
+  "songTitle": "The Wicklow Wayfarer",
+  "audioFile": "music_The Wicklow Wayfarer_2025-11-18T17-27-35-761Z.mp3",
+  "timestamp": "2025-11-18T17-27-35-761Z",
+  "styleCard": {
+    "songTitle": "The Wicklow Wayfarer",
+    "genre": "Celtic Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Lively",
+      "Scenic",
+      "Journey",
+      "Whimsical"
+    ],
+    "description": "A lively Celtic folk tune with a driving rhythm, evoking the scenic beauty and winding roads of County Wicklow, Ireland."
+  },
+  "directions": [
+    "Start at R759, Ballinastoe, Roundwood, Wicklow",
+    "Go southeast on R759",
+    "Turn right",
+    "Arrive at Luggala, Roundwood, Wicklow, on the right",
+    "Depart Luggala, Roundwood, Wicklow",
+    "Go back northeast",
+    "Turn left on R759",
+    "At the stop sign, turn left on R759 (R115)",
+    "Finish at R115, Drummin, Glendalough, Wicklow, on the right"
+  ],
+  "routeGraphicsFile": "music_The Wicklow Wayfarer_2025-11-18T17-27-35-761Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763486855763,
+    "timestamp": "2025-11-18T17:27:35.763Z"
+  }
+}

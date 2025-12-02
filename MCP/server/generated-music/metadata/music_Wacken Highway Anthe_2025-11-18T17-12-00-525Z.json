@@ -1,0 +1,41 @@
+{
+  "trackId": "music_Wacken Highway Anthe_2025-11-18T17-12-00-525Z",
+  "songTitle": "Wacken Highway Anthem",
+  "audioFile": "music_Wacken Highway Anthe_2025-11-18T17-12-00-525Z.mp3",
+  "timestamp": "2025-11-18T17-12-00-525Z",
+  "styleCard": {
+    "songTitle": "Wacken Highway Anthem",
+    "genre": "Heavy Metal",
+    "artistName": "AI Composer",
+    "mood": [
+      "Energetic",
+      "Epic",
+      "Driving",
+      "Anthemic",
+      "Powerful"
+    ],
+    "description": "A high-octane heavy metal track designed for a relentless journey, building anticipation for the ultimate destination. Features driving riffs, thunderous drums, and a powerful vocal delivery, embodying the pilgrimage to a legendary metal festival."
+  },
+  "directions": [
+    "Start at Hamburg",
+    "Go west on Mönckebergstraße toward Bergstraße",
+    "At the traffic light, turn right on Schnackenburgallee",
+    "Take the exit on the right to merge onto the highway toward Flensburg / A7 / Kiel",
+    "Take the exit to merge onto A7 (E45)",
+    "Take exit 25 on the right to merge onto A23 toward Husum / Heide / HH-Eidelstedt",
+    "Take exit 7 on the right toward Schenefeld / Wacken",
+    "Make a sharp right on Burenbrook (B430)",
+    "Continue forward on Hauptstraße (L130) toward Wacken",
+    "Continue forward on Schenefelder Straße (L130)",
+    "Finish at Wacken, Schleswig-Holstein, on the left"
+  ],
+  "routeGraphicsFile": "music_Wacken Highway Anthe_2025-11-18T17-12-00-525Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763485920527,
+    "timestamp": "2025-11-18T17:12:00.527Z"
+  }
+}

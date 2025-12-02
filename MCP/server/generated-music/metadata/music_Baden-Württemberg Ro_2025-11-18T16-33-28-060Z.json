@@ -1,0 +1,41 @@
+{
+  "trackId": "music_Baden-Württemberg Ro_2025-11-18T16-33-28-060Z",
+  "songTitle": "Baden-Württemberg Route",
+  "audioFile": "music_Baden-Württemberg Ro_2025-11-18T16-33-28-060Z.mp3",
+  "timestamp": "2025-11-18T16-33-28-060Z",
+  "styleCard": {
+    "songTitle": "Baden-Württemberg Route",
+    "genre": "Ambient Electronic",
+    "artistName": "AI Composer",
+    "mood": [
+      "Focused",
+      "Cruising",
+      "Serene",
+      "Exploratory"
+    ],
+    "description": "An atmospheric electronic piece designed to soundtrack a methodical yet scenic journey through the German countryside. The music provides a calm, forward-moving backdrop, reflecting the precision of routing directions and the subtle beauty of the landscape."
+  },
+  "directions": [
+    "Start at Kohlstetten, Engstingen, Baden-Württemberg",
+    "Go east on Uracher Straße (K6733) toward Hauptstraße",
+    "Bear right on Münsinger Straße (K6733)",
+    "Turn left on L230 (Landstraße)",
+    "Turn right on B465 (Lichtensteinstraße)",
+    "At the roundabout, take the first exit to stay on B465 (Lichtensteinstraße)",
+    "Turn right toward Zwiefalten / Hayingen / Mün.-Buttenhausen / Lautertal",
+    "Turn right on Bahnhofstraße (K6769)",
+    "Continue forward on Lautertalstraße (K6769)",
+    "Cross over the railroad track",
+    "Turn right on Lerchenfeldstraße",
+    "Finish at Lerchenfeldstraße 4, 72525, Münsingen, Baden-Württemberg, on the right"
+  ],
+  "routeGraphicsFile": "music_Baden-Württemberg Ro_2025-11-18T16-33-28-060Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763483608064,
+    "timestamp": "2025-11-18T16:33:28.064Z"
+  }
+}

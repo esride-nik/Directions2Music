@@ -1,0 +1,45 @@
+{
+  "trackId": "music_Southland Journey_2025-11-18T16-39-34-029Z",
+  "songTitle": "Southland Journey",
+  "audioFile": "music_Southland Journey_2025-11-18T16-39-34-029Z.mp3",
+  "timestamp": "2025-11-18T16-39-34-029Z",
+  "styleCard": {
+    "songTitle": "Southland Journey",
+    "genre": "Cinematic Ambient Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Expansive",
+      "Serene",
+      "Reflective",
+      "Journey",
+      "Scenic",
+      "Hopeful"
+    ],
+    "description": "An evocative cinematic folk piece that paints a picture of a scenic road trip through the breathtaking landscapes of New Zealand, from Queenstown's winding roads to the tranquil beauty of Te Anau. The music captures the essence of open vistas, quiet contemplation, and the steady progression of a memorable journey."
+  },
+  "directions": [
+    "Start at Gorge Road, Queenstown, Otago, 9300",
+    "Go southwest on Gorge Road",
+    "Restriction: Through Traffic Prohibited",
+    "Turn left to stay on Gorge Road",
+    "Take the exit on the left to Hallenstein Street toward Frankton",
+    "Turn left to stay on Hallenstein Street",
+    "Make a sharp right on Dublin Street",
+    "Turn left on Frankton Road (6A)",
+    "At the roundabout, take the third exit onto 6 toward Hospital / Remarkables / Ski Area / Invercargill / Milford Sound",
+    "At the roundabout, take the second exit to stay on Kawarau Road (6)",
+    "Turn right on Alpine Drive",
+    "Turn left on Orbell Crescent, then turn right on Takahe Lane",
+    "Turn left on Orbell Crescent",
+    "Finish at 40 Sandy Brown Road, Te Anau, Southland, 9679, on the right"
+  ],
+  "routeGraphicsFile": "music_Southland Journey_2025-11-18T16-39-34-029Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763483974032,
+    "timestamp": "2025-11-18T16:39:34.032Z"
+  }
+}

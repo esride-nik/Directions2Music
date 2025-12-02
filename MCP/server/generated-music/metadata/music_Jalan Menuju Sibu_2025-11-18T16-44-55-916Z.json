@@ -1,0 +1,41 @@
+{
+  "trackId": "music_Jalan Menuju Sibu_2025-11-18T16-44-55-916Z",
+  "songTitle": "Jalan Menuju Sibu",
+  "audioFile": "music_Jalan Menuju Sibu_2025-11-18T16-44-55-916Z.mp3",
+  "timestamp": "2025-11-18T16-44-55-916Z",
+  "styleCard": {
+    "songTitle": "Jalan Menuju Sibu",
+    "genre": "Malaysian Indie Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Exploratory",
+      "Calm",
+      "Reflective",
+      "Hopeful",
+      "Serene"
+    ],
+    "description": "An acoustic-driven, laid-back track evoking the scenic journey through Sarawak, blending contemporary indie folk with subtle traditional Malaysian elements, perfect for a contemplative road trip."
+  },
+  "directions": [
+    "Start at Sri Aman, Bahagian Sri Aman, Sarawak",
+    "Go northwest on Lorong 2 toward Lorong 1",
+    "Bear left to merge onto AH150 (01-27)",
+    "Take the exit on the left to merge onto the highway",
+    "At the traffic light, turn right on 6308A",
+    "At the roundabout, take the third exit onto 6308B",
+    "Take the exit on the left to merge onto the highway toward Pusat Bandar",
+    "At the roundabout, take the third exit onto Jalan Alan",
+    "Bear left to merge onto Jalan Salim",
+    "At the roundabout, take the second exit onto Jalan Bukit Lima",
+    "Finish at Jalan Kapor, Sibu, Bahagian Sibu, 96000, Sarawak, on the right"
+  ],
+  "routeGraphicsFile": "music_Jalan Menuju Sibu_2025-11-18T16-44-55-916Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763484295920,
+    "timestamp": "2025-11-18T16:44:55.920Z"
+  }
+}
