@@ -59,45 +59,45 @@
             
             <!-- Controls Section -->
             <div style="padding:0.5rem;">
-              <!-- Music Navigation Controls -->
+              <!-- Music Navigation Controls - All in one row -->
               <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem;">
                 <!-- Navigation Buttons -->
-                <div style="display: flex; gap: 0.25rem; flex: 1;">
-                  <calcite-button 
-                    id="backBtn" 
-                    icon-start="chevron-left" 
-                    scale="m" 
-                    kind="neutral" 
-                    appearance="outline"
-                    disabled
-                    title="Play previous music"
-                    style="flex: 1;"
-                  ></calcite-button>
-                  <calcite-button 
-                    id="forwardBtn" 
-                    icon-start="chevron-right" 
-                    scale="m" 
-                    kind="neutral" 
-                    appearance="outline"
-                    disabled
-                    title="Play next music"
-                    style="flex: 1;"
-                  ></calcite-button>
-                </div>
+                <calcite-button 
+                  id="backBtn" 
+                  icon-start="chevron-left" 
+                  scale="m" 
+                  kind="neutral" 
+                  appearance="outline"
+                  disabled
+                  title="Play previous music"
+                ></calcite-button>
+                <calcite-button 
+                  id="forwardBtn" 
+                  icon-start="chevron-right" 
+                  scale="m" 
+                  kind="neutral" 
+                  appearance="outline"
+                  disabled
+                  title="Play next music"
+                ></calcite-button>
+                
+                <!-- Playlist Dropdown -->
+                <calcite-select 
+                  id="playlistSelect" 
+                  scale="m"
+                  disabled
+                  style="flex: 1;"
+                >
+                  <calcite-option value="" label="Loading songs..."></calcite-option>
+                </calcite-select>
               </div>
-              
-              <!-- Playlist Dropdown -->
-              <div style="margin: 0 0.5rem 0.5rem 0.5rem;">
-                <calcite-label>Playlist
-                  <calcite-select 
-                    id="playlistSelect" 
-                    scale="m"
-                    disabled
-                  >
-                    <calcite-option value="" label="Loading songs..."></calcite-option>
-                  </calcite-select>
-                </calcite-label>
-              </div>
+            </div>
+            
+            <!-- Audio Player -->
+            <div id="audioSection" style="padding:0.5rem; display: none;">
+              <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
+                <source id="audioSource" src="" type="audio/mpeg">
+              </audio>
             </div>
             
             <!-- Status Section -->
@@ -122,8 +122,8 @@
             
             <!-- Lyrics Display -->
             <calcite-card id="lyricsInfo" style="display: none; margin: 0.5rem;">
-              <h4 slot="heading">🎤 Lyrics</h4>
-              <div id="lyricsDetails" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9em;"></div>
+              <h4 slot="heading">🗺️ Directions</h4>
+              <div id="lyricsDetails" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9em; max-height: 200px; overflow-y: auto;"></div>
             </calcite-card>
             
             <!-- Error Display -->
@@ -135,13 +135,6 @@
             >
               <div id="errorContent"></div>
             </calcite-notice>
-            
-            <!-- Audio Player -->
-            <div id="audioSection" style="padding:0.5rem; display: none;">
-              <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
-                <source id="audioSource" src="" type="audio/mpeg">
-              </audio>
-            </div>
             
           </calcite-panel>    
         </calcite-accordion-item>
@@ -248,9 +241,9 @@
         showStyleCard(entry.styleCard);
         showAudio(entry.audioUrl);
         
-        // Show lyrics if available
-        if (entry.lyrics) {
-          showLyrics(entry.lyrics);
+        // Show directions as lyrics
+        if (entry.directions && entry.directions.length > 0) {
+          showLyrics(entry.directions.join('\n'));
         } else {
           hideLyrics();
         }
@@ -633,7 +626,13 @@
             ` (${currentMusicIndex + 1}/${musicHistory.length})` : '';
             
           heading.textContent = `🎨 ${styleCardData.songTitle}${trackInfo}`;
-          details.textContent = `${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}`;
+          
+          // Build details with genre, mood, and description
+          let detailsText = `${styleCardData.genre} • ${styleCardData.mood?.join(', ')}`;
+          if (styleCardData.description) {
+            detailsText += `\n\n${styleCardData.description}`;
+          }
+          details.textContent = detailsText;
         }
         
         showElement(styleInfo);
