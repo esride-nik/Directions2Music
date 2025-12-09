@@ -1,0 +1,46 @@
+{
+  "trackId": "music_Journey Through Saen_2025-12-08T20-12-10-980Z",
+  "songTitle": "Journey Through Saeng Chu To",
+  "audioFile": "music_Journey Through Saen_2025-12-08T20-12-10-980Z.mp3",
+  "timestamp": "2025-12-08T20-12-10-980Z",
+  "styleCard": {
+    "songTitle": "Journey Through Saeng Chu To",
+    "genre": "Thai Folk Pop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Scenic",
+      "Relaxed",
+      "Explorative",
+      "Serene",
+      "Nostalgic"
+    ],
+    "description": "A warm and inviting Thai Folk Pop piece that evokes the feeling of a leisurely road trip through the beautiful Thai countryside, blending traditional melodies with modern instrumentation, capturing the essence of a journey from Kanchanaburi to Lop Buri."
+  },
+  "directions": [
+    "Start at Kanchanaburi",
+    "Go northwest",
+    "Restriction: Avoid Private Roads",
+    "Restriction: Through Traffic Prohibited",
+    "Turn left on Saeng Chu To Rd., then turn left on Saeng Chu To Rd.",
+    "Make a U-turn and go back on Saeng Chu To Rd. (ถนนแสงชูโต)",
+    "Turn left to stay on Saeng Chu To Rd. (ถนนแสงชูโต)",
+    "Turn right on U Thong Rd. (ถนนอู่ทอง)",
+    "Turn right at Highway 322 to stay on Highway 321",
+    "Go forward on Malai Maen Rd. (ถนนมาลัยแมน)",
+    "Turn left on Prachathippatai Rd. (ถนนประชาธิปไตย)",
+    "At the roundabout, take the second exit onto Prachathippatai Rd. (ถนนประชาธิปไตย)",
+    "Turn left on Wongwian Sa Kaeo Rd. (ถนนวงเวียนสระแก้ว)",
+    "Turn left on Narai Maha Rat Rd. (ถนนนารายณ์มหาราช)",
+    "Turn left on Soi Thep Satri 1 (ซอยเทพสตรี 1)",
+    "Finish at Lop Buri, on the right"
+  ],
+  "routeGraphicsFile": "music_Journey Through Saen_2025-12-08T20-12-10-980Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1765224730983,
+    "timestamp": "2025-12-08T20:12:10.983Z"
+  }
+}
