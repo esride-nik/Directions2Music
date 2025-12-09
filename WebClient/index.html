@@ -581,7 +581,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           console.log('📬 Response status:', response.status, response.statusText);
           
           const result = await response.json();
-          console.log('📄 Raw response:', result);
+          console.log('📄 Raw response file names:', JSON.stringify(result.files.map(f => f.filename)));
           
           if (response.ok && result.files) {
             console.log(`🎵 Found ${result.files.length} files from server`);

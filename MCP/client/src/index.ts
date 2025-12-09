@@ -488,7 +488,7 @@ app.get('/test', (req, res) => {
 // Start the server
 function startServer() {
   app.listen(PORT, () => {
-    console.log(`🚀 Directions2Music Client Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Directions2Music MCP Client running on http://localhost:${PORT}`);
     console.log(`📁 Audio files served from: ${serverDir}`);
     console.log(`🎵 Audio endpoint: http://localhost:${PORT}/audio/`);
     console.log(`🎯 Start job: POST http://localhost:${PORT}/orchestrate`);
