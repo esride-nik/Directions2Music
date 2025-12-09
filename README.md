@@ -21,20 +21,6 @@ This project transforms GPS routing directions into personalized music by:
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-## Quick Test
-
-To test the complete system:
-
-```bash
-# Make the test script executable
-chmod +x test_client_server.sh
-
-# Run the automated test
-./test_client_server.sh
-```
-
-This will start both servers, send sample directions, generate music, and return an audio file URL.
-
 ## Prerequisites
 
 ### 1. API Keys Setup
@@ -143,22 +129,6 @@ curl -X POST "http://localhost:3001/orchestrate" \
 
 ## Testing & Development
 
-### Automated Test Script
-
-The `test_client_server.sh` script provides automated testing:
-
-```bash
-./test_client_server.sh
-```
-
-**What it does:**
-1. Starts both servers in the background
-2. Waits for startup completion
-3. Tests health endpoint
-4. Sends sample directions for orchestration
-5. Displays results and audio file information
-6. Cleans up background processes
-
 ### Manual Testing Endpoints
 
 #### Health Check
@@ -249,68 +219,6 @@ const pollStatus = async () => {
 pollStatus();
 ```
 
-### Live Example
-A complete WebClient example is available in `webclient_async_example.html` that demonstrates:
-- ✅ Async job submission
-- ✅ Real-time status polling  
-- ✅ Progress indication
-- ✅ Audio playback
-- ✅ Error handling
-- ✅ Job management
-
-**Why Async Jobs?**
-- Music generation can take 2-5 minutes (ElevenLabs processing time)
-- Prevents HTTP timeout errors
-- Better user experience with progress indication
-- Allows multiple concurrent jobs
-
-#### Legacy Direct Pattern (Not Recommended)
-For simple testing only (will timeout on real ElevenLabs API):
-```html
-<audio controls>
-  <source id="audioSource" src="" type="audio/mpeg">
-</audio>
-
-<script>
-async function generateMusic(directions) {
-  const response = await fetch('http://localhost:3001/orchestrate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ directions, dummyMode: true }) // Only works with dummy mode
-  });
-  
-  const result = await response.json();
-  if (result.success && result.audioUrl) {
-    document.getElementById('audioSource').src = 
-      `http://localhost:3001${result.audioUrl}`;
-    document.querySelector('audio').load();
-    document.querySelector('audio').play();
-  }
-}
-</script>
-```
-
-## File Structure
-
-```
-Directions2Music/
-├── README.md                          # This file
-├── test_client_server.sh              # Automated test script
-├── MCP/
-│   ├── server/                        # MCP Server (AI Processing)
-│   │   ├── README.md                  # Server-specific documentation
-│   │   ├── config.json.template       # API key template
-│   │   ├── config.json                # Your API keys (gitignored)
-│   │   ├── src/
-│   │   │   ├── index.ts              # Main server logic
-│   │   │   └── schemas.ts            # Data validation schemas
-│   │   └── dummyData/                # Test data
-│   └── client/                       # Client Express Server (API Layer)
-│       ├── src/
-│       │   └── index.ts              # Express server & orchestration
-│       └── package.json
-└── WebClient/                        # Frontend (your implementation)
-```
 
 ## Troubleshooting
 
@@ -334,35 +242,6 @@ Directions2Music/
 
 ### Debug Mode
 
-Enable detailed logging by checking server console output:
+Checki Node process console outut:
 - MCP Server: Shows composition plans and file operations
 - Client Server: Shows orchestration steps and file discovery
-
-## Development
-
-### Adding New Features
-
-1. **Server Logic**: Modify `MCP/server/src/index.ts`
-2. **API Schemas**: Update `MCP/server/src/schemas.ts`  
-3. **Client API**: Extend `MCP/client/src/index.ts`
-4. **Testing**: Update `test_client_server.sh`
-
-### Production Deployment
-
-For production use:
-1. Set up proper environment variable management
-2. Configure HTTPS and CORS policies
-3. Implement rate limiting and authentication
-4. Set up audio file cleanup/archiving
-5. Monitor API usage and costs
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Test your changes with `./test_client_server.sh`
-4. Submit a pull request
-
-## License
-
-[Add your license here]
