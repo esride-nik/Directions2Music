@@ -152,7 +152,10 @@ git push --force origin usingLLM
 Check that the API keys are gone:
 ```bash
 # Search for the API keys in git history
-git log -p --all | grep -E "(sk_REDACTED_ELEVENLABS_KEY|AIza_REDACTED_GOOGLE_KEY)"
+git log -p --all | grep -E "(YOUR_ELEVENLABS_API_KEY|YOUR_GOOGLE_API_KEY)"
+
+# Or search for any remaining actual keys (replace with your key patterns)
+git log -p --all | grep -E "(sk_[a-zA-Z0-9]{50,}|AIza[a-zA-Z0-9]{35,})"
 
 # Should return nothing if successfully removed
 ```
