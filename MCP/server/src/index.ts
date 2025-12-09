@@ -647,123 +647,6 @@ server.registerTool(
 const app = express();
 app.use(express.json());
 
-// Serve static audio files
-app.use('/audio', express.static(path.join(__dirname, '../generated-music/audio')));
-
-// Serve static route graphics files
-app.use('/route-graphics', express.static(path.join(__dirname, '../generated-music/route-graphics')));
-
-// Serve dummy data files for development
-app.use('/dummyData', express.static(path.join(__dirname, '../dummyData')));
-
-// API endpoint to list audio files with metadata
-app.get('/audio-files', async (req, res) => {
-  try {
-    const audioDir = path.join(__dirname, '../generated-music/audio');
-    const metadataDir = path.join(__dirname, '../generated-music/metadata');
-    
-    let audioFiles: string[] = [];
-    
-    try {
-      const files = await fs.readdir(audioDir);
-      audioFiles = files.filter(file => file.endsWith('.mp3'));
-    } catch (error) {
-      console.log('Audio directory not found, checking dummy data...');
-      // Fallback to dummy data for development
-      try {
-        const dummyDir = path.join(__dirname, '../dummyData');
-        const files = await fs.readdir(dummyDir);
-        audioFiles = files.filter(file => file.endsWith('.mp3'));
-      } catch (dummyError) {
-        console.log('No dummy audio files found');
-      }
-    }
-    
-    const fileDetails = await Promise.all(audioFiles.map(async (filename) => {
-      const trackId = filename.replace('.mp3', '');
-      const metadataFile = path.join(metadataDir, `${trackId}.json`);
-      const routeGraphicsFile = path.join(__dirname, `../generated-music/route-graphics/${trackId}.json`);
-      
-      let metadata = null;
-      let routeGraphics = null;
-      
-      // Try to load metadata
-      try {
-        const metadataContent = await fs.readFile(metadataFile, 'utf8');
-        metadata = JSON.parse(metadataContent);
-      } catch (error) {
-        console.log(`No metadata found for ${trackId}`);
-      }
-      
-      // Try to load route graphics
-      try {
-        const routeGraphicsContent = await fs.readFile(routeGraphicsFile, 'utf8');
-        routeGraphics = JSON.parse(routeGraphicsContent);
-      } catch (error) {
-        console.log(`No route graphics found for ${trackId}`);
-      }
-      
-      return {
-        filename,
-        title: metadata?.songTitle || trackId,
-        url: `/audio/${filename}`,
-        created: metadata?.timestamp || new Date().toISOString(),
-        styleCard: metadata?.styleCard || {
-          songTitle: trackId,
-          genre: 'Generated Music',
-          artistName: 'AI Composer',
-          mood: ['Generated']
-        },
-        directions: metadata?.directions || [`Generated music file: ${filename}`],
-        metadata: metadata,
-        routeGraphics: routeGraphics, // Embed route graphics directly
-        routeGraphicsUrl: routeGraphics ? `/route-graphics/${trackId}.json` : null // Also provide URL
-      };
-    }));
-    
-    // Sort by creation date (newest first)
-    fileDetails.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
-    
-    res.json({ files: fileDetails });
-  } catch (error) {
-    console.error('Error listing audio files:', error);
-    res.status(500).json({ error: 'Failed to list audio files' });
-  }
-});
-
-app.post("/mcp", async (req, res) => {
-  // In stateless mode, create a new transport for each request to prevent
-  // request ID collisions. Different clients may use the same JSON-RPC request IDs,
-  // which would cause responses to be routed to the wrong HTTP connections if
-  // the transport state is shared.
-
-  try {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true,
-    });
-
-    res.on("close", () => {
-      transport.close();
-    });
-
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  } catch (error) {
-    console.error("Error handling MCP request:", error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        jsonrpc: "2.0",
-        error: {
-          code: -32603,
-          message: "Internal server error",
-        },
-        id: null,
-      });
-    }
-  }
-});
-
 app.get("/", (req, res) => {
   res.send("Demo MCP Server running under /mcp, responding to POST requests.");
 });
@@ -771,7 +654,7 @@ app.get("/", (req, res) => {
 const port = parseInt(process.env.PORT || "3000");
 app
   .listen(port, () => {
-    console.log(`Demo MCP Server running on http://localhost:${port}/mcp`);
+    console.log(`🚀 Directions2Music MCP Server running on http://localhost:${port}`);
   }).on("error", (error) => {
     console.error("Server error:", error);
     process.exit(1);
