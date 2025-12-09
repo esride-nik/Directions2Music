@@ -118,7 +118,33 @@ git filter-branch --force --tree-filter '
 
 git reflog expire --expire=now --all
 git gc --prune=now --aggressive
-git push --force-with-lease origin usingLLM
+```
+
+### If you get "stale info" error when pushing:
+
+```bash
+# Option 1: Force push (after verifying your changes are correct)
+git push --force origin usingLLM
+
+# Option 2: If --force-with-lease fails, backup first then force
+git branch backup-before-force
+git push --force origin usingLLM
+```
+
+### Alternative: Remove file from commits before 71234a9
+
+```bash
+# Remove the file completely from all commits before the clean one
+git filter-branch --force --index-filter \
+  'COMMIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "");
+   if [ -n "$COMMIT_HASH" ] && ! git merge-base --is-ancestor 71234a9 $COMMIT_HASH 2>/dev/null; then
+     git rm --cached --ignore-unmatch MCP/server/src/index.ts;
+   fi' \
+  --tag-name-filter cat -- --all
+
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+git push --force origin usingLLM
 ```
 
 ## Verification
