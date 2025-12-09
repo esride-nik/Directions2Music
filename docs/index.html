@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Directions component with RouteLayer | Sample | ArcGIS Maps SDK for
+      JavaScript
+    </title>
+
+    <!-- Load Calcite components from CDN -->
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/3.3.3/calcite.esm.js"
+    ></script>
+
+    <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
+    <script src="https://js.arcgis.com/4.34/"></script>
+
+    <!-- Load Map components from CDN-->
+    <script
+      type="module"
+      src="https://js.arcgis.com/4.34/map-components/"
+    ></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      
+      /* Custom styles for Calcite components */
+      calcite-panel[slot="bottom-right"] {
+        max-width: 300px;
+        min-width: 220px;
+      }
+
+      calcite-card {
+        margin:0px;
+      }
+
+      #controlsAccordion {
+        width:30vw;
+      }
+    </style>
+  </head>
+
+  <body>
+    <arcgis-map item-id="45b3b2fb35e94ab09381d0caa0da5946">
+    <arcgis-zoom slot="top-right"></arcgis-zoom>
+    <calcite-accordion slot="top-left" id="controlsAccordion" selection-mode="single">
+        <calcite-accordion-item description="Music Playback" heading="🎵 Directions2Music Player" icon-start="music-note" expanded>
+          <!-- Static Music Player Panel -->
+          <calcite-panel heading="🎵 Directions2Music Player">
+            
+            <!-- Controls Section -->
+            <div style="padding:0.5rem;">
+              <!-- Music Navigation Controls -->
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem;">
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 0.25rem; flex: 1;">
+                  <calcite-button 
+                    id="backBtn" 
+                    icon-start="chevron-left" 
+                    scale="m" 
+                    kind="neutral" 
+                    appearance="outline"
+                    disabled
+                    title="Play previous music"
+                    style="flex: 1;"
+                  ></calcite-button>
+                  <calcite-button 
+                    id="forwardBtn" 
+                    icon-start="chevron-right" 
+                    scale="m" 
+                    kind="neutral" 
+                    appearance="outline"
+                    disabled
+                    title="Play next music"
+                    style="flex: 1;"
+                  ></calcite-button>
+                </div>
+              </div>
+              
+              <!-- Playlist Dropdown -->
+              <div style="margin: 0 0.5rem 0.5rem 0.5rem;">
+                <calcite-label>Playlist
+                  <calcite-select 
+                    id="playlistSelect" 
+                    scale="m"
+                    disabled
+                  >
+                    <calcite-option value="" label="Loading songs..."></calcite-option>
+                  </calcite-select>
+                </calcite-label>
+              </div>
+            </div>
+            
+            <!-- Status Section -->
+            <calcite-notice 
+              id="statusSection" 
+              kind="info" 
+              scale="s" 
+              style="display: none; margin: 0.5rem;"
+            >
+              <calcite-progress 
+                id="progressBar" 
+                type="indeterminate" 
+                style="display: none; margin-top: 0.5rem;"
+              ></calcite-progress>
+            </calcite-notice>
+            
+            <!-- Style Info -->
+            <calcite-card id="styleInfo" style="display: none; margin: 0.5rem;">
+              <h4 slot="heading">Song Information</h4>
+              <div id="styleDetails"></div>
+            </calcite-card>
+            
+            <!-- Lyrics Display -->
+            <calcite-card id="lyricsInfo" style="display: none; margin: 0.5rem;">
+              <h4 slot="heading">🎤 Lyrics</h4>
+              <div id="lyricsDetails" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9em;"></div>
+            </calcite-card>
+            
+            <!-- Error Display -->
+            <calcite-notice 
+              id="errorMessage" 
+              kind="danger" 
+              scale="s" 
+              style="display: none; margin:0.5rem;"
+            >
+              <div id="errorContent"></div>
+            </calcite-notice>
+            
+            <!-- Audio Player -->
+            <div id="audioSection" style="padding:0.5rem; display: none;">
+              <audio controls id="audioPlayer" style="width: 100%; margin-top: 0.5rem;">
+                <source id="audioSource" src="" type="audio/mpeg">
+              </audio>
+            </div>
+            
+          </calcite-panel>    
+        </calcite-accordion-item>
+    </arcgis-map>
+    <script type="module">
+      // Static deployment configuration
+      const API_BASE = '.'; // Relative path for static deployment
+      
+      // Music history navigation
+      let musicHistory = []; // Array of {audioUrl, styleCard, timestamp, directions} objects
+      let currentMusicIndex = -1; // Current position in history (-1 = no music loaded)
+      
+      // Route graphics layer for displaying historical routes
+      let routeGraphicsLayer = null;
+      let pendingRouteGraphics = null; // Store graphics to display once map is ready
+      
+      // DOM elements
+      const backBtn = document.getElementById('backBtn');
+      const forwardBtn = document.getElementById('forwardBtn');
+      const playlistSelect = document.getElementById('playlistSelect');
+      const styleInfo = document.getElementById('styleInfo');
+      const lyricsInfo = document.getElementById('lyricsInfo');
+      const errorMessage = document.getElementById('errorMessage');
+      const audioSection = document.getElementById('audioSection');
+      const audioPlayer = document.getElementById('audioPlayer');
+      const audioSource = document.getElementById('audioSource');
+
+      // Show/hide UI elements  
+      function showElement(element) { 
+        if (element) element.style.display = 'block'; 
+      }
+      function hideElement(element) { 
+        if (element) element.style.display = 'none'; 
+      }
+
+      function updateNavigationButtons() {
+        // Back button: enabled if we can go to previous item in dropdown (lower index)
+        const canGoBack = currentMusicIndex > 0;
+        // Forward button: enabled if we can go to next item in dropdown (higher index)
+        const canGoForward = currentMusicIndex < musicHistory.length - 1;
+        
+        backBtn.disabled = !canGoBack;
+        forwardBtn.disabled = !canGoForward;
+        
+        // Update tooltips with track info
+        if (musicHistory.length > 0) {
+          const currentTrack = currentMusicIndex + 1;
+          const totalTracks = musicHistory.length;
+          
+          backBtn.title = canGoBack ? 
+            `Previous in list (${currentTrack - 1}/${totalTracks})` : 
+            'No previous song';
+            
+          forwardBtn.title = canGoForward ? 
+            `Next in list (${currentTrack + 1}/${totalTracks})` : 
+            'No next song';
+        } else {
+          backBtn.title = 'No music history';
+          forwardBtn.title = 'No music history';
+        }
+        
+        // Update playlist dropdown
+        updatePlaylistDropdown();
+      }
+      
+      function updatePlaylistDropdown() {
+        // Clear existing options
+        playlistSelect.innerHTML = '';
+        
+        if (musicHistory.length === 0) {
+          playlistSelect.disabled = true;
+          const option = document.createElement('calcite-option');
+          option.value = '';
+          option.label = 'No songs yet';
+          playlistSelect.appendChild(option);
+        } else {
+          playlistSelect.disabled = false;
+          
+          // Add options in reverse order (newest first)
+          musicHistory.forEach((entry, index) => {
+            const option = document.createElement('calcite-option');
+            option.value = index.toString();
+            const songTitle = entry.styleCard?.songTitle || `Track ${musicHistory.length - index}`;
+            const genre = entry.styleCard?.genre || '';
+            option.label = genre ? `${songTitle} (${genre})` : songTitle;
+            
+            // Mark current selection
+            if (index === currentMusicIndex) {
+              option.selected = true;
+            }
+            
+            playlistSelect.appendChild(option);
+          });
+        }
+      }
+
+      function playMusicAtIndex(index) {
+        if (index < 0 || index >= musicHistory.length) return;
+        
+        currentMusicIndex = index;
+        const entry = musicHistory[index];
+        
+        // Update UI with historical data
+        showStyleCard(entry.styleCard);
+        showAudio(entry.audioUrl);
+        
+        // Show lyrics if available
+        if (entry.lyrics) {
+          showLyrics(entry.lyrics);
+        } else {
+          hideLyrics();
+        }
+        
+        // Display historical route graphics from separate file
+        if (entry.routeGraphicsFile) {
+          // Load from generated-music/route-graphics/ folder
+          const routeGraphicsUrl = `./generated-music/route-graphics/${entry.routeGraphicsFile}`;
+          loadRouteGraphicsFromUrl(routeGraphicsUrl, index);
+        } else if (entry.routeGraphics) {
+          displayRouteGraphics(entry.routeGraphics);
+        } else {
+          clearRouteGraphics();
+        }
+        
+        updateNavigationButtons();
+      }
+
+      // Load route graphics from separate file URL
+      async function loadRouteGraphicsFromUrl(routeGraphicsUrl, musicIndex) {
+        try {
+          console.log(`🗺️ Loading route graphics from: ${API_BASE}${routeGraphicsUrl}`);
+          const response = await fetch(`${API_BASE}${routeGraphicsUrl}`);
+          
+          if (response.ok) {
+            const routeGraphics = await response.json();
+            console.log(`✅ Loaded route graphics for track ${musicIndex}:`, routeGraphics);
+            
+            // Cache the loaded route graphics in the music history entry
+            if (musicHistory[musicIndex]) {
+              musicHistory[musicIndex].routeGraphics = routeGraphics;
+            }
+            
+            // Display only if this is still the current track
+            if (currentMusicIndex === musicIndex) {
+              displayRouteGraphics(routeGraphics);
+            }
+          } else {
+            console.warn(`⚠️ Failed to load route graphics: ${response.status} ${response.statusText}`);
+            clearRouteGraphics();
+          }
+        } catch (error) {
+          console.error(`💥 Error loading route graphics from ${routeGraphicsUrl}:`, error);
+          clearRouteGraphics();
+        }
+      }
+
+      function navigateBack() {
+        if (currentMusicIndex > 0) {
+          playMusicAtIndex(currentMusicIndex - 1);
+        }
+      }
+
+      function navigateForward() {
+        if (currentMusicIndex < musicHistory.length - 1) {
+          playMusicAtIndex(currentMusicIndex + 1);
+        }
+      }
+
+      // Route Graphics Management - Static version loads graphics from metadata
+
+      async function createRouteGraphicsLayer() {
+        if (routeGraphicsLayer) return routeGraphicsLayer;
+        
+        // Wait for map to be ready
+        if (!viewElement || !viewElement.map) {
+          console.log('⏳ Map not ready yet, waiting...');
+          return null;
+        }
+        
+        const GraphicsLayer = await $arcgis.import("@arcgis/core/layers/GraphicsLayer.js");
+        routeGraphicsLayer = new GraphicsLayer({
+          id: "historical-routes",
+          title: "Historical Routes"
+        });
+        
+        // Add to map
+        viewElement.map.add(routeGraphicsLayer);
+        return routeGraphicsLayer;
+      }
+
+      async function displayRouteGraphics(routeGraphics) {
+        if (!routeGraphics) return;
+        
+        // Check if map is ready
+        if (!viewElement || !viewElement.map) {
+          console.log('⏳ Map not ready, deferring route graphics display');
+          // Store for later display when map is ready
+          pendingRouteGraphics = routeGraphics;
+          return;
+        }
+        
+        const Graphic = await $arcgis.import("@arcgis/core/Graphic.js");
+        const layer = await createRouteGraphicsLayer();
+        
+        if (!layer) {
+          console.log('❌ Could not create route graphics layer');
+          return;
+        }
+        
+        // Clear existing graphics
+        layer.removeAll();
+        
+        const graphicsArray = [];
+        
+        // Helper function to safely create graphics with proper type validation
+        function createGraphicSafely(item, expectedGeometryType) {
+          try {
+            // Validate that geometry has the proper type
+            if (!item.geometry || !item.geometry.type) {
+              console.warn('⚠️ Missing geometry type, adding default:', expectedGeometryType);
+              item.geometry = { ...item.geometry, type: expectedGeometryType };
+            }
+            
+            // Add fallback symbology for old route graphics files
+            let symbol = item.symbol || {};
+            
+            // For simple-line symbols without visual properties
+            if (symbol.type === 'simple-line' && !symbol.color && !symbol.width) {
+              symbol = {
+                ...symbol,
+                color: [0, 122, 255, 0.8], // Blue color
+                width: 3,
+                style: "solid"
+              };
+              console.log('🎨 Added fallback line symbology');
+            }
+            
+            // For simple-marker symbols without visual properties
+            if (symbol.type === 'simple-marker' && !symbol.color && !symbol.size) {
+              // Determine if this is a stop or direction point based on context
+              const isStop = expectedGeometryType === 'point' && item.geometry;
+              symbol = {
+                ...symbol,
+                color: isStop ? [255, 0, 0, 0.8] : [255, 255, 255, 0.9], // Red for stops, white for direction points
+                size: isStop ? 12 : 8,
+                outline: {
+                  color: [0, 0, 0, 0.8],
+                  width: 1
+                }
+              };
+              console.log(`🎨 Added fallback marker symbology for ${isStop ? 'stop' : 'direction point'}`);
+            }
+            
+            // Create graphic - ArcGIS should now properly autocast
+            const graphic = new Graphic({
+              geometry: item.geometry,
+              symbol: symbol
+            });
+            return graphic;
+          } catch (error) {
+            console.warn('⚠️ Failed to create graphic:', error, item);
+            return null;
+          }
+        }
+        
+        // Add direction lines
+        if (routeGraphics.directionLines) {
+          routeGraphics.directionLines.forEach(item => {
+            const graphic = createGraphicSafely(item, 'polyline');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        // Add direction points
+        if (routeGraphics.directionPoints) {
+          routeGraphics.directionPoints.forEach(item => {
+            const graphic = createGraphicSafely(item, 'point');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        // Add stops
+        if (routeGraphics.stops) {
+          routeGraphics.stops.forEach(item => {
+            const graphic = createGraphicSafely(item, 'point');
+            if (graphic) {
+              layer.add(graphic);
+              graphicsArray.push(graphic);
+            }
+          });
+        }
+        
+        console.log('🗺️ Displayed route graphics:', {
+          lines: routeGraphics.directionLines?.length || 0,
+          points: routeGraphics.directionPoints?.length || 0,
+          stops: routeGraphics.stops?.length || 0,
+          totalGraphics: graphicsArray.length
+        });
+
+        // Navigate map to show the route graphics
+        if (viewElement && graphicsArray.length > 0) {
+          try {
+            await viewElement.goTo(graphicsArray);
+            console.log('📍 Map navigated to route graphics extent');
+          } catch (error) {
+            console.warn('⚠️ Could not navigate to route graphics:', error);
+            // Fallback: try to go to the first graphic's geometry
+            try {
+              if (graphicsArray[0] && graphicsArray[0].geometry) {
+                await viewElement.goTo(graphicsArray[0].geometry);
+                console.log('📍 Map navigated to first graphic');
+              }
+            } catch (fallbackError) {
+              console.warn('⚠️ Fallback navigation also failed:', fallbackError);
+            }
+          }
+        }
+      }
+
+      function clearRouteGraphics() {
+        if (routeGraphicsLayer) {
+          routeGraphicsLayer.removeAll();
+        }
+      }
+
+      // Load existing music files from static directory
+      async function loadMusicHistory() {
+        console.log('🔄 Starting to load music history (static mode)...');
+        
+        // Load playlist.json as the definitive source of available songs
+        let playlistConfig = null;
+        try {
+          const configResponse = await fetch('./playlist.json');
+          if (configResponse.ok) {
+            playlistConfig = await configResponse.json();
+            console.log('📋 Loaded playlist configuration:', playlistConfig);
+          } else {
+            console.error('❌ playlist.json not found or not accessible');
+            showError('No playlist.json found. Please create one with your song list.');
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Failed to load playlist.json:', error);
+          showError('Failed to load playlist.json. Please check the file exists.');
+          return;
+        }
+        
+        try {
+          // Use songs from playlist.json as the complete list
+          if (!playlistConfig.songs || !Array.isArray(playlistConfig.songs) || playlistConfig.songs.length === 0) {
+            console.error('❌ playlist.json must contain a "songs" array with at least one song');
+            showError('playlist.json is empty or invalid. Please add songs to the array.');
+            return;
+          }
+          
+          const audioFiles = playlistConfig.songs;
+          console.log(`🎵 Found ${audioFiles.length} audio files in playlist.json`);
+          
+          // Load metadata for each file in the order specified by playlist.json
+          const fileDetails = await Promise.all(audioFiles.map(async (filename) => {
+            const trackId = filename.replace('.mp3', '');
+            const metadataUrl = `./generated-music/metadata/${trackId}.json`;
+            
+            let metadata = null;
+            try {
+              const metadataResponse = await fetch(metadataUrl);
+              if (metadataResponse.ok) {
+                metadata = await metadataResponse.json();
+              } else {
+                console.warn(`⚠️ Metadata not found for ${trackId}, using filename`);
+              }
+            } catch (error) {
+              console.warn(`⚠️ Failed to load metadata for ${trackId}:`, error.message);
+            }
+            
+            return {
+              filename,
+              title: metadata?.songTitle || trackId,
+              url: `/generated-music/audio/${filename}`,
+              created: metadata?.timestamp || new Date().toISOString(),
+              styleCard: metadata?.styleCard || {
+                songTitle: metadata?.songTitle || trackId,
+                genre: 'Generated Music',
+                artistName: 'AI Composer',
+                mood: ['Generated']
+              },
+              directions: metadata?.directions || [`Generated music file: ${filename}`],
+              routeGraphicsFile: metadata?.routeGraphicsFile || null,
+              lyrics: metadata?.lyrics || null,
+              metadata: metadata
+            };
+          }));
+          
+          // Convert files to music history entries (already in playlist.json order)
+          fileDetails.forEach((file, index) => {
+            console.log(`📀 Processing file ${index + 1}:`, file.filename);
+            const musicEntry = {
+              audioUrl: `${API_BASE}${file.url}`,
+              styleCard: file.styleCard,
+              directions: file.directions,
+              timestamp: file.created,
+              routeGraphicsFile: file.routeGraphicsFile,
+              lyrics: file.lyrics,
+              metadata: file.metadata
+            };
+            musicHistory.push(musicEntry);
+            console.log(`✅ Added to history: ${musicEntry.styleCard.songTitle}`);
+          });
+
+          console.log(`📚 Total music history length: ${musicHistory.length}`);
+          
+          // Start playing first track if available
+          if (musicHistory.length > 0) {
+            console.log('▶️ Playing first track');
+            currentMusicIndex = 0;
+            playMusicAtIndex(0);
+          } else {
+            console.log('❌ No music in history to play');
+          }
+          
+          updateNavigationButtons();
+          console.log('✅ Music history loading completed successfully');
+        } catch (error) {
+          console.error('💥 Failed to load music history:', error);
+          showError('Failed to load music library: ' + error.message);
+        }
+      }
+
+      // Update job status display using Calcite Notice
+      function updateJobStatus(jobData) {
+        const elapsed = jobData.elapsedTime ? Math.round(jobData.elapsedTime / 1000) : 0;
+        
+        // Update the status notice
+        statusSection.kind = jobData.status === 'completed' ? 'success' : 
+                            jobData.status === 'failed' ? 'danger' : 'info';
+        statusSection.open = true;
+        
+        // Create status content
+        const statusText = `Status: ${jobData.status.toUpperCase()}${elapsed > 0 ? ` • ${elapsed}s` : ''}`;
+        const messageText = jobData.message || 'Processing...';
+        
+        // Update notice content
+        statusSection.innerHTML = `
+          <div slot="title">${statusText}</div>
+          <div slot="message">${messageText}</div>
+        `;
+      }
+
+      // Update progress - using Calcite Progress component
+      function updateProgress(status, elapsedTime = 0) {
+        if (progressBar) {
+          if (status === 'pending') {
+            progressBar.type = 'indeterminate';
+            showElement(progressBar);
+          } else if (status === 'processing') {
+            // For processing, we can show determinate progress based on time
+            const expectedDuration = 180000; // ms
+            const progress = Math.min(90, (elapsedTime / expectedDuration) * 80 + 10);
+            progressBar.type = 'determinate';
+            progressBar.value = progress / 100; // Calcite expects 0-1 range
+            showElement(progressBar);
+          } else if (status === 'completed') {
+            progressBar.type = 'determinate';
+            progressBar.value = 1;
+            setTimeout(() => hideElement(progressBar), 2000);
+          } else if (status === 'failed') {
+            hideElement(progressBar);
+          }
+        }
+      }
+
+      // Show style card information
+      function showStyleCard(styleCardData) {
+        if (!styleCardData || !styleInfo) return;
+        
+        // Update the style info card
+        const heading = styleInfo.querySelector('h4[slot="heading"]');
+        const details = styleInfo.querySelector('#styleDetails');
+        
+        if (heading && details) {
+          // Show track position if we're browsing history
+          const trackInfo = musicHistory.length > 0 ? 
+            ` (${currentMusicIndex + 1}/${musicHistory.length})` : '';
+            
+          heading.textContent = `🎨 ${styleCardData.songTitle}${trackInfo}`;
+          details.textContent = `${styleCardData.genre} • ${styleCardData.artistName} • ${styleCardData.mood?.join(', ')}`;
+        }
+        
+        showElement(styleInfo);
+      }
+
+      // Show lyrics
+      function showLyrics(lyrics) {
+        if (!lyrics || !lyricsInfo) return;
+        
+        const lyricsDetails = lyricsInfo.querySelector('#lyricsDetails');
+        if (lyricsDetails) {
+          lyricsDetails.textContent = lyrics;
+        }
+        
+        showElement(lyricsInfo);
+      }
+
+      // Hide lyrics
+      function hideLyrics() {
+        if (lyricsInfo) {
+          hideElement(lyricsInfo);
+        }
+      }
+
+      // Show audio player
+      function showAudio(audioUrl) {
+        if (audioSource && audioPlayer && audioSection) {
+          audioSource.src = audioUrl;
+          audioPlayer.load();
+          showElement(audioSection);
+          audioPlayer.play().catch(e => console.log('Audio autoplay prevented'));
+        }
+      }
+
+      // Show error message using Calcite Notice
+      function showError(error) {
+        if (errorMessage) {
+          errorMessage.kind = 'danger';
+          errorMessage.open = true;
+          errorMessage.innerHTML = `
+            <div slot="title">Error</div>
+            <div slot="message">${error}</div>
+          `;
+        }
+      }
+
+      // Static deployment - no music generation available
+
+      // Event listeners
+      backBtn.addEventListener('click', navigateBack);
+      forwardBtn.addEventListener('click', navigateForward);
+      playlistSelect.addEventListener('calciteSelectChange', (event) => {
+        const selectedIndex = parseInt(event.target.value);
+        if (!isNaN(selectedIndex) && selectedIndex >= 0) {
+          playMusicAtIndex(selectedIndex);
+        }
+      });
+      
+      // Initialize navigation buttons on page load
+      updateNavigationButtons();
+
+      // import esriConfig to set the API key
+      const esriConfig = await $arcgis.import("@arcgis/core/config.js");
+
+      // get access to the arcgis-map component element
+      const viewElement = document.querySelector("arcgis-map");
+
+      // load application config (config.json) — same-origin fetch
+      // Using top-level await in this module script ensures config is
+      // available before we configure esriConfig.
+      const configResp = await fetch(new URL("./config.json", import.meta.url));
+      if (!configResp.ok) {
+        console.warn(
+          "Failed to load config.json, falling back to placeholder token"
+        );
+      }
+      const appConfig = configResp.ok ? await configResp.json() : {};
+
+      // define the API key and define their scopes (only for directions component)
+      // config.json can provide either `apiKey` or `token` fields.
+      const token = appConfig.apiKey || appConfig.token || "%YOUR_ACCESS_TOKEN%";
+      esriConfig.apiKeys.scopes = [
+        {
+          token: token,
+          urls: [
+            "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer",
+            "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World",
+          ],
+        },
+      ];
+
+      // wait for the map to be ready
+      await viewElement.viewOnReady();
+
+      // Set padding to prevent controlsAccordion (30vw width) from covering route geometry
+      // The 30vw translates to roughly 30% of viewport width in pixels
+      const paddingLeft = Math.round(window.innerWidth * 0.3) + 20; // Add 20px buffer
+      viewElement.view.padding = {
+        left: paddingLeft,
+        top: 0,
+        right: 0,
+        bottom: 0
+      };
+      console.log(`🗺️ Set view padding - left: ${paddingLeft}px to prevent UI occlusion`);
+
+      // Handle any pending route graphics now that map is ready
+      if (pendingRouteGraphics) {
+        console.log('📍 Map ready, displaying pending route graphics');
+        displayRouteGraphics(pendingRouteGraphics);
+        pendingRouteGraphics = null;
+      }
+
+      // Load music history after map is ready
+      await loadMusicHistory();
+
+      // Update padding when window resizes (since controlsAccordion width is 30vw)
+      function updateViewPadding() {
+        const paddingLeft = Math.round(window.innerWidth * 0.3) + 20; // Add 20px buffer
+        if (viewElement.view) {
+          viewElement.view.padding = {
+            left: paddingLeft,
+            top: 0,
+            right: 0,
+            bottom: 0
+          };
+          console.log(`🗺️ Updated view padding - left: ${paddingLeft}px`);
+        }
+      }
+
+      // Listen for window resize events to update padding
+      window.addEventListener('resize', updateViewPadding);
+    </script>
+  </body>
+</html>

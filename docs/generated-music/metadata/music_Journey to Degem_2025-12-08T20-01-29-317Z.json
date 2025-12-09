@@ -1,0 +1,45 @@
+{
+  "trackId": "music_Journey to Degem_2025-12-08T20-01-29-317Z",
+  "songTitle": "Journey to Degem",
+  "audioFile": "music_Journey to Degem_2025-12-08T20-01-29-317Z.mp3",
+  "timestamp": "2025-12-08T20-01-29-317Z",
+  "styleCard": {
+    "songTitle": "Journey to Degem",
+    "genre": "Ethio-Jazz",
+    "artistName": "AI Composer",
+    "mood": [
+      "Driving",
+      "Groovy",
+      "Exploratory",
+      "Vibrant",
+      "Melancholic"
+    ],
+    "description": "A soulful and rhythmic Ethio-jazz piece, combining traditional Ethiopian melodies with a driving funk rhythm, evoking the spirit of a road trip through the diverse landscapes and bustling streets from Addis Ababa to Oromia, with a hint of urban melancholy and discovery."
+  },
+  "directions": [
+    "Start at Addis Abeba, Addis Ababa",
+    "Go west",
+    "Restriction: Avoid Unpaved Roads",
+    "Turn right on Tesema Aba Kemaw Street",
+    "At the roundabout, take the second exit onto A5 (Gobena Aba Tigu Street)",
+    "At the roundabout, take the second exit to stay on A5",
+    "Continue forward on A4",
+    "Turn left at Arbegnoch Street to stay on A4 (Arbegnoch Street)",
+    "At the roundabout, take the second exit to stay on A4 (Arbegnoch Street)",
+    "Turn right on Mali Street",
+    "Turn left on A3 (Dejazmach Belay Zeleke Street)",
+    "At the roundabout, take the fourth exit to stay on A3 (Tunisia Street)",
+    "Make a sharp left",
+    "Restriction: Avoid Unpaved Roads",
+    "Finish at Degem, Selale, Oromia, on the right"
+  ],
+  "routeGraphicsFile": "music_Journey to Degem_2025-12-08T20-01-29-317Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1765224089322,
+    "timestamp": "2025-12-08T20:01:29.322Z"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "trackId": "music_The Apeldoorn Route_2025-11-18T17-02-59-738Z",
+  "songTitle": "The Apeldoorn Route",
+  "audioFile": "music_The Apeldoorn Route_2025-11-18T17-02-59-738Z.mp3",
+  "timestamp": "2025-11-18T17-02-59-738Z",
+  "styleCard": {
+    "songTitle": "The Apeldoorn Route",
+    "genre": "Downtempo Electronic",
+    "artistName": "AI Composer",
+    "mood": [
+      "Calm",
+      "Focused",
+      "Relaxed",
+      "Contemplative",
+      "Navigational"
+    ],
+    "description": "A relaxed electronic soundscape perfect for a long drive through the Dutch countryside. The steady rhythm and airy synths provide a backdrop to precise navigation, evoking a sense of calm purpose and an enjoyable journey towards a destination."
+  },
+  "directions": [
+    "Start at Wichmond",
+    "Go west on Baakseweg",
+    "At the roundabout, take the first exit onto Beeklaan",
+    "Continue forward on Vierakkersestraatweg",
+    "Continue forward on Hoge Balver",
+    "Turn right on Verlengde Ooyerhoekseweg",
+    "Turn left on Gelderhorst",
+    "Bear right to Den Elterweg (N314)",
+    "Turn right on Den Elterweg (N314)",
+    "At the traffic light, turn left on N348",
+    "Take the exit to merge onto N348",
+    "At the roundabout, take the third exit onto N345 (Wapsumsestraat)",
+    "At the roundabout, take the second exit to stay on N345",
+    "At the roundabout, take the second exit to stay on N345 (Weg naar Voorst)",
+    "Cross over the railroad track",
+    "Turn right on Koning Stadhouderlaan",
+    "At the traffic light, turn right on Asselsestraat",
+    "Continue forward on Leienplein",
+    "Turn left on Nieuwstraat",
+    "Turn right on Van Kinsbergenstraat",
+    "Restriction: Through Traffic Prohibited",
+    "Finish at Poke Poke, on the right"
+  ],
+  "routeGraphicsFile": "music_The Apeldoorn Route_2025-11-18T17-02-59-738Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763485379741,
+    "timestamp": "2025-11-18T17:02:59.741Z"
+  }
+}

@@ -11,6 +11,8 @@ This project transforms GPS routing directions into personalized music by:
 
 ## Architecture
 
+![Architecture](out/Directions2Music_sequenceDiagram/Directions2Music_sequenceDiagram.png) 
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   WebClient     │    │  Client Express │    │   MCP Server    │

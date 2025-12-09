@@ -1,0 +1,45 @@
+{
+  "trackId": "music_Iela Labyrinth (Rīga_2025-11-18T17-08-23-811Z",
+  "songTitle": "Iela Labyrinth (Rīga 1050)",
+  "audioFile": "music_Iela Labyrinth (Rīga_2025-11-18T17-08-23-811Z.mp3",
+  "timestamp": "2025-11-18T17-08-23-811Z",
+  "styleCard": {
+    "songTitle": "Iela Labyrinth (Rīga 1050)",
+    "genre": "Trip Hop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Urban",
+      "Contemplative",
+      "Flowing",
+      "Slightly Melancholic"
+    ],
+    "description": "A hypnotic Trip Hop journey through the labyrinthine streets of Rīga, built around a steady, understated rhythm and a melancholic synth soundscape. The spoken-word lyrics guide the listener through a precise urban route, evoking a sense of discovery and quiet observation."
+  },
+  "directions": [
+    "Start at Horna Dārzs",
+    "Go northwest on Tirgoņu iela toward Jūras iela",
+    "Turn left on Jūras iela",
+    "Turn left on Ērgļu iela",
+    "At the traffic light, turn left on Jomas iela",
+    "Continue forward on Lienes iela",
+    "Continue forward on Mežaparka prospekts",
+    "Continue forward on Rīgas iela",
+    "Keep left at the fork onto Rīgas iela",
+    "Continue forward on Pērkona iela",
+    "Continue forward",
+    "At the traffic light, make a sharp left on Emīlijas Benjamiņas iela",
+    "At the traffic light, make a sharp left on 13. janvāra iela",
+    "Turn right on Aspazijas bulvāris",
+    "Turn right on Krišjāņa Barona iela",
+    "Finish at Krišjāņa Barona iela, Rīga, 1050, on the left"
+  ],
+  "routeGraphicsFile": "music_Iela Labyrinth (Rīga_2025-11-18T17-08-23-811Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763485703813,
+    "timestamp": "2025-11-18T17:08:23.813Z"
+  }
+}

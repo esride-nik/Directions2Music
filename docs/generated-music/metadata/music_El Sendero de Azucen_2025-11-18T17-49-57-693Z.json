@@ -1,0 +1,40 @@
+{
+  "trackId": "music_El Sendero de Azucen_2025-11-18T17-49-57-693Z",
+  "songTitle": "El Sendero de Azucena",
+  "audioFile": "music_El Sendero de Azucen_2025-11-18T17-49-57-693Z.mp3",
+  "timestamp": "2025-11-18T17-49-57-693Z",
+  "styleCard": {
+    "songTitle": "El Sendero de Azucena",
+    "genre": "Tango",
+    "artistName": "AI Composer",
+    "mood": [
+      "Melancholic",
+      "Passionate",
+      "Nostalgic",
+      "Dramatic",
+      "Journey"
+    ],
+    "description": "A traditional tango piece, evoking the melancholic yet beautiful journey from the urban heart of Buenos Aires to the coastal serenity of Mar del Plata, filled with dramatic turns and reflective stretches."
+  },
+  "directions": [
+    "Start at Buenos Aires, Ciudad Autónoma de Buenos Aires",
+    "Go east on Avenida Hipólito Yrigoyen",
+    "Turn right on Calle Balcarce",
+    "At the traffic light, turn left on Avenida Belgrano",
+    "At the traffic light, continue forward on Calle Azucena Villaflor",
+    "At the traffic light, turn right on Avenida Ingeniero Huergo",
+    "Keep right to merge onto Autopista Buenos Aires La Plata (RN-01)",
+    "At the roundabout, take the first exit toward Acceso a Barrios",
+    "Turn left on Calle Lorenzini",
+    "Finish at Calle Lorenzini 960, Mar del Plata, General Pueyrredón, B7606, Provincia de Buenos Aires, on the left"
+  ],
+  "routeGraphicsFile": "music_El Sendero de Azucen_2025-11-18T17-49-57-693Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763488197699,
+    "timestamp": "2025-11-18T17:49:57.699Z"
+  }
+}

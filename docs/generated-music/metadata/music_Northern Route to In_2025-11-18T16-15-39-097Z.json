@@ -1,0 +1,42 @@
+{
+  "trackId": "music_Northern Route to In_2025-11-18T16-15-39-097Z",
+  "songTitle": "Northern Route to Inari",
+  "audioFile": "music_Northern Route to In_2025-11-18T16-15-39-097Z.mp3",
+  "timestamp": "2025-11-18T16-15-39-097Z",
+  "styleCard": {
+    "songTitle": "Northern Route to Inari",
+    "genre": "Nordic Ambient Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Reflective",
+      "Expansive",
+      "Serene",
+      "Wintry",
+      "Journey"
+    ],
+    "description": "A meditative journey through the serene and expansive winter landscapes of Finnish Lapland, guided by a steady, unfolding path."
+  },
+  "directions": [
+    "Start at Sompiontie 6, 99600, Sodankylä",
+    "Go east on Sompiontie toward Vasantie",
+    "Turn left on Vasantie",
+    "Bear left on Unarintie",
+    "Turn right on Jäämerentie",
+    "At the roundabout, take the first exit onto Ivalontie (E75)",
+    "Continue forward on Rovaniementie (E75)",
+    "Continue forward on Ivalontie (E75)",
+    "At the roundabout, take the second exit to stay on Ivalontie (E75)",
+    "Turn left to stay on Simmettijärventie",
+    "Restriction: Avoid Unpaved Roads",
+    "Finish at 99870, Inari, on the left"
+  ],
+  "routeGraphicsFile": "music_Northern Route to In_2025-11-18T16-15-39-097Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763482539100,
+    "timestamp": "2025-11-18T16:15:39.100Z"
+  }
+}

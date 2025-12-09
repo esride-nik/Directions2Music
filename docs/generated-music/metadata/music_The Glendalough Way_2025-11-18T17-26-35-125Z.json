@@ -1,0 +1,53 @@
+{
+  "trackId": "music_The Glendalough Way_2025-11-18T17-26-35-125Z",
+  "songTitle": "The Glendalough Way",
+  "audioFile": "music_The Glendalough Way_2025-11-18T17-26-35-125Z.mp3",
+  "timestamp": "2025-11-18T17-26-35-125Z",
+  "styleCard": {
+    "songTitle": "The Glendalough Way",
+    "genre": "Irish Folk",
+    "artistName": "AI Composer",
+    "mood": [
+      "Evocative",
+      "Journey",
+      "Scenic",
+      "Spirited",
+      "Traditional",
+      "Reflective"
+    ],
+    "description": "A lively and melodic Irish folk tune that evokes the spirit of a journey from the bustling streets of Dublin through the scenic landscapes of Wicklow to the serene beauty of Glendalough. Characterized by traditional instruments and a foot-tapping rhythm."
+  },
+  "directions": [
+    "Start at Beresford Lane, Dublin 1, Dublin",
+    "Go southeast on Beresford Lane (Beresford Lane) toward Gardiner Street Lower / Frenchman's Lane",
+    "Continue forward on D'olier Street (Sráid D'olier)",
+    "At the traffic light, bear right on College Street (Sráid An Choláiste)",
+    "Keep left at the fork onto College Street (Sráid An Choláiste)",
+    "Bear left on College Green (Faiche An Choláiste)",
+    "Continue forward on Dame Street (Sráid An Dáma)",
+    "At the traffic light, continue forward on Cork Hill (Cnoc Chorcaí)",
+    "Bear right on Whitefriar Street (Sráid Na Mbráithre Bána)",
+    "Make a sharp right on Peter Street (Sráid Pheadair)",
+    "Turn left on Bride Street (Sráid Bhríde)",
+    "At the traffic light, continue forward on New Bride Street (Sráid Bhríde Nua)",
+    "Continue forward on Heytesbury Street (Sráid Heytesbury)",
+    "At the traffic light, continue forward on Harold's Cross Road (Bóthar Chrois Araild)",
+    "Keep left at the fork to stay on N81",
+    "At the traffic light, continue forward on Terenure Road North (Bóthar Thír An Iúir Thuaidh)",
+    "At the traffic light, turn right on Terenure Place (Plás Thír An Iúir)",
+    "At the traffic light, bear left on Templeogue Road (Bóthar Theach Mealóg)",
+    "Turn left to stay on Templeogue Road (Bóthar Theach Mealóg) toward M50 / Baile Coimín / Blessington / Tamhlacht / Tallaght",
+    "At the traffic light, turn left on Old Bridge Road (Bóthar An Tseandroichid)",
+    "Make a sharp left on R756 (Garryknock)",
+    "Finish at R756, Turlough Hill, Glendalough, Wicklow, on the right"
+  ],
+  "routeGraphicsFile": "music_The Glendalough Way_2025-11-18T17-26-35-125Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763486795128,
+    "timestamp": "2025-11-18T17:26:35.128Z"
+  }
+}

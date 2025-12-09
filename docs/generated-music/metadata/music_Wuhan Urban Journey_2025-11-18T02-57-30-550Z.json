@@ -1,0 +1,32 @@
+{
+  "trackId": "music_Wuhan Urban Journey_2025-11-18T02-57-30-550Z",
+  "songTitle": "Wuhan Urban Journey",
+  "audioFile": "music_Wuhan Urban Journey_2025-11-18T02-57-30-550Z.mp3",
+  "timestamp": "2025-11-18T02-57-30-550Z",
+  "styleCard": {
+    "songTitle": "Wuhan Urban Journey",
+    "genre": "Urban Ambient",
+    "artistName": "AI Composer",
+    "mood": [
+      "Contemplative",
+      "Urban",
+      "Reflective",
+      "Calm"
+    ],
+    "description": "A serene urban ambient soundscape that captures the contemplative rhythm of navigating the streets of Wuhan, blending modern electronic elements with the subtle echoes of traditional Chinese sounds and city life."
+  },
+  "directions": [
+    "Start at Er Huan Xian, Xin Village St, Jiang'an District, Wuhan City, Hubei Province",
+    "Go southwest",
+    "Finish at You Yi Rd, 六角亭街道, Qiaokou District, Wuhan City, Hubei Province, on the left"
+  ],
+  "routeGraphicsFile": "music_Wuhan Urban Journey_2025-11-18T02-57-30-550Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763434650553,
+    "timestamp": "2025-11-18T02:57:30.553Z"
+  }
+}

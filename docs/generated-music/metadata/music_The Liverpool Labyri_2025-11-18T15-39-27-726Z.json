@@ -1,0 +1,40 @@
+{
+  "trackId": "music_The Liverpool Labyri_2025-11-18T15-39-27-726Z",
+  "songTitle": "The Liverpool Labyrinth",
+  "audioFile": "music_The Liverpool Labyri_2025-11-18T15-39-27-726Z.mp3",
+  "timestamp": "2025-11-18T15-39-27-726Z",
+  "styleCard": {
+    "songTitle": "The Liverpool Labyrinth",
+    "genre": "Indie Rock",
+    "artistName": "AI Composer",
+    "mood": [
+      "Urban",
+      "Purposeful",
+      "Exploratory",
+      "Driving"
+    ],
+    "description": "A driving indie rock track that encapsulates the bustling energy and purposeful navigation through the historic streets of Liverpool, reflecting a sense of urban adventure and discovery."
+  },
+  "directions": [
+    "Start at Kirkdale Road, Liverpool, Merseyside, England, L5 2QQ",
+    "Go southwest on Kirkdale Road (A59) toward Scotland Road / Boundary Street",
+    "At the traffic light, continue forward on Scotland Road (A59)",
+    "Turn left on Wilbraham Street",
+    "Turn right on Great Homer Street (B5173)",
+    "Bear right on Saint Anne Street (B5173)",
+    "Make a sharp right on Great Richmond Street",
+    "Make a sharp left on Rose Hill",
+    "Continue forward on Christian Street",
+    "Make a sharp right on Gerard Street",
+    "Finish at 11 Gerard Street, Liverpool, Merseyside, England, L3 3JW, on the left"
+  ],
+  "routeGraphicsFile": "music_The Liverpool Labyri_2025-11-18T15-39-27-726Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763480367729,
+    "timestamp": "2025-11-18T15:39:27.729Z"
+  }
+}

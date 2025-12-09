@@ -1,0 +1,38 @@
+{
+  "trackId": "music_NR9 Horizon_2025-11-18T16-36-36-857Z",
+  "songTitle": "NR9 Horizon",
+  "audioFile": "music_NR9 Horizon_2025-11-18T16-36-36-857Z.mp3",
+  "timestamp": "2025-11-18T16-36-36-857Z",
+  "styleCard": {
+    "songTitle": "NR9 Horizon",
+    "genre": "Afro-Electronic",
+    "artistName": "AI Composer",
+    "mood": [
+      "Reflective",
+      "Exploratory",
+      "Calm",
+      "Focused",
+      "Serene"
+    ],
+    "description": "An atmospheric and rhythmic journey through sound, blending traditional African melodic elements with modern electronic production. The music suggests a smooth, deliberate path, avoiding detours, focusing on the destination with a sense of serene discovery."
+  },
+  "directions": [
+    "Start at Huye, Southern Province",
+    "Go west",
+    "Restriction: Avoid Unpaved Roads",
+    "Restriction: Through Traffic Prohibited",
+    "Make a sharp left",
+    "Turn right",
+    "Make a sharp right on NR9",
+    "Finish at NR9, Karama, Huye, Southern Province, on the left"
+  ],
+  "routeGraphicsFile": "music_NR9 Horizon_2025-11-18T16-36-36-857Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763483796859,
+    "timestamp": "2025-11-18T16:36:36.859Z"
+  }
+}

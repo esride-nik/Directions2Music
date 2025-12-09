@@ -1,0 +1,48 @@
+{
+  "trackId": "music_Canary Coast Drive_2025-11-18T16-50-49-133Z",
+  "songTitle": "Canary Coast Drive",
+  "audioFile": "music_Canary Coast Drive_2025-11-18T16-50-49-133Z.mp3",
+  "timestamp": "2025-11-18T16-50-49-133Z",
+  "styleCard": {
+    "songTitle": "Canary Coast Drive",
+    "genre": "Tropical Pop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Upbeat",
+      "Relaxed",
+      "Sunny",
+      "Driving",
+      "Exploratory"
+    ],
+    "description": "An upbeat and relaxed tropical pop track designed for a scenic drive through the Canary Islands, blending modern electronic elements with the warm essence of traditional Latin acoustic sounds."
+  },
+  "directions": [
+    "Start at Tenerife, Santa Cruz de Tenerife, Canarias",
+    "At the traffic light, turn right on Plaza Weyler",
+    "At the traffic light, continue forward on Calle Galcerán",
+    "Continue forward on Puente Galcerán",
+    "Continue forward on Calle Galcerán",
+    "At the traffic light, continue forward on Avenida de La Salle",
+    "Keep left at the fork onto Avenida de La Salle",
+    "Continue forward",
+    "Bear right on Avenida del Tres de Mayo (Túnel Ingeniero Amigo de Lara)",
+    "Continue forward on Autopista TF-5 Santa Cruz Laguna",
+    "Go forward on Autopista del Norte (TF-5)",
+    "At the roundabout, take the second exit onto Avenida de Juan Carlos Darias (TF-655)",
+    "Continue forward on Avenida Juan Carlos I (TF-655)",
+    "At the traffic light, turn right on Avenida Amsterdam",
+    "At the roundabout, take the second exit onto Avenida de Los Playeros",
+    "Keep right at the fork onto Avenida de Los Playeros",
+    "Turn right on Calle Montaña Chica",
+    "Finish at Peluquería Y Estética Alejandra, on the right"
+  ],
+  "routeGraphicsFile": "music_Canary Coast Drive_2025-11-18T16-50-49-133Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763484649135,
+    "timestamp": "2025-11-18T16:50:49.135Z"
+  }
+}

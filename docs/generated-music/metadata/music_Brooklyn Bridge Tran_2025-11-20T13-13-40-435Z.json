@@ -1,0 +1,41 @@
+{
+  "trackId": "music_Brooklyn Bridge Tran_2025-11-20T13-13-40-435Z",
+  "songTitle": "Brooklyn Bridge Transit",
+  "audioFile": "music_Brooklyn Bridge Tran_2025-11-20T13-13-40-435Z.mp3",
+  "timestamp": "2025-11-20T13-13-40-435Z",
+  "styleCard": {
+    "songTitle": "Brooklyn Bridge Transit",
+    "genre": "Lo-fi Hip-Hop",
+    "artistName": "AI Composer",
+    "mood": [
+      "Urban",
+      "Chill",
+      "Reflective",
+      "Journey",
+      "Atmospheric"
+    ],
+    "description": "A relaxed, urban instrumental track designed for a reflective drive or walk through the city, capturing the essence of navigating New York's iconic streets with a smooth, laid-back groove."
+  },
+  "directions": [
+    "Start at Manhattan, New York",
+    "Go southwest on 11th Ave toward W 29th St",
+    "At the stop sign, keep right at the fork onto 11th Ave",
+    "At the traffic light, bear left on West St (NY-9A)",
+    "At the traffic light, turn left on Chambers St",
+    "At the traffic light, make a sharp right on Brooklyn Brg",
+    "At the traffic light, turn left on Brooklyn Brg",
+    "Take the exit on the right to Middagh St",
+    "Continue forward on Cadman Plz W",
+    "At the traffic light, bear right on Court St",
+    "Finish at Brooklyn, New York"
+  ],
+  "routeGraphicsFile": "music_Brooklyn Bridge Tran_2025-11-20T13-13-40-435Z.json",
+  "composition": {
+    "durationMs": 120000,
+    "style": "AI generated music based on geographic and cultural context"
+  },
+  "generationMetadata": {
+    "elapsedTimeMs": 1763644420438,
+    "timestamp": "2025-11-20T13:13:40.438Z"
+  }
+}
