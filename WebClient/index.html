@@ -218,10 +218,10 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
 
       function updateNavigationButtons() {
-        // Back button: enabled if we can go back to older music (higher index)
-        const canGoBack = currentMusicIndex < musicHistory.length - 1;
-        // Forward button: enabled if we can go forward to newer music (lower index)
-        const canGoForward = currentMusicIndex > 0;
+        // Back button: enabled if we can go to previous item in dropdown (lower index)
+        const canGoBack = currentMusicIndex > 0;
+        // Forward button: enabled if we can go to next item in dropdown (higher index)
+        const canGoForward = currentMusicIndex < musicHistory.length - 1;
         
         backBtn.disabled = !canGoBack;
         forwardBtn.disabled = !canGoForward;
@@ -232,12 +232,12 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           const totalTracks = musicHistory.length;
           
           backBtn.title = canGoBack ? 
-            `Previous music (older - ${currentTrack + 1}/${totalTracks})` : 
-            'No older music available';
+            `Previous in list (${currentTrack - 1}/${totalTracks})` : 
+            'No previous song';
             
           forwardBtn.title = canGoForward ? 
-            `Next music (newer - ${currentTrack - 1}/${totalTracks})` : 
-            'No newer music available';
+            `Next in list (${currentTrack + 1}/${totalTracks})` : 
+            'No next song';
         } else {
           backBtn.title = 'No music history';
           forwardBtn.title = 'No music history';
@@ -334,14 +334,14 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       }
 
       function navigateBack() {
-        if (currentMusicIndex < musicHistory.length - 1) {
-          playMusicAtIndex(currentMusicIndex + 1);
+        if (currentMusicIndex > 0) {
+          playMusicAtIndex(currentMusicIndex - 1);
         }
       }
 
       function navigateForward() {
-        if (currentMusicIndex > 0) {
-          playMusicAtIndex(currentMusicIndex - 1);
+        if (currentMusicIndex < musicHistory.length - 1) {
+          playMusicAtIndex(currentMusicIndex + 1);
         }
       }
 
@@ -562,6 +562,19 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       // Load existing music files from server
       async function loadMusicHistory() {
         console.log('🔄 Starting to load music history...');
+        
+        // Try to load optional playlist configuration
+        let playlistConfig = null;
+        try {
+          const configResponse = await fetch('./playlist.json');
+          if (configResponse.ok) {
+            playlistConfig = await configResponse.json();
+            console.log('📋 Loaded playlist configuration:', playlistConfig);
+          }
+        } catch (error) {
+          console.log('ℹ️ No playlist.json found, using default order');
+        }
+        
         try {
           console.log(`📡 Fetching from: ${API_BASE}/audio-files`);
           const response = await fetch(`${API_BASE}/audio-files`);
@@ -573,8 +586,44 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
           if (response.ok && result.files) {
             console.log(`🎵 Found ${result.files.length} files from server`);
             
-            // Convert server files to music history entries with rich metadata
-            result.files.forEach((file, index) => {
+            // Create a map of all available files for easy lookup
+            const fileMap = new Map();
+            result.files.forEach(file => {
+              fileMap.set(file.filename, file);
+            });
+            
+            // Process files based on playlist configuration
+            const processedFiles = [];
+            
+            if (playlistConfig && playlistConfig.songs && Array.isArray(playlistConfig.songs)) {
+              // Add songs in the specified order
+              playlistConfig.songs.forEach(filename => {
+                const file = fileMap.get(filename);
+                if (file) {
+                  processedFiles.push(file);
+                  fileMap.delete(filename); // Remove from map to track what's been added
+                  console.log(`📌 Added from playlist config: ${filename}`);
+                } else {
+                  console.warn(`⚠️ Playlist config references missing file: ${filename}`);
+                }
+              });
+              
+              // If playAll is true, add remaining files in their original order
+              if (playlistConfig.playAll) {
+                const remainingFiles = Array.from(fileMap.values());
+                processedFiles.push(...remainingFiles);
+                console.log(`📚 Added ${remainingFiles.length} remaining files (playAll: true)`);
+              } else {
+                console.log(`🚫 Skipped ${fileMap.size} files not in playlist (playAll: false)`);
+              }
+            } else {
+              // No playlist config, use all files in original order
+              processedFiles.push(...result.files);
+              console.log('📂 Using all files in default order (no playlist config)');
+            }
+            
+            // Convert processed files to music history entries with rich metadata
+            processedFiles.forEach((file, index) => {
               console.log(`📀 Processing file ${index + 1}:`, file.filename);
               const musicEntry = {
                 audioUrl: `${API_BASE}${file.url}`,
