@@ -217,26 +217,6 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         if (element) element.style.display = 'none'; 
       }
 
-      // Music History Management
-      function addToMusicHistory(audioUrl, styleCard, directions) {
-        const musicEntry = {
-          audioUrl,
-          styleCard,
-          directions,
-          timestamp: new Date().toISOString(),
-          routeGraphics: currentRouteGraphics // Store current route graphics
-        };
-        
-        // If we're not at the end of history, remove everything after current position
-        if (currentMusicIndex < musicHistory.length - 1) {
-          musicHistory.splice(currentMusicIndex + 1);
-        }
-        
-        musicHistory.push(musicEntry);
-        currentMusicIndex = musicHistory.length - 1;
-        updateNavigationButtons();
-      }
-
       function updateNavigationButtons() {
         // Back button: enabled if we can go back to older music (higher index)
         const canGoBack = currentMusicIndex < musicHistory.length - 1;
