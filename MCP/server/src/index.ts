@@ -278,8 +278,12 @@ const generateMusicElevenLabs = async (
       
       // Create filename with new folder structure
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const trackId = songTitle 
-        ? `music_${songTitle.substring(0, 20)}_${timestamp}` 
+      // Sanitize songTitle to remove characters that aren't valid in filenames
+      const sanitizedTitle = songTitle 
+        ? songTitle.substring(0, 20).replace(/[<>:"/\\|?*]/g, '_').replace(/\s+/g, '_')
+        : '';
+      const trackId = sanitizedTitle 
+        ? `music_${sanitizedTitle}_${timestamp}` 
         : `music_${timestamp}`;
       const audioFile = `./generated-music/audio/${trackId}.mp3`;
       const metadataFile = `./generated-music/metadata/${trackId}.json`;
