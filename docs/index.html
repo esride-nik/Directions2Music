@@ -250,8 +250,8 @@
         
         // Display historical route graphics from separate file
         if (entry.routeGraphicsFile) {
-          // Load from generated-music/route-graphics/ folder
-          const routeGraphicsUrl = `./generated-music/route-graphics/${entry.routeGraphicsFile}`;
+          // Load from generated-music/route-graphics/ folder using absolute path
+          const routeGraphicsUrl = `/generated-music/route-graphics/${entry.routeGraphicsFile}`;
           loadRouteGraphicsFromUrl(routeGraphicsUrl, index);
         } else if (entry.routeGraphics) {
           displayRouteGraphics(entry.routeGraphics);
