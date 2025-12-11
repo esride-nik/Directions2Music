@@ -13,11 +13,11 @@ This project transforms GPS routing directions into personalized music by:
 
 This project was created for a SpeedGeeking, which is always such a fun event. Presenters are giving 5-minute talks while the crowd is walking around in groups, randomly listening in. I did this at the Esri European Dev & Tech Summit 2025 in Frankfurt 😎 Enjoy!
 
-<a href="https://www.youtube.com/watch?v=ryNoRc7zTmM" target="_blank" rel="noopener noreferrer">
+<a href="https://youtu.be/FgVlefXrZCc" target="_blank" rel="noopener noreferrer">
   <img src="./assets/Directions2Music_SpeedGeeking.png" alt="Watch the presentation" />
 </a>
 
-<a href="https://www.youtube.com/watch?v=ryNoRc7zTmM" target="_blank" rel="noopener noreferrer">🎥 Watch on YouTube</a>
+<a href="https://youtu.be/FgVlefXrZCc" target="_blank" rel="noopener noreferrer">🎥 Watch on YouTube</a>
 
 ## Architecture
 
