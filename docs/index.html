@@ -162,6 +162,12 @@
       const audioPlayer = document.getElementById('audioPlayer');
       const audioSource = document.getElementById('audioSource');
 
+      // Auto-advance to next track when current track ends
+      audioPlayer.addEventListener('ended', () => {
+        console.log('🎵 Track ended, auto-advancing to next track');
+        navigateForward();
+      });
+
       // Show/hide UI elements  
       function showElement(element) { 
         if (element) element.style.display = 'block'; 
@@ -663,7 +669,19 @@
           audioSource.src = audioUrl;
           audioPlayer.load();
           showElement(audioSection);
-          audioPlayer.play().catch(e => console.log('Audio autoplay prevented'));
+          
+          // Try to autoplay - browsers require user interaction first
+          const playPromise = audioPlayer.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log('✅ Audio autoplay successful');
+              })
+              .catch(e => {
+                console.log('⏸️ Audio autoplay prevented - user must click play button');
+                // This is expected on first page load - user needs to interact first
+              });
+          }
         }
       }
 
